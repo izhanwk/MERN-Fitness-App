@@ -1,8 +1,19 @@
-# React + Vite
+# MERN Fitness App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A dynamic and interactive fitness application built with React that helps users track their calorie and nutritional intake in alignment with their fitness goals. This app features a user-friendly interface and real-time tracking capabilities.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- **Calorie Tracking**: Monitor daily calorie consumption.
+- **Nutrition Tracking**: Keep track of Nutritional intake based on fitness goals.
+- **Interactive Interface**: Easy-to-use design with a clean and responsive layout.
+- **Goal-Oriented**: Tailored to help users achieve their fitness objectives.
+- **Resumeable**: Resumeable app so that if you log out and log in again the progress would resume from where you left it.
+
+---
+
+## Technologies Used
+- **Frontend**: React, Tailwind CSS
+- **Backend**: Node.js, Express , JWS Token and more
+- **Database**: MongoDB 
