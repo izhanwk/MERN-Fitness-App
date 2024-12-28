@@ -1,0 +1,18 @@
+#big-box::-webkit-scrollbar-track {
+  background-color: rgb(36, 0, 36);
+  border-radius: 25px;
+}
+
+#big-box::-webkit-scrollbar {
+  width: 9px;
+}
+
+#big-box::-webkit-scrollbar-thumb {
+  background-color: #46105e;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+#big-box::-webkit-scrollbar-thumb:hover {
+  background-color: #8a14bd;
+}
