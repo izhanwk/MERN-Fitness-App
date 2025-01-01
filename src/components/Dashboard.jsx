@@ -33,20 +33,6 @@ const NutritionTracker = () => {
   const [showList, setshowList] = useState(false);
   const [selectfoodArray, setselectfoodArray] = useState([]);
 
-  // const [countCalories, setcountCalories] = useState(0);
-  // const [countProteins, setcountProteins] = useState(0);
-  // const [countFats, setcountFats] = useState(0);
-  // const [countCarbs, setcountCarbs] = useState(0);
-  // const [countVA, setcountVA] = useState(0);
-  // const [countVB, setcountVB] = useState(0);
-  // const [countVC, setcountVC] = useState(0);
-  // const [countVE, setcountVE] = useState(0);
-  // const [countVK, setcountVK] = useState(0);
-  // const [countIron, setcountIron] = useState(0);
-  // const [countCalcium, setcountCalcium] = useState(0);
-  // const [countMagnesium, setcountMagnesium] = useState(0);
-
-  // const [sCal, setsCal] = useState([]);
   const [loading, setLoading] = useState(true); // Track loading state
 
   const [foodselection, setfoodselection] = useState([]);
