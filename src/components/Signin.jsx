@@ -29,7 +29,6 @@ function Signin() {
         alert("Incomplete profile, redirecting...");
         const responseData = await response.json();
         const email = responseData.email;
-        console.log(responseData.data.token);
         localStorage.setItem("token", responseData.data.token);
         navigate("/signup/userdata", { state: { email } });
         return;
@@ -40,7 +39,6 @@ function Signin() {
         localStorage.setItem("token", responseData.data.token);
         localStorage.setItem("refreshtoken", responseData.data.refresh);
         console.log(`${localStorage.getItem("refreshtoken")}`);
-        alert("Token Saved");
         navigate("/dashboard");
       } else {
         const errorData = await response.json();
