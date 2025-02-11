@@ -17,15 +17,16 @@ let refreshkey = process.env.REFRESH;
 
 app.use(
   cors({
-    origin:
-      "mongodb+srv://izhanwaseem6:0d1P5WuAsnyKy4no@cluster0.j2hzs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", // Your Vercel frontend URL
+    origin: "https://mern-fitness-app-one.vercel.app", // Your Vercel frontend URL
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
 );
 
 mongoose
-  .connect("roundhouse.proxy.rlwy.net")
+  .connect(
+    "mongodb+srv://izhanwaseem6:0d1P5WuAsnyKy4no@cluster0.j2hzs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+  )
   .then(() => {
     console.log("Connected to Database");
   })
