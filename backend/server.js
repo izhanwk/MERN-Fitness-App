@@ -17,7 +17,7 @@ let refreshkey = process.env.REFRESH;
 
 app.use(
   cors({
-    origin: "https://mern-fitness-app-one.vercel.app/", // Your Vercel frontend URL
+    origin: "https://mern-fitness-app-one.vercel.app", // Your Vercel frontend URL
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
