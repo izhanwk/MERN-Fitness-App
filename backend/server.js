@@ -9,7 +9,7 @@ import Data from "../Model/Registerdata.js";
 import Foods from "../Model/Foods.js";
 
 const app = express();
-// app.use(express.json());
+app.use(express.json());
 const port = process.env.PORT || 3000;
 let primaryEmail = "";
 let secretkey = "izhanbhaikasecret";
