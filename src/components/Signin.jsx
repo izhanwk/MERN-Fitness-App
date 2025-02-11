@@ -17,13 +17,16 @@ function Signin() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("http://localhost:3000/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        "https://mern-fitness-app-production-e9fe.up.railway.app/signin",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       if (response.status === 302) {
         alert("Incomplete profile, redirecting...");
