@@ -34,6 +34,7 @@ mongoose
 
 app.use(bodyParser.json());
 app.use(cors());
+
 // const deletFoodz = async () => {
 //   await Foods.deleteMany();
 // };
