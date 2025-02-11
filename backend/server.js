@@ -12,8 +12,8 @@ const app = express();
 // app.use(express.json());
 const port = process.env.PORT || 3000;
 let primaryEmail = "";
-let secretkey = process.env.SECRET_KEY;
-let refreshkey = process.env.REFRESH;
+let secretkey = "izhanbhaikasecret";
+let refreshkey = "oneandonlyIzhankirefreshsecretkey";
 
 app.use(
   cors({
