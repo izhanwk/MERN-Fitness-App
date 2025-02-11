@@ -23,7 +23,6 @@ app.use(
   })
 );
 
-console.log(process.env.MONGODB_URL);
 mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => {
