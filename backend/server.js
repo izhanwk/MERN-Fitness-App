@@ -33,13 +33,7 @@ mongoose
   });
 
 app.use(bodyParser.json());
-
-// Apply CORS middleware globally BEFORE defining routes
-app.use(cors(corsOptions));
-
-// Optional: explicitly handle preflight OPTIONS requests for all routes
-app.options("*", cors(corsOptions));
-
+app.use(cors());
 // const deletFoodz = async () => {
 //   await Foods.deleteMany();
 // };
