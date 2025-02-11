@@ -34,15 +34,6 @@ mongoose
     console.log("Failed to connect with database: ", err);
   });
 
-app.use(bodyParser.json());
-// app.use(cors());
-
-// const deletFoodz = async () => {
-//   await Foods.deleteMany();
-// };
-
-// deletFoodz();
-
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });

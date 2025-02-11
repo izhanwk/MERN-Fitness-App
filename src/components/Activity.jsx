@@ -10,7 +10,7 @@ function Activity() {
 
   const sendData = async () => {
     let response = await fetch(
-      "https://mern-fitness-app-production-e9fe.up.railway.app//activity",
+      "https://mern-fitness-app-production-e9fe.up.railway.app/activity",
       {
         method: "POST",
         headers: {
