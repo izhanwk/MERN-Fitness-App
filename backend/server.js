@@ -24,7 +24,7 @@ app.use(
 );
 
 mongoose
-  .connect(process.env.MONGODB_URL)
+  .connect("roundhouse.proxy.rlwy.net")
   .then(() => {
     console.log("Connected to Database");
   })
