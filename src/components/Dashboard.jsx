@@ -41,17 +41,14 @@ const NutritionTracker = () => {
   const refreshtoken = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshtoken");
-      let response = await fetch(
-        "https://mern-fitness-app-production-e9fe.up.railway.app/refresh-token",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            // Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
-          },
-          body: JSON.stringify({ refreshtoken: refreshToken }),
-        }
-      );
+      let response = await fetch("http://localhost:3000/refresh-token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
+        },
+        body: JSON.stringify({ refreshtoken: refreshToken }),
+      });
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.token);
@@ -73,12 +70,9 @@ const NutritionTracker = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(
-          "https://mern-fitness-app-production-e9fe.up.railway.app/getdata",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await fetch("http://localhost:3000/getdata", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         if (response.ok) {
           setuserData((prevUserData) => ({ ...prevUserData, ...data }));
@@ -97,12 +91,9 @@ const NutritionTracker = () => {
     const fetchFood = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(
-          "https://mern-fitness-app-production-e9fe.up.railway.app/getfood",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await fetch("http://localhost:3000/getfood", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         if (response.ok) {
           setfood(data);
@@ -129,12 +120,9 @@ const NutritionTracker = () => {
       const fetchData = async () => {
         try {
           const token = localStorage.getItem("token");
-          const response = await fetch(
-            "https://mern-fitness-app-production-e9fe.up.railway.app/getdata",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
+          const response = await fetch("http://localhost:3000/getdata", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           if (response.ok) {
             // alert("Token is valid");
             console.log("Token is Valid");
@@ -441,16 +429,13 @@ const NutritionTracker = () => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   useEffect(() => {
     const storeData = async () => {
-      let response = await fetch(
-        "https://mern-fitness-app-production-e9fe.up.railway.app/store",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      let response = await fetch("http://localhost:3000/store", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setnewfood(data);
@@ -465,17 +450,14 @@ const NutritionTracker = () => {
   useEffect(() => {
     if (isFirstLoad) return;
     const storeData = async () => {
-      await fetch(
-        "https://mern-fitness-app-production-e9fe.up.railway.app/store",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ array: newfood }),
-        }
-      );
+      await fetch("http://localhost:3000/store", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ array: newfood }),
+      });
     };
 
     storeData();

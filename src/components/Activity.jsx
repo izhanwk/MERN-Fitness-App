@@ -9,17 +9,14 @@ function Activity() {
   let navigate = useNavigate();
 
   const sendData = async () => {
-    let response = await fetch(
-      "https://mern-fitness-app-production-e9fe.up.railway.app/activity",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ activity: activityLevel }),
-      }
-    );
+    let response = await fetch("http://localhost:3000/activity", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ activity: activityLevel }),
+    });
     if (response.ok) {
       console.log("Sent to DB");
     }
