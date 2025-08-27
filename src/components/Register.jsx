@@ -17,16 +17,13 @@ function Register() {
 
   const onSubmit = async (data) => {
     try {
-      let response = await fetch(
-        "https://mern-fitness-app-production-e9fe.up.railway.app/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      let response = await fetch("http://localhost:3000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
       if (response.ok) {
         alert("Registeration Successful");
         navigate("/signin");
