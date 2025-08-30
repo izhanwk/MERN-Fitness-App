@@ -1,8 +1,7 @@
 import React from "react";
 import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import SNavbar from "./SNavbar";
+import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
   const {
@@ -25,7 +24,7 @@ function Register() {
         body: JSON.stringify(data),
       });
       if (response.ok) {
-        alert("Registeration Successful");
+        alert("Registration Successful");
         navigate("/signin");
       } else if (response.status === 503) {
         setError("email", {
@@ -34,96 +33,257 @@ function Register() {
         });
       }
     } catch (error) {
-      alert("Oops! There occured an problem");
+      alert("Oops! There occurred a problem");
     }
   };
 
   return (
-    <div className="h-screen bg-[#30093f] p-0 m-0 flex flex-col items-center font-dm-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
       <Navbar />
-      <div className="flex max-md:w-screen">
-        <SNavbar></SNavbar>
-        <div className="w-screen flex flex-col items-center">
-          <div className="text-2xl text-center mt-[5vh] text-yellow-400 font-dm-sans">
-            Register yourself
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-yellow-400/10 rounded-full blur-2xl animate-pulse delay-500"></div>
+      </div>
+
+      <div className="flex w-screen relative z-10">
+        <div className="w-screen flex flex-col items-center justify-center py-12">
+          <div className="text-center mb-10">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">
+              Create Your Account
+            </h1>
+            <p className="text-purple-200 text-lg max-w-md mx-auto">
+              Join FitTracker to start your fitness journey and achieve your
+              nutrition goals
+            </p>
           </div>
-          <div className="w-[50vw] h-96 bg-[#1f0729] mt-8 rounded-3xl max-md:w-[80vw]">
+
+          <div className="w-full flex flex-col justify-start max-w-md bg-gradient-to-br from-purple-900/40 to-blue-900/40 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden transform transition-all duration-500 hover:shadow-purple-500/10">
+            <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600">
+              <h2 className="text-white text-lg font-bold text-center py-2">
+                Register New Account
+              </h2>
+            </div>
+
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col items-center justify-center text-sm h-[100%]"
+              className="flex flex-col items-center justify-center text-sm h-full p-8 space-y-8"
             >
-              <div className="relative">
+              <div className="relative w-full">
+                <div className="flex items-center mb-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-purple-300 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <label className="text-purple-200 text-sm font-medium">
+                    Email Address
+                  </label>
+                </div>
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className={`w-80 max-md:text-[9px] h-6 max-md:w-44 max-md:h-5 outline-none rounded-md text-center border-[2px] m-5 max-lg:w-60 max-lg:text-[10px] ${
-                    errors.email ? "border-red-600" : "border-transparent"
+                  className={`w-full h-14 px-5 outline-none rounded-xl bg-white/95 backdrop-blur-sm text-slate-800 font-medium transition-all duration-300 shadow-lg border-2 ${
+                    errors.email
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-white/30 focus:border-yellow-400 focus:bg-white"
                   }`}
                   {...register("email", {
                     required: {
                       value: true,
-                      message: "This field is required",
+                      message: "Email is required",
+                    },
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
                     },
                   })}
                 />
                 {errors.email && (
-                  <div className="text-red-600  absolute top-12 max-md:top-10 max-md:text-[8px] left-[50%] text-xs -translate-x-1/2">
-                    {errors.email.message}
+                  <div className="text-red-400 absolute -bottom-6 left-0 text-sm font-medium flex items-center mt-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {errors.email?.message}
                   </div>
                 )}
               </div>
-              <div className="relative">
+
+              <div className="relative w-full">
+                <div className="flex items-center mb-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-purple-300 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                  <label className="text-purple-200 text-sm font-medium">
+                    Password
+                  </label>
+                </div>
                 <input
                   type="password"
-                  placeholder="Enter your password"
-                  className={`w-80 max-md:text-[9px] h-6 max-md:w-44 max-md:h-5 outline-none rounded-md text-center border-[2px] m-5 max-lg:w-60 max-lg:text-[10px] ${
-                    errors.password ? "border-red-600" : "border-transparent"
+                  placeholder="Create a password"
+                  className={`w-full h-14 px-5 outline-none rounded-xl bg-white/95 backdrop-blur-sm text-slate-800 font-medium transition-all duration-300 shadow-lg border-2 ${
+                    errors.password
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-white/30 focus:border-yellow-400 focus:bg-white"
                   }`}
                   {...register("password", {
                     required: {
                       value: true,
-                      message: "This field is required",
+                      message: "Password is required",
                     },
                     minLength: {
                       value: 8,
-                      message: "At least 8 characters are required",
+                      message: "Password must be at least 8 characters",
                     },
                   })}
                 />
                 {errors.password && (
-                  <div className="text-red-600  absolute top-12 max-md:top-10 max-md:text-[8px] left-[50%] text-xs -translate-x-1/2">
-                    {errors.password.message}
+                  <div className="text-red-400 absolute -bottom-6 left-0 text-sm font-medium flex items-center mt-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {errors.password?.message}
                   </div>
                 )}
               </div>
-              <div className="relative">
+
+              <div className="relative w-full">
+                <div className="flex items-center mb-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-purple-300 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
+                  </svg>
+                  <label className="text-purple-200 text-sm font-medium">
+                    Confirm Password
+                  </label>
+                </div>
                 <input
                   type="password"
                   placeholder="Re-enter your password"
-                  className={`w-80 max-md:text-[9px] h-6 max-md:w-44 max-md:h-5 outline-none rounded-md text-center border-[2px] m-5 max-lg:w-60 max-lg:text-[10px]${
-                    errors.repassword ? "border-red-600" : "border-transparent"
+                  className={`w-full h-14 px-5 outline-none rounded-xl bg-white/95 backdrop-blur-sm text-slate-800 font-medium transition-all duration-300 shadow-lg border-2 ${
+                    errors.repassword
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-white/30 focus:border-yellow-400 focus:bg-white"
                   }`}
                   {...register("repassword", {
                     required: {
                       value: true,
-                      message: "This field is required",
+                      message: "Please confirm your password",
                     },
                     validate: (value) =>
                       value === password || "The passwords do not match",
                   })}
                 />
                 {errors.repassword && (
-                  <div className="text-red-600  absolute top-12 max-md:top-10 max-md:text-[8px] left-[50%] text-xs -translate-x-1/2">
-                    {errors.repassword.message}
+                  <div className="text-red-400 absolute -bottom-6 left-0 text-sm font-medium flex items-center mt-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 01118 0z"
+                      />
+                    </svg>
+                    {errors.repassword?.message}
                   </div>
                 )}
               </div>
-              <button
-                type="submit"
-                className="flex justify-center max-lg:text-[11px] max-lg:w-13 max-lg:h-4 items-center bg-yellow-400 max-md:w-14 max-md:h-3 text-xs max-md:text-[7px] w-28 font-semibold h-5 rounded-2xl m-5 max-md:m-1  hover:bg-white hover:text-black"
-              >
-                Next
-              </button>
+
+              <div className="pt-4 w-full">
+                <button
+                  type="submit"
+                  className="group relative w-full h-14 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold text-lg rounded-xl shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 hover:scale-[1.02] hover:from-yellow-300 hover:to-orange-400 flex items-center justify-center"
+                >
+                  <span className="relative z-10 flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    Create Account
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-orange-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+                </button>
+              </div>
+
+              <div className="text-center pt-4">
+                <p className="text-purple-200 text-sm">
+                  Already have an account?{" "}
+                  <Link to={"/signin"}>
+                    <span className="text-yellow-400 hover:text-yellow-300 transition-colors duration-300 font-semibold underline cursor-pointer">
+                      Sign in here
+                    </span>
+                  </Link>
+                </p>
+              </div>
             </form>
           </div>
         </div>

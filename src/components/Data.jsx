@@ -1,13 +1,8 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-// import { useLocation } from "react-router-dom";
 
 function Data() {
-  // const location = useLocation();
-  // const email = location.state?.email;
-  // console.log(email);
-
   const {
     register,
     handleSubmit,
@@ -26,133 +21,254 @@ function Data() {
         },
         body: JSON.stringify(data),
       });
-      console.log("COnnected");
+      console.log("Connected");
       if (response.ok) {
-        alert("Your data submitted");
+        alert("Your data has been submitted successfully!");
         navigate("/goals");
       } else if (response.status === 403) {
+        // Handle 403 error if needed
       } else {
         throw new Error("Failed to submit data");
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Oops! There occurred a problem");
+      alert("Oops! There was a problem submitting your data.");
     }
   };
 
   return (
-    <div className="w-[50vw] h-96 bg-[#1f0729] mt-8 rounded-3xl max-md:w-[80vw]">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col items-center justify-center h-[100%] text-xs"
-      >
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Enter your name"
-            className={`w-96 h-6 outline-none rounded-md text-center m-5 border-[2px] max-lg:w-72 max-md:w-56 max-lg:text-[10px] ${
-              errors.name ? "border-red-600" : "border-transparent"
-            }`}
-            {...register("name", {
-              required: { value: true, message: "This field is required" },
-            })}
-          />
-          {errors.name && (
-            <div className="absolute top-12 text-[10px] left-[50%] text-red-600 -translate-x-1/2 max-md:text-[9px] max-md:top-11">
-              {errors.name.message}
-            </div>
-          )}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <div className="w-full max-w-md bg-gradient-to-br from-purple-900/70 to-indigo-900/70 backdrop-blur-md rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
+        <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600">
+          <h2 className="text-white text-lg font-bold text-center py-2">
+            Complete Your Profile
+          </h2>
         </div>
-        <div className="relative">
-          <input
-            type="date"
-            className={`w-96 h-6 outline-none rounded-md text-center m-5 border-[2px] max-lg:w-72 max-md:w-56 max-lg:text-[10px] ${
-              errors.date ? "border-red-600" : "border-transparent"
-            }`}
-            {...register("date", {
-              required: { value: true, message: "This field is required" },
-            })}
-          />
-          {errors.date && (
-            <div className="absolute top-12 left-[50%] text-red-600 -translate-x-1/2 max-lg:text-[10px] max-md:text-[9px] max-md:top-11">
-              {errors.date.message}
-            </div>
-          )}
-        </div>
-        <div className="flex">
-          <p className="text-white flex items-center text-xs max-lg:text-[10px]">
-            Select your gender
-          </p>
-          <select
-            className="w-28 h-5 outline-none rounded-md text-center m-5 p-0 max-lg:w-24 max-lg:text-[10px]"
-            {...register("gender")}
-          >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
-        <div className="flex">
+
+        <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-6">
+          {/* Name Field */}
           <div className="relative">
+            <label className="block text-sm font-medium text-purple-200 mb-1">
+              Full Name
+            </label>
             <input
-              type="number"
-              step="0.1"
-              placeholder="Enter your weight"
-              className={`w-48 h-5 outline-none rounded-md text-center border-[2px] m-5 max-lg:w-40 max-md:w-32 max-md:text-[10px]  ${
-                errors.weight ? "border-red-600" : "border-transparent"
+              type="text"
+              placeholder="Enter your name"
+              className={`w-full px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 ${
+                errors.name ? "border-red-500" : "border-white/20"
               }`}
-              {...register("weight", {
-                required: { value: true, message: "This field is required" },
+              {...register("name", {
+                required: { value: true, message: "Name is required" },
               })}
             />
-            {errors.weight && (
-              <div className="absolute top-11 left-[50%] text-red-600 -translate-x-1/2 max-lg:text-[10px] max-md:w-24 max-md:text-[9px] max-md:top-10">
-                {errors.weight.message}
-              </div>
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-400 flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                {errors.name.message}
+              </p>
             )}
           </div>
 
-          <select
-            className="w-28 h-5 outline-none rounded-md text-center m-5 p-0 max-lg:text-[10px]"
-            {...register("weightScale")}
-          >
-            <option>LBs</option>
-            <option>Kgs</option>
-          </select>
-        </div>
-        <div className="flex">
+          {/* Date of Birth Field */}
           <div className="relative">
+            <label className="block text-sm font-medium text-purple-200 mb-1">
+              Date of Birth
+            </label>
             <input
-              type="number"
-              step="any"
-              placeholder="Enter your height"
-              className={`w-48 h-5 outline-none rounded-md text-center border-[2px] m-5 max-lg:w-40 max-md:w-32 max-md:text-[10px]  ${
-                errors.height ? "border-red-600" : "border-transparent"
+              type="date"
+              className={`w-full px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 ${
+                errors.date ? "border-red-500" : "border-white/20"
               }`}
-              {...register("height", {
-                required: { value: true, message: "This field is required" },
+              {...register("date", {
+                required: { value: true, message: "Date of birth is required" },
               })}
             />
-            {errors.height && (
-              <div className="absolute top-11 left-[50%] text-red-600 -translate-x-1/2 max-lg:text-[10px] max-md:w-24 max-md:text-[9px] max-md:top-10">
-                {errors.height.message}
-              </div>
+            {errors.date && (
+              <p className="mt-1 text-sm text-red-400 flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                {errors.date.message}
+              </p>
             )}
           </div>
-          <select
-            className="w-28 h-5 outline-none rounded-md text-center m-5 p-0 max-lg:text-[10px]"
-            {...register("lengthScale")}
+
+          {/* Gender Field */}
+          <div>
+            <label className="block text-sm font-medium text-purple-200 mb-1">
+              Gender
+            </label>
+            <select
+              className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              {...register("gender")}
+            >
+              <option value="male" className="text-indigo-900/70 font-semibold">
+                Male
+              </option>
+              <option
+                value="female"
+                className="text-indigo-900/70 font-semibold"
+              >
+                Female
+              </option>
+            </select>
+          </div>
+
+          {/* Weight Field */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="relative">
+              <label className="block text-sm font-medium text-purple-200 mb-1">
+                Weight
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                placeholder="Enter weight"
+                className={`w-full max-md:text-xs px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 ${
+                  errors.weight ? "border-red-500" : "border-white/20"
+                }`}
+                {...register("weight", {
+                  required: { value: true, message: "Weight is required" },
+                })}
+              />
+              {errors.weight && (
+                <p className="mt-1 text-sm text-red-400 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  {errors.weight.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-purple-200 mb-1">
+                Unit
+              </label>
+              <select
+                className="w-full px-4 py-3 max-md:text-xs bg-white/10 backdrop-blur-sm rounded-lg border-2 border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+                {...register("weightScale")}
+              >
+                <option className="text-indigo-900/70 font-semibold">
+                  LBs
+                </option>
+                <option className="text-indigo-900/70 font-semibold">
+                  Kgs
+                </option>
+              </select>
+            </div>
+          </div>
+
+          {/* Height Field */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="relative">
+              <label className="block text-sm font-medium text-purple-200 mb-1">
+                Height
+              </label>
+              <input
+                type="number"
+                step="any"
+                placeholder="Enter height"
+                className={`w-full max-md:text-xs px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 ${
+                  errors.height ? "border-red-500" : "border-white/20"
+                }`}
+                {...register("height", {
+                  required: { value: true, message: "Height is required" },
+                })}
+              />
+              {errors.height && (
+                <p className="mt-1 text-sm text-red-400 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  {errors.height.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-purple-200 mb-1">
+                Unit
+              </label>
+              <select
+                className="w-full px-4 py-3 max-md:text-xs bg-white/10 backdrop-blur-sm rounded-lg border-2 border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+                {...register("lengthScale")}
+              >
+                <option className="text-indigo-900/70 font-semibold">ft</option>
+                <option className="text-indigo-900/70 font-semibold">cm</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-purple-500/25 flex items-center justify-center"
           >
-            <option>ft</option>
-            <option>cm</option>
-          </select>
-        </div>
-        <button
-          type="submit"
-          className="bg-yellow-400 w-24 font-semibold h-4 rounded-2xl m-2 hover:bg-white"
-        >
-          Submit
-        </button>
-      </form>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Complete Profile
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
