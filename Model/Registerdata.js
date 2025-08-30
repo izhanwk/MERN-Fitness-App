@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const dataSchema = new mongoose.Schema({
   email: String,
   password: String,
+  verified: Boolean,
   name: String,
   date: Date,
   gender: String,

@@ -12,6 +12,7 @@ import Fatloss from "./components/Fatloss.jsx";
 import Activity from "./components/Activity.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import Protectedroute from "./components/Protectedroute.jsx";
+import Sessions from "./components/Sessions.jsx";
 import { Navigate } from "react-router-dom";
 const token = localStorage.getItem("token");
 
@@ -74,6 +75,14 @@ const router = createBrowserRouter(
       element: (
         <Protectedroute>
           <Dashboard />
+        </Protectedroute>
+      ),
+    },
+    {
+      path: "/sessions",
+      element: (
+        <Protectedroute>
+          <Sessions />
         </Protectedroute>
       ),
     },
