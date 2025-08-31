@@ -75,8 +75,9 @@ const verifyToken = async (req, res, next) => {
       console.log(token);
       return res.status(403).json({ message: "Invalid or expired token" });
     }
-    await Sessions.updateOne({ token }, { $set: { lastActive: new Date() } });
 
+    session.lastActive = new Date();
+    await session.save();
     next();
   } catch (err) {
     return res.status(403).json({ message: "Invalid or expired token" });
