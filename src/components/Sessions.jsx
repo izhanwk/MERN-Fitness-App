@@ -99,13 +99,19 @@ function Sessions() {
                   {new Date(session.lastActive).toLocaleString()}
                 </p>
 
-                <button
-                  className="flex items-center space-x-2 bg-red-600 px-4 py-2 rounded-lg"
-                  onClick={() => logOutSession(session._id)}
-                >
-                  <LogOut size={18} />
-                  <span>Logout</span>
-                </button>
+                {session.currentDevice ? (
+                  <span className="inline-flex items-center space-x-2 bg-red-600 opacity-30 px-4 py-2 rounded-lg">
+                    Logout
+                  </span>
+                ) : (
+                  <button
+                    className="inline-flex items-center space-x-2 bg-red-600 px-4 py-2 rounded-lg"
+                    onClick={() => logOutSession(session._id)}
+                  >
+                    <LogOut size={18} />
+                    <span>Logout</span>
+                  </button>
+                )}
               </div>
             ))}
           </div>
