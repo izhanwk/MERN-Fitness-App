@@ -13,6 +13,7 @@ import Activity from "./components/Activity.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import Protectedroute from "./components/Protectedroute.jsx";
 import Sessions from "./components/Sessions.jsx";
+import Changepassword from "./components/Changepassword.jsx";
 import { Navigate } from "react-router-dom";
 const token = localStorage.getItem("token");
 
@@ -25,6 +26,10 @@ const router = createBrowserRouter(
     {
       path: "/signin",
       element: <Signin />,
+    },
+    {
+      path: "/changepassword",
+      element: <Changepassword />,
     },
     {
       path: "/signup/userdata",
