@@ -207,13 +207,22 @@ function Signin() {
                           d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
-                      {errors.password?.message}
-                    </div>
-                  )}
-                </div>
+                  {errors.password?.message}
+                  </div>
+                )}
+              </div>
 
-                <div className="pt-4 md:pt-6 w-full">
-                  <button
+              <div className="w-full text-right mt-2">
+                <Link
+                  to="/changepassword"
+                  className="text-yellow-400 text-xs md:text-sm hover:text-yellow-300"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              <div className="pt-4 md:pt-6 w-full">
+                <button
                     type="submit"
                     className="group relative w-full h-12 md:h-14 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold text-base md:text-lg rounded-xl shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 hover:scale-[1.02] hover:from-yellow-300 hover:to-orange-400 flex items-center justify-center"
                   >
