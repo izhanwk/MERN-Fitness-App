@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DNavbar from "./DNavbar";
 // import SDNavbar from "./SDNavbar";
+import apiFetch from "../utils/api";
 
 const NutritionTracker = () => {
   const [food, setfood] = useState([]);
@@ -47,10 +48,12 @@ const NutritionTracker = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(
+        const response = await apiFetch(
           "https://7ec1b82ac30b.ngrok-free.app/getdata",
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         const data = await response.json();
@@ -71,10 +74,12 @@ const NutritionTracker = () => {
     const fetchFood = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(
+        const response = await apiFetch(
           "https://7ec1b82ac30b.ngrok-free.app/getfood",
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         const data = await response.json();
@@ -386,7 +391,7 @@ const NutritionTracker = () => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   useEffect(() => {
     const storeData = async () => {
-      let response = await fetch("https://7ec1b82ac30b.ngrok-free.app/store", {
+      let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/store", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -407,7 +412,7 @@ const NutritionTracker = () => {
   useEffect(() => {
     if (isFirstLoad) return;
     const storeData = async () => {
-      await fetch("https://7ec1b82ac30b.ngrok-free.app/store", {
+      await apiFetch("https://7ec1b82ac30b.ngrok-free.app/store", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import SNavbar from "./SNavbar";
+import apiFetch from "../utils/api";
 
 function Signin() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ function Signin() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         "https://7ec1b82ac30b.ngrok-free.app/signin",
         {
           method: "POST",

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import DNavbar from "./DNavbar";
 import { LogOut } from "lucide-react";
+import apiFetch from "../utils/api";
 
 function Sessions() {
   const [sessions, setSessions] = useState([]);
@@ -20,10 +21,12 @@ function Sessions() {
         const decoded = jwtDecode(token);
         console.log("Decoded token:", decoded);
 
-        const response = await fetch(
+        const response = await apiFetch(
           `https://7ec1b82ac30b.ngrok-free.app/sessions?id=${decoded.userId}`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 
@@ -43,7 +46,7 @@ function Sessions() {
 
   const logOutSession = async (id) => {
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `https://7ec1b82ac30b.ngrok-free.app/logoutsession?id=${id}`,
         {
           method: "DELETE",
