@@ -12,7 +12,7 @@ function DNavbar() {
   const logOut = async () => {
     console.log("Loggin out");
     const token = localStorage.getItem("token");
-    const response = await fetch("http://localhost:3000/logout", {
+    const response = await fetch("https://7ec1b82ac30b.ngrok-free.app/logout", {
       headers: { Authorization: `Bearer ${token}` },
     });
     localStorage.removeItem("token");
@@ -22,14 +22,17 @@ function DNavbar() {
   const refreshtoken = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshtoken");
-      let response = await fetch("http://localhost:3000/refresh-token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
-        },
-        body: JSON.stringify({ refreshtoken: refreshToken }),
-      });
+      let response = await fetch(
+        "https://7ec1b82ac30b.ngrok-free.app/refresh-token",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
+          },
+          body: JSON.stringify({ refreshtoken: refreshToken }),
+        }
+      );
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.token);
@@ -51,9 +54,12 @@ function DNavbar() {
       const fetchData = async () => {
         try {
           const token = localStorage.getItem("token");
-          const response = await fetch("http://localhost:3000/getdata", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await fetch(
+            "https://7ec1b82ac30b.ngrok-free.app/getdata",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             // alert("Token is valid");
             console.log("Token is Valid");

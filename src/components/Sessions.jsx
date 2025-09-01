@@ -21,7 +21,7 @@ function Sessions() {
         console.log("Decoded token:", decoded);
 
         const response = await fetch(
-          `http://localhost:3000/sessions?id=${decoded.userId}`,
+          `https://7ec1b82ac30b.ngrok-free.app/sessions?id=${decoded.userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -44,7 +44,7 @@ function Sessions() {
   const logOutSession = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/logoutsession?id=${id}`,
+        `https://7ec1b82ac30b.ngrok-free.app/logoutsession?id=${id}`,
         {
           method: "DELETE",
           headers: {

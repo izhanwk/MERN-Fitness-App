@@ -34,7 +34,7 @@ function Goals() {
 
   const onSubmit = async (data) => {
     try {
-      let response = await fetch("http://localhost:3000/goals", {
+      let response = await fetch("https://7ec1b82ac30b.ngrok-free.app/goals", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

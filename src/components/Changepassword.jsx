@@ -13,11 +13,14 @@ function Changepassword() {
   const sendOtp = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:3000/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const res = await fetch(
+        "https://7ec1b82ac30b.ngrok-free.app/forgot-password",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
       if (res.ok) {
         setOtpSent(true);
       } else {
@@ -35,11 +38,14 @@ function Changepassword() {
       return;
     }
     try {
-      const res = await fetch("http://localhost:3000/change-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp, password }),
-      });
+      const res = await fetch(
+        "https://7ec1b82ac30b.ngrok-free.app/change-password",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp, password }),
+        }
+      );
       if (res.ok) {
         alert("Password updated");
         navigate("/signin");

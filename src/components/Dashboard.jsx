@@ -47,9 +47,12 @@ const NutritionTracker = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:3000/getdata", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetch(
+          "https://7ec1b82ac30b.ngrok-free.app/getdata",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = await response.json();
         if (response.ok) {
           setuserData((prevUserData) => ({ ...prevUserData, ...data }));
@@ -68,9 +71,12 @@ const NutritionTracker = () => {
     const fetchFood = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:3000/getfood", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetch(
+          "https://7ec1b82ac30b.ngrok-free.app/getfood",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = await response.json();
         if (response.ok) {
           setfood(data);
@@ -380,7 +386,7 @@ const NutritionTracker = () => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   useEffect(() => {
     const storeData = async () => {
-      let response = await fetch("http://localhost:3000/store", {
+      let response = await fetch("https://7ec1b82ac30b.ngrok-free.app/store", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -401,7 +407,7 @@ const NutritionTracker = () => {
   useEffect(() => {
     if (isFirstLoad) return;
     const storeData = async () => {
-      await fetch("http://localhost:3000/store", {
+      await fetch("https://7ec1b82ac30b.ngrok-free.app/store", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
