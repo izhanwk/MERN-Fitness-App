@@ -50,7 +50,10 @@ const NutritionTracker = () => {
         const response = await fetch(
           "https://7ec1b82ac30b.ngrok-free.app/getdata",
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
           }
         );
         const data = await response.json();
@@ -74,7 +77,10 @@ const NutritionTracker = () => {
         const response = await fetch(
           "https://7ec1b82ac30b.ngrok-free.app/getfood",
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
           }
         );
         const data = await response.json();
@@ -391,6 +397,7 @@ const NutritionTracker = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "ngrok-skip-browser-warning": "true",
         },
       });
       if (response.ok) {
@@ -412,6 +419,7 @@ const NutritionTracker = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "ngrok-skip-browser-warning": "true",
         },
         body: JSON.stringify({ array: newfood }),
       });

@@ -17,7 +17,10 @@ function Changepassword() {
         "https://7ec1b82ac30b.ngrok-free.app/forgot-password",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
+          },
           body: JSON.stringify({ email }),
         }
       );
@@ -42,7 +45,10 @@ function Changepassword() {
         "https://7ec1b82ac30b.ngrok-free.app/change-password",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
+          },
           body: JSON.stringify({ email, otp, password }),
         }
       );

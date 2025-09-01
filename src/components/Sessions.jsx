@@ -23,7 +23,10 @@ function Sessions() {
         const response = await fetch(
           `https://7ec1b82ac30b.ngrok-free.app/sessions?id=${decoded.userId}`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
           }
         );
 
@@ -50,6 +53,7 @@ function Sessions() {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "ngrok-skip-browser-warning": "true",
           },
         }
       );

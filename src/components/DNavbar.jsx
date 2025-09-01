@@ -13,7 +13,10 @@ function DNavbar() {
     console.log("Loggin out");
     const token = localStorage.getItem("token");
     const response = await fetch("https://7ec1b82ac30b.ngrok-free.app/logout", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "true",
+      },
     });
     localStorage.removeItem("token");
     navigate("/signin");
@@ -28,6 +31,7 @@ function DNavbar() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
             // Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
           },
           body: JSON.stringify({ refreshtoken: refreshToken }),
@@ -57,7 +61,10 @@ function DNavbar() {
           const response = await fetch(
             "https://7ec1b82ac30b.ngrok-free.app/getdata",
             {
-              headers: { Authorization: `Bearer ${token}` },
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true",
+              },
             }
           );
           if (response.ok) {
