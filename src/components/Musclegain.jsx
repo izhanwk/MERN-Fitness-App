@@ -3,13 +3,14 @@ import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
+import apiFetch from "../utils/api";
 
 function Musclegain() {
   const [musclegainMode, setmusclegainMode] = useState("");
   let navigate = useNavigate();
   const sendData = async () => {
     try {
-      let response = await fetch("https://7ec1b82ac30b.ngrok-free.app/mode", {
+      let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/mode", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

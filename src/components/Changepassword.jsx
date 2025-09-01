@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
+import apiFetch from "../utils/api";
 
 function Changepassword() {
   const [email, setEmail] = useState("");
@@ -13,11 +14,13 @@ function Changepassword() {
   const sendOtp = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(
+      const res = await apiFetch(
         "https://7ec1b82ac30b.ngrok-free.app/forgot-password",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ email }),
         }
       );
@@ -38,11 +41,13 @@ function Changepassword() {
       return;
     }
     try {
-      const res = await fetch(
+      const res = await apiFetch(
         "https://7ec1b82ac30b.ngrok-free.app/change-password",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ email, otp, password }),
         }
       );

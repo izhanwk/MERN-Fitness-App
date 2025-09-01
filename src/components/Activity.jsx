@@ -3,13 +3,14 @@ import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
+import apiFetch from "../utils/api";
 
 function Activity() {
   const [activityLevel, setactivityLevel] = useState(0);
   let navigate = useNavigate();
 
   const sendData = async () => {
-    let response = await fetch("https://7ec1b82ac30b.ngrok-free.app/activity", {
+    let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/activity", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

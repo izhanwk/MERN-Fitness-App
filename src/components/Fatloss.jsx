@@ -3,6 +3,7 @@ import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
+import apiFetch from "../utils/api";
 
 function Fatloss() {
   const [fatlossMode, setfatlossMode] = useState("");
@@ -11,7 +12,7 @@ function Fatloss() {
 
   const sendData = async (data) => {
     try {
-      let response = await fetch("https://7ec1b82ac30b.ngrok-free.app/mode", {
+      let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/mode", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

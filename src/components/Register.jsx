@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
+import apiFetch from "../utils/api";
 
 function Register() {
   const {
@@ -16,7 +17,7 @@ function Register() {
 
   const onSubmit = async (data) => {
     try {
-      let response = await fetch(
+      let response = await apiFetch(
         "https://7ec1b82ac30b.ngrok-free.app/register",
         {
           method: "POST",

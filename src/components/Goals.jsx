@@ -4,6 +4,7 @@ import DNavbar from "./DNavbar";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
+import apiFetch from "../utils/api";
 
 function Goals() {
   const {
@@ -34,7 +35,7 @@ function Goals() {
 
   const onSubmit = async (data) => {
     try {
-      let response = await fetch("https://7ec1b82ac30b.ngrok-free.app/goals", {
+      let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/goals", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

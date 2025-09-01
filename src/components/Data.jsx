@@ -1,6 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import apiFetch from "../utils/api";
 
 function Data() {
   const {
@@ -13,7 +14,7 @@ function Data() {
 
   const onSubmit = async (data) => {
     try {
-      let response = await fetch("https://7ec1b82ac30b.ngrok-free.app/data", {
+      let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // for hamburger icons
 import { jwtDecode } from "jwt-decode";
+import apiFetch from "../utils/api";
 
 function DNavbar() {
   const navigate = useNavigate();
@@ -12,8 +13,10 @@ function DNavbar() {
   const logOut = async () => {
     console.log("Loggin out");
     const token = localStorage.getItem("token");
-    const response = await fetch("https://7ec1b82ac30b.ngrok-free.app/logout", {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/logout", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     localStorage.removeItem("token");
     navigate("/signin");
@@ -22,7 +25,7 @@ function DNavbar() {
   const refreshtoken = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshtoken");
-      let response = await fetch(
+      let response = await apiFetch(
         "https://7ec1b82ac30b.ngrok-free.app/refresh-token",
         {
           method: "POST",
@@ -54,10 +57,12 @@ function DNavbar() {
       const fetchData = async () => {
         try {
           const token = localStorage.getItem("token");
-          const response = await fetch(
+          const response = await apiFetch(
             "https://7ec1b82ac30b.ngrok-free.app/getdata",
             {
-              headers: { Authorization: `Bearer ${token}` },
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             }
           );
           if (response.ok) {
