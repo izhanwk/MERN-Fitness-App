@@ -24,7 +24,7 @@ app.use(express.json());
 app.set("view engine", "ejs");
 // set views folder
 app.set("views", path.join(__dirname, "views"));
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 let primaryEmail = "";
 let secretkey = "izhanbhaikasecret";
 let refreshkey = "oneandonlyIzhankirefreshsecretkey";
@@ -117,6 +117,7 @@ app.post("/refresh-token", async (req, res) => {
 
 app.get("/getdata", verifyToken, async (req, res) => {
   try {
+    console.log("Hite");
     const email = req.email;
     const user = await Data.findOne({ email: email });
     if (user) {
@@ -402,7 +403,7 @@ app.post("/register", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    const url = `http://localhost:3000/verify/${token}`;
+    const url = `https://7ec1b82ac30b.ngrok-free.app/verify/${token}`;
 
     // send verification email
     await transporter.sendMail({

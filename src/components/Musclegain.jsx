@@ -9,7 +9,7 @@ function Musclegain() {
   let navigate = useNavigate();
   const sendData = async () => {
     try {
-      let response = await fetch("http://localhost:3000/mode", {
+      let response = await fetch("https://7ec1b82ac30b.ngrok-free.app/mode", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

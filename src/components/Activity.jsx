@@ -9,7 +9,7 @@ function Activity() {
   let navigate = useNavigate();
 
   const sendData = async () => {
-    let response = await fetch("http://localhost:3000/activity", {
+    let response = await fetch("https://7ec1b82ac30b.ngrok-free.app/activity", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
