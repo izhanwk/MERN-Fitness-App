@@ -1,16 +1,18 @@
-import React from "react";
 import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
 import apiFetch from "../utils/api";
+import Loader from "./Loader";
 
 function Fatloss() {
   const [fatlossMode, setfatlossMode] = useState("");
   let navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   //   console.log(fatlossMode);
 
-  const sendData = async (data) => {
+  const sendData = async () => {
+    setLoading(true);
     try {
       let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/mode", {
         method: "POST",
@@ -26,7 +28,10 @@ function Fatloss() {
         navigate("/activity");
       }
     } catch (err) {
+      console.error(err);
       alert("A problem occured");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,6 +47,7 @@ function Fatloss() {
 
   return (
     <div>
+      {loading && <Loader />}
       <DNavbar />
       <div className="flex w-screen">
         <SDNavbar />

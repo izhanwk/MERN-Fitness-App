@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 import apiFetch from "../utils/api";
+import Loader from "./Loader";
 
 function Changepassword() {
   const [email, setEmail] = useState("");
@@ -10,9 +11,11 @@ function Changepassword() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const sendOtp = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await apiFetch(
         "https://7ec1b82ac30b.ngrok-free.app/forgot-password",
@@ -31,6 +34,8 @@ function Changepassword() {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,6 +45,7 @@ function Changepassword() {
       alert("Passwords do not match");
       return;
     }
+    setLoading(true);
     try {
       const res = await apiFetch(
         "https://7ec1b82ac30b.ngrok-free.app/change-password",
@@ -60,11 +66,14 @@ function Changepassword() {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {loading && <Loader />}
       <Navbar />
       <div className="flex w-screen items-center justify-center pt-10">
         <form
