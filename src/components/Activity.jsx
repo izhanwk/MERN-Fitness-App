@@ -1,15 +1,17 @@
-import React from "react";
 import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
 import apiFetch from "../utils/api";
+import Loader from "./Loader";
 
 function Activity() {
   const [activityLevel, setactivityLevel] = useState(0);
   let navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const sendData = async () => {
+    setLoading(true);
     let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/activity", {
       method: "POST",
       headers: {
@@ -21,6 +23,7 @@ function Activity() {
     if (response.ok) {
       console.log("Sent to DB");
     }
+    setLoading(false);
   };
   useEffect(() => {
     if (activityLevel) {
@@ -32,6 +35,7 @@ function Activity() {
 
   return (
     <div>
+      {loading && <Loader />}
       <DNavbar />
       <div className="flex">
         <SDNavbar />

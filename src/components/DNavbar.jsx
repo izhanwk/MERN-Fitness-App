@@ -1,24 +1,27 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // for hamburger icons
-import { jwtDecode } from "jwt-decode";
 import apiFetch from "../utils/api";
+import Loader from "./Loader";
 
 function DNavbar() {
   const navigate = useNavigate();
   const [visible2, setvisible2] = useState(false);
   const [visible, setvisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const logOut = async () => {
     console.log("Loggin out");
+    setLoading(true);
     const token = localStorage.getItem("token");
-    const response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/logout", {
+    await apiFetch("https://7ec1b82ac30b.ngrok-free.app/logout", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     localStorage.removeItem("token");
+    setLoading(false);
     navigate("/signin");
   };
 
@@ -92,6 +95,7 @@ function DNavbar() {
 
   return (
     <div className="relative">
+      {loading && <Loader />}
       {/* Modal for Contact/About/Guide */}
       {visible2 && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex justify-center items-center">
