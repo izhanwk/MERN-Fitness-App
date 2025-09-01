@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import { jwtDecode } from "jwt-decode";
 import DNavbar from "./DNavbar";
 import { LogOut } from "lucide-react";
 import apiFetch from "../utils/api";
+import Loader from "./Loader";
 
 function Sessions() {
   const [sessions, setSessions] = useState([]);
-  const [loading, setLoading] = useState(true); // ✅ loading state
+  const [loading, setLoading] = useState(true); // initial load
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -45,6 +47,7 @@ function Sessions() {
   }, []);
 
   const logOutSession = async (id) => {
+    setActionLoading(true);
     try {
       const response = await apiFetch(
         `https://7ec1b82ac30b.ngrok-free.app/logoutsession?id=${id}`,
@@ -66,16 +69,19 @@ function Sessions() {
     } catch (error) {
       console.error("Error deleting session:", error);
       alert("Server error");
+    } finally {
+      setActionLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+      {(loading || actionLoading) && <Loader />}
       <DNavbar />
       <div className="max-w-4xl mx-auto px-6 py-10">
         <h1 className="text-3xl font-bold mb-6 text-center">Active Sessions</h1>
 
-        {/* ✅ Loading state */}
+        {/* Loading state */}
         {loading ? (
           <p className="text-center text-gray-400">Loading sessions...</p>
         ) : sessions.length === 0 ? (
