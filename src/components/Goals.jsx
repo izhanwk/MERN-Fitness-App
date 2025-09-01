@@ -1,10 +1,10 @@
-import React from "react";
 import { useState, useEffect } from "react";
 import DNavbar from "./DNavbar";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
 import apiFetch from "../utils/api";
+import Loader from "./Loader";
 
 function Goals() {
   const {
@@ -18,6 +18,7 @@ function Goals() {
 
   const navigate = useNavigate();
   const [goal, setgoal] = useState("");
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (selectedGoal) {
       setgoal(selectedGoal);
@@ -34,6 +35,7 @@ function Goals() {
   };
 
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
       let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/goals", {
         method: "POST",
@@ -51,12 +53,16 @@ function Goals() {
         alert("An error occured from server. Login Again");
       }
     } catch (err) {
+      console.error(err);
       alert("Problem while connecting with server");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="h-screen bg-[#30093f] p-0 m-0 flex flex-col items-center font-dm-sans">
+      {loading && <Loader />}
       <DNavbar />
       <div className="flex w-screen">
         <SDNavbar></SDNavbar>

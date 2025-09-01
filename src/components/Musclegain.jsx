@@ -1,14 +1,16 @@
-import React from "react";
 import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
 import apiFetch from "../utils/api";
+import Loader from "./Loader";
 
 function Musclegain() {
   const [musclegainMode, setmusclegainMode] = useState("");
   let navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const sendData = async () => {
+    setLoading(true);
     try {
       let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/mode", {
         method: "POST",
@@ -24,7 +26,10 @@ function Musclegain() {
         navigate("/activity");
       }
     } catch (err) {
+      console.error(err);
       alert("A problem occured");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,6 +43,7 @@ function Musclegain() {
 
   return (
     <div>
+      {loading && <Loader />}
       <DNavbar />
       <div className="flex w-screen">
         <SDNavbar />

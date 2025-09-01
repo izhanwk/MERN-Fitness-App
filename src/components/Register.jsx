@@ -1,8 +1,9 @@
-import React from "react";
+import { useState } from "react";
 import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import apiFetch from "../utils/api";
+import Loader from "./Loader";
 
 function Register() {
   const {
@@ -14,8 +15,10 @@ function Register() {
   } = useForm();
   const password = watch("password");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
       let response = await apiFetch(
         "https://7ec1b82ac30b.ngrok-free.app/register",
@@ -37,12 +40,16 @@ function Register() {
         });
       }
     } catch (error) {
+      console.error(error);
       alert("Oops! There occurred a problem");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
+      {loading && <Loader />}
       <Navbar />
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">

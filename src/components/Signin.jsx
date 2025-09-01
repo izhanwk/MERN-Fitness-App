@@ -1,22 +1,23 @@
-import React from "react";
+import { useState } from "react";
 import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import SNavbar from "./SNavbar";
 import apiFetch from "../utils/api";
+import Loader from "./Loader";
 
 function Signin() {
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    watch,
     setError,
     formState: { errors },
   } = useForm();
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
       const response = await apiFetch(
         "https://7ec1b82ac30b.ngrok-free.app/signin",
@@ -58,11 +59,14 @@ function Signin() {
     } catch (err) {
       alert("An error occurred. Please try again.");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
+      {loading && <Loader />}
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0 font-dm-sans relative overflow-hidden">
         <Navbar />
 
@@ -253,7 +257,7 @@ function Signin() {
 
                 <div className="text-center pt-3 md:pt-4">
                   <p className="text-purple-200 text-xs md:text-sm">
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <Link to={"/signup"}>
                       <span className="text-yellow-400 hover:text-yellow-300 transition-colors duration-300 font-semibold underline cursor-pointer">
                         Create one now
