@@ -8,7 +8,6 @@ function Signup() {
     <>
       <div className="h-screen bg-[#30093f] ...">
         <DNavbar />
-
         <Data />
       </div>
     </>

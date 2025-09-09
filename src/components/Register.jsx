@@ -20,16 +20,13 @@ function Register() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      let response = await apiFetch(
-        "https://7ec1b82ac30b.ngrok-free.app/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      let response = await apiFetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
       if (response.ok) {
         alert("Registration Successful");
         navigate("/signin");

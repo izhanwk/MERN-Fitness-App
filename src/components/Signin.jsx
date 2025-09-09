@@ -19,22 +19,20 @@ function Signin() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await apiFetch(
-        "https://7ec1b82ac30b.ngrok-free.app/signin",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await apiFetch("http://localhost:5000/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
       if (response.status === 302) {
         alert("Incomplete profile, redirecting...");
         const responseData = await response.json();
         const email = responseData.email;
         localStorage.setItem("token", responseData.data.token);
+        localStorage.setItem("refreshtoken", responseData.data.refresh);
         navigate("/signup/userdata", { state: { email } });
         return;
       }

@@ -62,6 +62,7 @@ const verifyToken = async (req, res, next) => {
 
   try {
     // Verify token
+
     const decodedToken = jwt.verify(token, secretkey);
 
     // Attach decoded info to request
@@ -73,6 +74,7 @@ const verifyToken = async (req, res, next) => {
     const session = await Sessions.findOne({ userId: req.userId });
 
     if (!session) {
+      const newSession = new Sessions({});
       console.log(token);
       return res.status(403).json({ message: "Invalid or expired token" });
     }
@@ -236,6 +238,33 @@ app.post("/signin", async (req, res) => {
                 const device = `${agent.os.toString()} ${agent.toAgent()}`;
 
                 if (!user.height || !user.weight || !user.activity) {
+                  const existing = await Sessions.findOne({
+                    userId: user._id,
+                    device: device,
+                    ip: req.ip,
+                  });
+                  if (existing) {
+                    console.log("Session already exist");
+                    return res.status(302).json({
+                      success: true,
+                      data: {
+                        userId: user.id,
+                        email: user.email,
+                        token: token,
+                        refresh: refreshToken,
+                      },
+                    });
+                  }
+                  console.log("Session not exist");
+                  const newSession = new Sessions({
+                    userId: user._id,
+                    device,
+                    ip: req.ip,
+                    token,
+                    createdAt: new Date(),
+                    lastActive: new Date(),
+                  });
+                  await newSession.save();
                   return res.status(302).json({
                     success: true,
                     data: {
@@ -252,6 +281,7 @@ app.post("/signin", async (req, res) => {
                   ip: req.ip,
                 });
                 if (existing) {
+                  console.log("Session already exist");
                   return res.status(200).json({
                     success: true,
                     data: {
@@ -262,7 +292,8 @@ app.post("/signin", async (req, res) => {
                     },
                   });
                 }
-                await Sessions.create({
+                console.log("Session not exist");
+                const newSession = new Sessions({
                   userId: user._id,
                   device,
                   ip: req.ip,
@@ -270,6 +301,7 @@ app.post("/signin", async (req, res) => {
                   createdAt: new Date(),
                   lastActive: new Date(),
                 });
+                await newSession.save();
                 return res.status(200).json({
                   success: true,
                   data: {
@@ -302,6 +334,7 @@ app.post("/signin", async (req, res) => {
 });
 
 app.post("/data", verifyToken, async (req, res) => {
+  console.log("Data hit");
   const email = req.user.email; // from JWT
   const { name, date, gender, weight, weightScale, height, lengthScale } =
     req.body;
@@ -403,7 +436,7 @@ app.post("/register", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    const url = `https://7ec1b82ac30b.ngrok-free.app/verify/${token}`;
+    const url = `http://localhost:5000/verify/${token}`;
 
     // send verification email
     await transporter.sendMail({
@@ -416,7 +449,7 @@ app.post("/register", async (req, res) => {
 
     res.status(200).send("Verification email sent! Please check your inbox.");
   } catch (err) {
-    console.error(err);
+    console.error("Error sending verification email : ", err);
     res.status(400).send("Registration failed.");
   }
 });
@@ -550,6 +583,59 @@ app.post("/change-password", async (req, res) => {
     return res.status(200).json({ message: "Password updated" });
   } catch (err) {
     console.error("Change password error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/editdata", verifyToken, async (req, res) => {
+  const email = req.email;
+  const user = await Data.findOne({ email: email });
+  if (user) {
+    return res.status(200).json(user);
+  }
+});
+
+app.put("/editdata", verifyToken, async (req, res) => {
+  try {
+    // Only allow updates to these fields
+    const allowed = [
+      "name",
+      "date",
+      "gender",
+      "weight",
+      "weightScale",
+      "height",
+      "lengthScale",
+      "goal",
+      "mode",
+      "activity",
+      // if you want to allow `array`, add it here:
+      // "array",
+      // do NOT allow password/refreshtoken/verified updates here
+      // do NOT allow email changes via this route unless you confirm ownership again
+    ];
+
+    const updates = {};
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) updates[key] = req.body[key];
+    }
+
+    // Coerce types to match schema
+    if (updates.date) updates.date = new Date(updates.date);
+    if (updates.weight != null) updates.weight = Number(updates.weight);
+    if (updates.height != null) updates.height = Number(updates.height);
+    if (updates.activity != null) updates.activity = Number(updates.activity);
+
+    const user = await Data.findOneAndUpdate(
+      { email: req.email },
+      { $set: updates },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.status(200).json(user);
+  } catch (e) {
+    console.error(e);
     return res.status(500).json({ message: "Server error" });
   }
 });

@@ -3,7 +3,7 @@ export default function apiFetch(url, options = {}) {
   return fetch(url, {
     ...rest,
     headers: {
-      'ngrok-skip-browser-warning': 'true',
+      "ngrok-skip-browser-warning": "true",
       ...headers,
     },
   });

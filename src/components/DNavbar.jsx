@@ -15,7 +15,7 @@ function DNavbar() {
     console.log("Loggin out");
     setLoading(true);
     const token = localStorage.getItem("token");
-    await apiFetch("https://7ec1b82ac30b.ngrok-free.app/logout", {
+    await apiFetch("http://localhost:5000/logout", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -28,17 +28,15 @@ function DNavbar() {
   const refreshtoken = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshtoken");
-      let response = await apiFetch(
-        "https://7ec1b82ac30b.ngrok-free.app/refresh-token",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            // Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
-          },
-          body: JSON.stringify({ refreshtoken: refreshToken }),
-        }
-      );
+      console.log("Our refresh token : ", refreshToken);
+      let response = await apiFetch("http://localhost:5000/refresh-token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
+        },
+        body: JSON.stringify({ refreshtoken: refreshToken }),
+      });
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.token);
@@ -60,14 +58,11 @@ function DNavbar() {
       const fetchData = async () => {
         try {
           const token = localStorage.getItem("token");
-          const response = await apiFetch(
-            "https://7ec1b82ac30b.ngrok-free.app/getdata",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          const response = await apiFetch("http://localhost:5000/getdata", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           if (response.ok) {
             // alert("Token is valid");
             console.log("Token is Valid");

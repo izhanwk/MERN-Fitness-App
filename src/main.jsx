@@ -15,6 +15,7 @@ import Protectedroute from "./components/Protectedroute.jsx";
 import Sessions from "./components/Sessions.jsx";
 import Changepassword from "./components/Changepassword.jsx";
 import { Navigate } from "react-router-dom";
+import Edit from "./components/Edit.jsx";
 const token = localStorage.getItem("token");
 
 const router = createBrowserRouter(
@@ -88,6 +89,14 @@ const router = createBrowserRouter(
       element: (
         <Protectedroute>
           <Sessions />
+        </Protectedroute>
+      ),
+    },
+    {
+      path: "/edit",
+      element: (
+        <Protectedroute>
+          <Edit />
         </Protectedroute>
       ),
     },
