@@ -17,7 +17,7 @@ function Data() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      let response = await apiFetch("https://7ec1b82ac30b.ngrok-free.app/data", {
+      let response = await apiFetch("http://localhost:5000/data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,7 +30,8 @@ function Data() {
         alert("Your data has been submitted successfully!");
         navigate("/goals");
       } else if (response.status === 403) {
-        // Handle 403 error if needed
+        const data = await response.json();
+        console.log("403 : ", data);
       } else {
         throw new Error("Failed to submit data");
       }

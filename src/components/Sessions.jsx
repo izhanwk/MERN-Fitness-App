@@ -24,7 +24,7 @@ function Sessions() {
         console.log("Decoded token:", decoded);
 
         const response = await apiFetch(
-          `https://7ec1b82ac30b.ngrok-free.app/sessions?id=${decoded.userId}`,
+          `http://localhost:5000/sessions?id=${decoded.userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -50,7 +50,7 @@ function Sessions() {
     setActionLoading(true);
     try {
       const response = await apiFetch(
-        `https://7ec1b82ac30b.ngrok-free.app/logoutsession?id=${id}`,
+        `http://localhost:5000/logoutsession?id=${id}`,
         {
           method: "DELETE",
           headers: {
