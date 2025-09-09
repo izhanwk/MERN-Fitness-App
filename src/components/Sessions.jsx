@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import DNavbar from "./DNavbar";
 import { LogOut } from "lucide-react";
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 import Loader from "./Loader";
 
 function Sessions() {
@@ -23,8 +23,8 @@ function Sessions() {
         const decoded = jwtDecode(token);
         console.log("Decoded token:", decoded);
 
-        const response = await apiFetch(
-          `http://localhost:5000/sessions?id=${decoded.userId}`,
+        const response = await api.get(
+          `/sessions?id=${decoded.userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -34,7 +34,7 @@ function Sessions() {
 
         if (!response.ok) throw new Error("Failed to fetch sessions");
 
-        const data = await response.json();
+        const data = response.data;
         console.log("Fetched sessions:", data);
         console.log(data);
         setSessions(data);
@@ -49,10 +49,9 @@ function Sessions() {
   const logOutSession = async (id) => {
     setActionLoading(true);
     try {
-      const response = await apiFetch(
-        `http://localhost:5000/logoutsession?id=${id}`,
+      const response = await api.delete(
+        `/logoutsession?id=${id}`,
         {
-          method: "DELETE",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -63,7 +62,7 @@ function Sessions() {
       if (response.ok) {
         setSessions((prev) => prev.filter((s) => s._id !== id));
       } else {
-        const data = await response.json();
+        const data = response.data;
         alert(data.message || "Error deleting session");
       }
     } catch (error) {

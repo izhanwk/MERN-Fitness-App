@@ -2,7 +2,7 @@ import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 import Loader from "./Loader";
 
 function Musclegain() {
@@ -13,14 +13,16 @@ function Musclegain() {
   const sendData = async () => {
     setLoading(true);
     try {
-      const response = await apiFetch("http://localhost:5000/mode", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ mode: musclegainMode }),
-      });
+      const response = await api.post(
+        "/mode",
+        { mode: musclegainMode },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (response.ok) {
         alert("Mode saved successfully!");

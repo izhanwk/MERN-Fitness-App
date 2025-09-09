@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 import Loader from "./Loader";
 
 function Data() {
@@ -17,20 +17,22 @@ function Data() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      let response = await apiFetch("http://localhost:5000/data", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(data),
-      });
+      let response = await api.post(
+        "/data",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       console.log("Connected");
       if (response.ok) {
         alert("Your data has been submitted successfully!");
         navigate("/goals");
       } else if (response.status === 403) {
-        const data = await response.json();
+        const data = response.data;
         console.log("403 : ", data);
       } else {
         throw new Error("Failed to submit data");

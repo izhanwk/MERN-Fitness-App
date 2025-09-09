@@ -3,7 +3,7 @@ import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 import Loader from "./Loader";
 
 function Signin() {
@@ -19,17 +19,19 @@ function Signin() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await apiFetch("http://localhost:5000/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await api.post(
+        "/signin",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.status === 302) {
         alert("Incomplete profile, redirecting...");
-        const responseData = await response.json();
+        const responseData = response.data;
         const email = responseData.email;
         localStorage.setItem("token", responseData.data.token);
         localStorage.setItem("refreshtoken", responseData.data.refresh);
@@ -38,13 +40,13 @@ function Signin() {
       }
 
       if (response.ok) {
-        const responseData = await response.json();
+        const responseData = response.data;
         localStorage.setItem("token", responseData.data.token);
         localStorage.setItem("refreshtoken", responseData.data.refresh);
         console.log(`${localStorage.getItem("refreshtoken")}`);
         navigate("/dashboard");
       } else {
-        const errorData = await response.json();
+        const errorData = response.data;
         setError("email", {
           type: "server",
           message: errorData.message || "You provided wrong data",

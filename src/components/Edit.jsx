@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import DNavbar from "./DNavbar";
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 
@@ -31,11 +31,11 @@ function Edit() {
     const getInfo = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await apiFetch("http://localhost:5000/editdata", {
+        const response = await api.get("/editdata", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resData = await response.json();
         if (!response.ok) throw new Error("Fetch failed");
+        const resData = response.data;
 
         const dateISO = resData?.date
           ? new Date(resData.date).toISOString().slice(0, 10)
@@ -102,21 +102,23 @@ function Edit() {
         // array/password/refreshtoken/verified not edited here
       };
 
-      const response = await apiFetch("http://localhost:5000/editdata", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await api.put(
+        "/editdata",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(errText || "Save failed");
+        const errText = response.data?.message || "Save failed";
+        throw new Error(errText);
       }
 
-      const updated = await response.json();
+      const updated = response.data;
       // reflect server truth in the form
       const next = {
         ...form,

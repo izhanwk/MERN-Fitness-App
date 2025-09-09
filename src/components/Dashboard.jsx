@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import DNavbar from "./DNavbar";
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 
 // Map activity labels (or use numeric factors directly)
 const ACTIVITY = {
@@ -103,10 +103,10 @@ const NutritionTracker = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await apiFetch("http://localhost:5000/getdata", {
+        const res = await api.get("/getdata", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
+        const data = res.data;
         if (!res.ok) {
           alert("Token expired");
           navigate("/signin");
@@ -123,10 +123,10 @@ const NutritionTracker = () => {
     const fetchFood = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await apiFetch("http://localhost:5000/getfood", {
+        const res = await api.get("/getfood", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
+        const data = res.data;
         if (res.ok) {
           setfood(data);
           setfoodselection((prev) => [...prev, ...data]);
@@ -310,15 +310,14 @@ const NutritionTracker = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiFetch("http://localhost:5000/store", {
-          method: "GET",
+        const res = await api.get("/store", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
         if (res.ok) {
-          const data = await res.json();
+          const data = res.data;
           setnewfood(data || []);
           setIsFirstLoad(false);
         }
@@ -333,14 +332,16 @@ const NutritionTracker = () => {
     if (isFirstLoad) return;
     (async () => {
       try {
-        await apiFetch("http://localhost:5000/store", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ array: newfood }),
-        });
+        await api.post(
+          "/store",
+          { array: newfood },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
       } catch (e) {
         console.error("POST /store error", e);
       }

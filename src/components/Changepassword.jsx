@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 import Loader from "./Loader";
 
 function Changepassword() {
@@ -17,13 +17,15 @@ function Changepassword() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await apiFetch("http://localhost:5000/forgot-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
+      const res = await api.post(
+        "/forgot-password",
+        { email },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (res.ok) {
         setOtpSent(true);
       } else {
@@ -44,18 +46,20 @@ function Changepassword() {
     }
     setLoading(true);
     try {
-      const res = await apiFetch("http://localhost:5000/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, otp, password }),
-      });
+      const res = await api.post(
+        "/change-password",
+        { email, otp, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (res.ok) {
         alert("Password updated");
         navigate("/signin");
       } else {
-        const data = await res.json();
+        const data = res.data;
         alert(data.message || "Error updating password");
       }
     } catch (err) {
