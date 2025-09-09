@@ -3,7 +3,7 @@ import DNavbar from "./DNavbar";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 import Loader from "./Loader";
 
 function Goals() {
@@ -38,14 +38,16 @@ function Goals() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      let response = await apiFetch("http://localhost:5000/goals", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(data),
-      });
+      let response = await api.post(
+        "/goals",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       if (response.ok) {
         alert("Your goal has been submitted successfully!");
         buttonClick();

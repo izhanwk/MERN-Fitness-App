@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // for hamburger icons
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 import Loader from "./Loader";
 
 function DNavbar() {
@@ -15,7 +15,7 @@ function DNavbar() {
     console.log("Loggin out");
     setLoading(true);
     const token = localStorage.getItem("token");
-    await apiFetch("http://localhost:5000/logout", {
+    await api.get("/logout", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -29,16 +29,18 @@ function DNavbar() {
     try {
       const refreshToken = localStorage.getItem("refreshtoken");
       console.log("Our refresh token : ", refreshToken);
-      let response = await apiFetch("http://localhost:5000/refresh-token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
-        },
-        body: JSON.stringify({ refreshtoken: refreshToken }),
-      });
+      let response = await api.post(
+        "/refresh-token",
+        { refreshtoken: refreshToken },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
+          },
+        }
+      );
       if (response.ok) {
-        const data = await response.json();
+        const data = response.data;
         localStorage.setItem("token", data.token);
         console.log(localStorage.getItem("token"));
         console.log("Token Refreshed");
@@ -58,7 +60,7 @@ function DNavbar() {
       const fetchData = async () => {
         try {
           const token = localStorage.getItem("token");
-          const response = await apiFetch("http://localhost:5000/getdata", {
+          const response = await api.get("/getdata", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
