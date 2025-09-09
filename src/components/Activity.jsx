@@ -1,7 +1,7 @@
 import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 import Loader from "./Loader";
 
 function Activity() {
@@ -12,14 +12,16 @@ function Activity() {
   const sendData = async () => {
     setLoading(true);
     try {
-      const response = await apiFetch("http://localhost:5000/activity", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ activity: activityLevel }),
-      });
+      const response = await api.post(
+        "/activity",
+        { activity: activityLevel },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (response.ok) {
         alert("Activity level saved successfully!");

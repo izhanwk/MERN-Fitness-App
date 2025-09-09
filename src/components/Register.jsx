@@ -2,7 +2,7 @@ import { useState } from "react";
 import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
-import apiFetch from "../utils/api";
+import api from "../utils/api";
 import Loader from "./Loader";
 
 function Register() {
@@ -20,13 +20,15 @@ function Register() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      let response = await apiFetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      let response = await api.post(
+        "/register",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (response.ok) {
         alert("Registration Successful");
         navigate("/signin");
