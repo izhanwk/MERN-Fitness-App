@@ -71,7 +71,7 @@ const verifyToken = async (req, res, next) => {
     req.userId = decodedToken.userId;
 
     // Update lastActive for this session
-    const session = await Sessions.findOne({ userId: req.userId });
+    const session = await Sessions.findOne({ userId: req.userId, ip: req.ip });
 
     if (!session) {
       const newSession = new Sessions({});
