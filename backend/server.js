@@ -26,8 +26,8 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 const port = process.env.PORT || 5000;
 let primaryEmail = "";
-let secretkey = "izhanbhaikasecret";
-let refreshkey = "oneandonlyIzhankirefreshsecretkey";
+let secretkey = process.env.SECRET_KEY;
+let refreshkey = process.env.REFRESH;
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {

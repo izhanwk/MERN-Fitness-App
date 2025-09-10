@@ -102,16 +102,12 @@ function Edit() {
         // array/password/refreshtoken/verified not edited here
       };
 
-      const response = await api.put(
-        "/editdata",
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.put("/editdata", payload, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         const errText = response.data?.message || "Save failed";
