@@ -71,11 +71,10 @@ const verifyToken = async (req, res, next) => {
     req.userId = decodedToken.userId;
 
     // Update lastActive for this session
+    console.log("IP of device : ", req.ip);
     const session = await Sessions.findOne({ userId: req.userId, ip: req.ip });
 
     if (!session) {
-      const newSession = new Sessions({});
-      console.log(token);
       return res.status(403).json({ message: "Invalid or expired token" });
     }
 
