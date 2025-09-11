@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // for hamburger icons
 import api from "../utils/api";
 import Loader from "./Loader";
+import axios from "axios";
 
 function DNavbar() {
   const navigate = useNavigate();
@@ -28,22 +29,24 @@ function DNavbar() {
   const refreshtoken = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshtoken");
-      console.log("Our refresh token : ", refreshToken);
-      let response = await api.post(
-        "/refresh-token",
+      console.log("Our refresh token:", refreshToken);
+
+      const response = await axios.post(
+        "https://mern-fitness-app-production.up.railway.app/refresh-token",
         { refreshtoken: refreshToken },
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
+            Authorization: `Bearer ${refreshToken}`,
           },
         }
       );
-      if (response.ok) {
+
+      if (response.status === 200) {
         const data = response.data;
         localStorage.setItem("token", data.token);
-        console.log(localStorage.getItem("token"));
-        console.log("Token Refreshed");
+        console.log("New token:", localStorage.getItem("token"));
+        console.log("Token refreshed successfully");
         // alert("Token Refreshed");
       } else {
         localStorage.removeItem("token");
@@ -52,33 +55,49 @@ function DNavbar() {
         navigate("/signin");
       }
     } catch (err) {
-      console.log("Error occured : ", err);
+      console.error("Error occurred:", err);
+      localStorage.removeItem("token");
+      alert("Session Expired");
+      navigate("/signin");
     }
   };
+
   useEffect(() => {
     const interValid = setInterval(() => {
       const fetchData = async () => {
         try {
           const token = localStorage.getItem("token");
-          const response = await api.get("/getdata", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (response.ok) {
-            // alert("Token is valid");
-            console.log("Token is Valid");
+
+          const response = await axios.get(
+            "https://mern-fitness-app-production.up.railway.app/getdata",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.status === 200) {
+            console.log("Token is valid");
           } else if (response.status === 403) {
             refreshtoken();
           } else {
             logOut();
           }
         } catch (err) {
-          console.log(`Error in fetchData: ${err}`);
+          if (err.response?.status === 403) {
+            // Token expired, try refreshing
+            refreshtoken();
+          } else {
+            console.error("Error in fetchData:", err);
+            logOut();
+          }
         }
       };
+
       fetchData();
-    }, 60000);
+    }, 60000); // Runs every 60 seconds
+
     return () => clearInterval(interValid);
   }, []);
 
