@@ -19,6 +19,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(express.json());
 // set view engine to ejs
 app.set("view engine", "ejs");
@@ -37,6 +38,9 @@ const transporter = nodemailer.createTransport({
 });
 
 app.use(cors());
+
+const getClientIp = (req) =>
+  req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.ip;
 
 mongoose
   .connect(
@@ -65,14 +69,15 @@ const verifyToken = async (req, res, next) => {
 
     const decodedToken = jwt.verify(token, secretkey);
 
-    // Attach decoded info to request
-    req.user = decodedToken;
-    req.email = decodedToken.email;
-    req.userId = decodedToken.userId;
+  // Attach decoded info to request
+  req.user = decodedToken;
+  req.email = decodedToken.email;
+  req.userId = decodedToken.userId;
 
-    // Update lastActive for this session
-    console.log("IP of device : ", req.ip);
-    const session = await Sessions.findOne({ userId: req.userId, ip: req.ip });
+  // Update lastActive for this session
+  const ip = getClientIp(req);
+  console.log("IP of device : ", ip);
+  const session = await Sessions.findOne({ userId: req.userId, ip });
 
     if (!session) {
       return res.status(403).json({ message: "Invalid or expired token" });
@@ -235,12 +240,13 @@ app.post("/signin", async (req, res) => {
                 user.save();
                 const agent = useragent.parse(req.headers["user-agent"]);
                 const device = `${agent.os.toString()} ${agent.toAgent()}`;
+                const ip = getClientIp(req);
 
                 if (!user.height || !user.weight || !user.activity) {
                   const existing = await Sessions.findOne({
                     userId: user._id,
                     device: device,
-                    ip: req.ip,
+                    ip,
                   });
                   if (existing) {
                     console.log("Session already exist");
@@ -255,14 +261,14 @@ app.post("/signin", async (req, res) => {
                     });
                   }
                   console.log("Session not exist");
-                  const newSession = new Sessions({
-                    userId: user._id,
-                    device,
-                    ip: req.ip,
-                    token,
-                    createdAt: new Date(),
-                    lastActive: new Date(),
-                  });
+                    const newSession = new Sessions({
+                      userId: user._id,
+                      device,
+                      ip,
+                      token,
+                      createdAt: new Date(),
+                      lastActive: new Date(),
+                    });
                   await newSession.save();
                   return res.status(302).json({
                     success: true,
@@ -277,7 +283,7 @@ app.post("/signin", async (req, res) => {
                 const existing = await Sessions.findOne({
                   userId: user._id,
                   device: device,
-                  ip: req.ip,
+                  ip,
                 });
                 if (existing) {
                   console.log("Session already exist");
@@ -295,7 +301,7 @@ app.post("/signin", async (req, res) => {
                 const newSession = new Sessions({
                   userId: user._id,
                   device,
-                  ip: req.ip,
+                  ip,
                   token,
                   createdAt: new Date(),
                   lastActive: new Date(),
@@ -489,10 +495,11 @@ app.get("/verify/:token", async (req, res) => {
 
 app.get("/sessions", verifyToken, async (req, res) => {
   const userId = req.query.id;
+  const ip = getClientIp(req);
 
   const sessions = await Sessions.find({ userId });
   sessions.forEach((session) => {
-    if (session.ip === req.ip) {
+    if (session.ip === ip) {
       session.currentDevice = true;
     }
   });
@@ -504,12 +511,13 @@ app.get("/logout", verifyToken, async (req, res) => {
   try {
     const agent = useragent.parse(req.headers["user-agent"]);
     const device = `${agent.os.toString()} ${agent.toAgent()}`;
+    const ip = getClientIp(req);
     // console.log(req.email);
     const user = await Data.findOne({ email: req.email });
     // Delete the session linked to this token
     await Sessions.deleteOne({
       userId: user.id,
-      ip: req.ip,
+      ip,
       device: device,
     });
 
