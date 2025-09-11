@@ -30,7 +30,7 @@ function Register() {
         validateStatus: () => true,
       });
       if (response.status >= 200 && response.status < 300) {
-        alert("Registration Successful");
+        alert("Registration Successful check your email");
         navigate("/signin");
       } else if (response.status === 503) {
         setError("email", {
