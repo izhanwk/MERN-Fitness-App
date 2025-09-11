@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import DNavbar from "./DNavbar";
-import api from "../utils/api";
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Map activity labels (or use numeric factors directly)
 const ACTIVITY = {
@@ -103,11 +105,15 @@ const NutritionTracker = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await api.get("/getdata", {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await axios.get(`${API_URL}/getdata`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          validateStatus: () => true,
         });
         const data = res.data;
-        if (!res.ok) {
+        if (res.status < 200 || res.status >= 300) {
           alert("Token expired");
           navigate("/signin");
           return;
@@ -123,11 +129,15 @@ const NutritionTracker = () => {
     const fetchFood = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await api.get("/getfood", {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await axios.get(`${API_URL}/getfood`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          validateStatus: () => true,
         });
         const data = res.data;
-        if (res.ok) {
+        if (res.status >= 200 && res.status < 300) {
           setfood(data);
           setfoodselection((prev) => [...prev, ...data]);
           setoriginalList(data);
@@ -310,13 +320,15 @@ const NutritionTracker = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get("/store", {
+        const res = await axios.get(`${API_URL}/store`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "ngrok-skip-browser-warning": "true",
           },
+          validateStatus: () => true,
         });
-        if (res.ok) {
+        if (res.status >= 200 && res.status < 300) {
           const data = res.data;
           setnewfood(data || []);
           setIsFirstLoad(false);
@@ -332,14 +344,16 @@ const NutritionTracker = () => {
     if (isFirstLoad) return;
     (async () => {
       try {
-        await api.post(
-          "/store",
+        await axios.post(
+          `${API_URL}/store`,
           { array: newfood },
           {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "ngrok-skip-browser-warning": "true",
             },
+            validateStatus: () => true,
           }
         );
       } catch (e) {

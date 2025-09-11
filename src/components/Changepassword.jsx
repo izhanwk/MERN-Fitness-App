@@ -1,8 +1,10 @@
 import { useState } from "react";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api";
+import axios from "axios";
 import Loader from "./Loader";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Changepassword() {
   const [email, setEmail] = useState("");
@@ -17,16 +19,18 @@ function Changepassword() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post(
-        "/forgot-password",
+      const res = await axios.post(
+        `${API_URL}/forgot-password`,
         { email },
         {
           headers: {
             "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
           },
+          validateStatus: () => true,
         }
       );
-      if (res.ok) {
+      if (res.status >= 200 && res.status < 300) {
         setOtpSent(true);
       } else {
         alert("Failed to send OTP");
@@ -46,16 +50,18 @@ function Changepassword() {
     }
     setLoading(true);
     try {
-      const res = await api.post(
-        "/change-password",
+      const res = await axios.post(
+        `${API_URL}/change-password`,
         { email, otp, password },
         {
           headers: {
             "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
           },
+          validateStatus: () => true,
         }
       );
-      if (res.ok) {
+      if (res.status >= 200 && res.status < 300) {
         alert("Password updated");
         navigate("/signin");
       } else {

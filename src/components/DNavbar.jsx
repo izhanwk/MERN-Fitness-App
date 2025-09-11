@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // for hamburger icons
-import api from "../utils/api";
 import Loader from "./Loader";
 import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function DNavbar() {
   const navigate = useNavigate();
@@ -16,10 +17,12 @@ function DNavbar() {
     console.log("Loggin out");
     setLoading(true);
     const token = localStorage.getItem("token");
-    await api.get("/logout", {
+    await axios.get(`${API_URL}/logout`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "true",
       },
+      validateStatus: () => true,
     });
     localStorage.removeItem("token");
     setLoading(false);
@@ -32,13 +35,15 @@ function DNavbar() {
       console.log("Our refresh token:", refreshToken);
 
       const response = await axios.post(
-        "https://mern-fitness-app-production.up.railway.app/refresh-token",
+        `${API_URL}/refresh-token`,
         { refreshtoken: refreshToken },
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${refreshToken}`,
+            "ngrok-skip-browser-warning": "true",
           },
+          validateStatus: () => true,
         }
       );
 
@@ -68,14 +73,13 @@ function DNavbar() {
         try {
           const token = localStorage.getItem("token");
 
-          const response = await axios.get(
-            "https://mern-fitness-app-production.up.railway.app/getdata",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          const response = await axios.get(`${API_URL}/getdata`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            validateStatus: () => true,
+          });
 
           if (response.status === 200) {
             console.log("Token is valid");

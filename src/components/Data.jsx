@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api";
+import axios from "axios";
 import Loader from "./Loader";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Data() {
   const {
@@ -17,18 +19,16 @@ function Data() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      let response = await api.post(
-        "/data",
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.post(`${API_URL}/data`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "ngrok-skip-browser-warning": "true",
+        },
+        validateStatus: () => true,
+      });
       console.log("Connected");
-      if (response.ok) {
+      if (response.status >= 200 && response.status < 300) {
         alert("Your data has been submitted successfully!");
         navigate("/goals");
       } else if (response.status === 403) {
