@@ -69,15 +69,15 @@ const verifyToken = async (req, res, next) => {
 
     const decodedToken = jwt.verify(token, secretkey);
 
-  // Attach decoded info to request
-  req.user = decodedToken;
-  req.email = decodedToken.email;
-  req.userId = decodedToken.userId;
+    // Attach decoded info to request
+    req.user = decodedToken;
+    req.email = decodedToken.email;
+    req.userId = decodedToken.userId;
 
-  // Update lastActive for this session
-  const ip = getClientIp(req);
-  console.log("IP of device : ", ip);
-  const session = await Sessions.findOne({ userId: req.userId, ip });
+    // Update lastActive for this session
+    const ip = getClientIp(req);
+    console.log("IP of device : ", ip);
+    const session = await Sessions.findOne({ userId: req.userId, ip });
 
     if (!session) {
       return res.status(403).json({ message: "Invalid or expired token" });
@@ -261,14 +261,14 @@ app.post("/signin", async (req, res) => {
                     });
                   }
                   console.log("Session not exist");
-                    const newSession = new Sessions({
-                      userId: user._id,
-                      device,
-                      ip,
-                      token,
-                      createdAt: new Date(),
-                      lastActive: new Date(),
-                    });
+                  const newSession = new Sessions({
+                    userId: user._id,
+                    device,
+                    ip,
+                    token,
+                    createdAt: new Date(),
+                    lastActive: new Date(),
+                  });
                   await newSession.save();
                   return res.status(302).json({
                     success: true,
@@ -441,7 +441,7 @@ app.post("/register", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    const url = `http://localhost:5000/verify/${token}`;
+    const url = `${process.env.VITE_API_URL}/${token}`;
 
     // send verification email
     await transporter.sendMail({
