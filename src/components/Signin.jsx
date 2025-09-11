@@ -3,8 +3,10 @@ import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api";
+import axios from "axios";
 import Loader from "./Loader";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Signin() {
   const navigate = useNavigate();
@@ -19,15 +21,13 @@ function Signin() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await api.post(
-        "/signin",
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axios.post(`${API_URL}/signin`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+        },
+        validateStatus: () => true,
+      });
 
       if (response.status === 302) {
         alert("Incomplete profile, redirecting...");
@@ -39,7 +39,7 @@ function Signin() {
         return;
       }
 
-      if (response.ok) {
+      if (response.status >= 200 && response.status < 300) {
         const responseData = response.data;
         localStorage.setItem("token", responseData.data.token);
         localStorage.setItem("refreshtoken", responseData.data.refresh);

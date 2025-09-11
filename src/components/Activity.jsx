@@ -1,8 +1,10 @@
 import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api";
+import axios from "axios";
 import Loader from "./Loader";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Activity() {
   const [activityLevel, setActivityLevel] = useState(0);
@@ -12,18 +14,20 @@ function Activity() {
   const sendData = async () => {
     setLoading(true);
     try {
-      const response = await api.post(
-        "/activity",
+      const response = await axios.post(
+        `${API_URL}/activity`,
         { activity: activityLevel },
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "ngrok-skip-browser-warning": "true",
           },
+          validateStatus: () => true,
         }
       );
 
-      if (response.ok) {
+      if (response.status >= 200 && response.status < 300) {
         alert("Activity level saved successfully!");
         navigate("/dashboard");
       } else {

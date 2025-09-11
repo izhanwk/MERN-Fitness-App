@@ -3,8 +3,10 @@ import DNavbar from "./DNavbar";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
-import api from "../utils/api";
+import axios from "axios";
 import Loader from "./Loader";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Goals() {
   const {
@@ -38,21 +40,19 @@ function Goals() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      let response = await api.post(
-        "/goals",
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      if (response.ok) {
+      const response = await axios.post(`${API_URL}/goals`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "ngrok-skip-browser-warning": "true",
+        },
+        validateStatus: () => true,
+      });
+      if (response.status >= 200 && response.status < 300) {
         alert("Your goal has been submitted successfully!");
         buttonClick();
       }
-      if (!response.ok) {
+      if (response.status < 200 || response.status >= 300) {
         alert("An error occurred from server. Please login again.");
       }
     } catch (err) {

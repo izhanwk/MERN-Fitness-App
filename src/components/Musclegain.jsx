@@ -2,8 +2,10 @@ import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
-import api from "../utils/api";
+import axios from "axios";
 import Loader from "./Loader";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Musclegain() {
   const [musclegainMode, setMusclegainMode] = useState("");
@@ -13,18 +15,20 @@ function Musclegain() {
   const sendData = async () => {
     setLoading(true);
     try {
-      const response = await api.post(
-        "/mode",
+      const response = await axios.post(
+        `${API_URL}/mode`,
         { mode: musclegainMode },
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "ngrok-skip-browser-warning": "true",
           },
+          validateStatus: () => true,
         }
       );
 
-      if (response.ok) {
+      if (response.status >= 200 && response.status < 300) {
         alert("Mode saved successfully!");
         navigate("/activity");
       } else {

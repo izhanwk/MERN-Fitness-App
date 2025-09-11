@@ -3,8 +3,10 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import DNavbar from "./DNavbar";
 import { LogOut } from "lucide-react";
-import api from "../utils/api";
+import axios from "axios";
 import Loader from "./Loader";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Sessions() {
   const [sessions, setSessions] = useState([]);
@@ -23,16 +25,19 @@ function Sessions() {
         const decoded = jwtDecode(token);
         console.log("Decoded token:", decoded);
 
-        const response = await api.get(
-          `/sessions?id=${decoded.userId}`,
+        const response = await axios.get(
+          `${API_URL}/sessions?id=${decoded.userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
             },
+            validateStatus: () => true,
           }
         );
 
-        if (!response.ok) throw new Error("Failed to fetch sessions");
+        if (response.status < 200 || response.status >= 300)
+          throw new Error("Failed to fetch sessions");
 
         const data = response.data;
         console.log("Fetched sessions:", data);
@@ -49,17 +54,19 @@ function Sessions() {
   const logOutSession = async (id) => {
     setActionLoading(true);
     try {
-      const response = await api.delete(
-        `/logoutsession?id=${id}`,
+      const response = await axios.delete(
+        `${API_URL}/logoutsession?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "ngrok-skip-browser-warning": "true",
           },
+          validateStatus: () => true,
         }
       );
 
-      if (response.ok) {
+      if (response.status >= 200 && response.status < 300) {
         setSessions((prev) => prev.filter((s) => s._id !== id));
       } else {
         const data = response.data;

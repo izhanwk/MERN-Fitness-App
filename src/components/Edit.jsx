@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import DNavbar from "./DNavbar";
-import api from "../utils/api";
+import axios from "axios";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Edit() {
   const navigate = useNavigate();
@@ -31,10 +33,15 @@ function Edit() {
     const getInfo = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await api.get("/editdata", {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await axios.get(`${API_URL}/editdata`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          validateStatus: () => true,
         });
-        if (!response.ok) throw new Error("Fetch failed");
+        if (response.status < 200 || response.status >= 300)
+          throw new Error("Fetch failed");
         const resData = response.data;
 
         const dateISO = resData?.date
@@ -102,14 +109,16 @@ function Edit() {
         // array/password/refreshtoken/verified not edited here
       };
 
-      const response = await api.put("/editdata", payload, {
+      const response = await axios.put(`${API_URL}/editdata`, payload, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
         },
+        validateStatus: () => true,
       });
 
-      if (!response.ok) {
+      if (response.status < 200 || response.status >= 300) {
         const errText = response.data?.message || "Save failed";
         throw new Error(errText);
       }

@@ -2,8 +2,10 @@ import { useState } from "react";
 import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
-import api from "../utils/api";
+import axios from "axios";
 import Loader from "./Loader";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Register() {
   const {
@@ -20,16 +22,14 @@ function Register() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      let response = await api.post(
-        "/register",
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.ok) {
+      const response = await axios.post(`${API_URL}/register`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+        },
+        validateStatus: () => true,
+      });
+      if (response.status >= 200 && response.status < 300) {
         alert("Registration Successful");
         navigate("/signin");
       } else if (response.status === 503) {
