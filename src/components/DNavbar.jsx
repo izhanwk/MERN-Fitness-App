@@ -25,62 +25,62 @@ function DNavbar() {
     navigate("/signin");
   };
 
-  // const refreshtoken = async () => {
-  //   try {
-  //     const refreshToken = localStorage.getItem("refreshtoken");
-  //     console.log("Our refresh token : ", refreshToken);
-  //     let response = await api.post(
-  //       "/refresh-token",
-  //       { refreshtoken: refreshToken },
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           // Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
-  //         },
-  //       }
-  //     );
-  //     if (response.ok) {
-  //       const data = response.data;
-  //       localStorage.setItem("token", data.token);
-  //       console.log(localStorage.getItem("token"));
-  //       console.log("Token Refreshed");
-  //       // alert("Token Refreshed");
-  //     } else {
-  //       localStorage.removeItem("token");
-  //       console.log("Login failed");
-  //       alert("Session Expired");
-  //       navigate("/signin");
-  //     }
-  //   } catch (err) {
-  //     console.log("Error occured : ", err);
-  //   }
-  // };
-  // useEffect(() => {
-  //   const interValid = setInterval(() => {
-  //     const fetchData = async () => {
-  //       try {
-  //         const token = localStorage.getItem("token");
-  //         const response = await api.get("/getdata", {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //           },
-  //         });
-  //         if (response.ok) {
-  //           // alert("Token is valid");
-  //           console.log("Token is Valid");
-  //         } else if (response.status === 403) {
-  //           refreshtoken();
-  //         } else {
-  //           logOut();
-  //         }
-  //       } catch (err) {
-  //         console.log(`Error in fetchData: ${err}`);
-  //       }
-  //     };
-  //     fetchData();
-  //   }, 60000);
-  //   return () => clearInterval(interValid);
-  // }, []);
+  const refreshtoken = async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshtoken");
+      console.log("Our refresh token : ", refreshToken);
+      let response = await api.post(
+        "/refresh-token",
+        { refreshtoken: refreshToken },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("refreshtoken")}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = response.data;
+        localStorage.setItem("token", data.token);
+        console.log(localStorage.getItem("token"));
+        console.log("Token Refreshed");
+        // alert("Token Refreshed");
+      } else {
+        localStorage.removeItem("token");
+        console.log("Login failed");
+        alert("Session Expired");
+        navigate("/signin");
+      }
+    } catch (err) {
+      console.log("Error occured : ", err);
+    }
+  };
+  useEffect(() => {
+    const interValid = setInterval(() => {
+      const fetchData = async () => {
+        try {
+          const token = localStorage.getItem("token");
+          const response = await api.get("/getdata", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (response.ok) {
+            // alert("Token is valid");
+            console.log("Token is Valid");
+          } else if (response.status === 403) {
+            refreshtoken();
+          } else {
+            logOut();
+          }
+        } catch (err) {
+          console.log(`Error in fetchData: ${err}`);
+        }
+      };
+      fetchData();
+    }, 60000);
+    return () => clearInterval(interValid);
+  }, []);
 
   const show = () => {
     setvisible(!visible);
