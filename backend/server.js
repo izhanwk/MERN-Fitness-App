@@ -443,6 +443,8 @@ app.post("/register", async (req, res) => {
 
     const url = `https://mern-fitness-app-production.up.railway.app/${token}`;
     console.log(url);
+    console.log(process.env.EMAIL_USER);
+    console.log(process.env.EMAIL_PASS);
 
     // send verification email
     await transporter.sendMail({
