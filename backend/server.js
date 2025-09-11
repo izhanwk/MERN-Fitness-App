@@ -441,7 +441,7 @@ app.post("/register", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    const url = `${process.env.VITE_API_URL}/${token}`;
+    const url = `https://mern-fitness-app-production.up.railway.app/${token}`;
     console.log(url);
 
     // send verification email
