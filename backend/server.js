@@ -442,6 +442,7 @@ app.post("/register", async (req, res) => {
     );
 
     const url = `${process.env.VITE_API_URL}/${token}`;
+    console.log(url);
 
     // send verification email
     await transporter.sendMail({
