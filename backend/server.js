@@ -11,6 +11,7 @@ import nodemailer from "nodemailer";
 import Sessions from "../Model/Sessions.js";
 import Otp from "../Model/Otp.js";
 import useragent from "useragent";
+import { sendGmail } from "./gmailSender.js";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -447,14 +448,20 @@ app.post("/register", async (req, res) => {
     console.log(process.env.EMAIL_PASS);
 
     // send verification email
-    await transporter.sendMail({
-      from: `"Fitness App" <${process.env.EMAIL_USER}>`,
+    // await transporter.sendMail({
+    //   from: `"Fitness App" <${process.env.EMAIL_USER}>`,
+    //   to: email,
+    //   subject: "Verify your email",
+    //   html: `<h3>Click below to verify your email:</h3>
+    //          <a href="${url}">${url}</a>`,
+    // });
+
+    await sendGmail({
       to: email,
       subject: "Verify your email",
       html: `<h3>Click below to verify your email:</h3>
              <a href="${url}">${url}</a>`,
     });
-
     res.status(200).send("Verification email sent! Please check your inbox.");
   } catch (err) {
     console.error("Error sending verification email : ", err);
