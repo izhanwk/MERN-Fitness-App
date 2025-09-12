@@ -30,12 +30,10 @@ let primaryEmail = "";
 let secretkey = process.env.SECRET_KEY;
 let refreshkey = process.env.REFRESH;
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // Use 'false' for STARTTLS
+  service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER, // your email
+    pass: process.env.EMAIL_PASS, // your app password
   },
 });
 
