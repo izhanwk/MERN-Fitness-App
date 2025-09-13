@@ -344,6 +344,7 @@ const NutritionTracker = () => {
     if (isFirstLoad) return;
     (async () => {
       try {
+        setLoading(true);
         await axios.post(
           `${API_URL}/store`,
           { array: newfood },
@@ -356,8 +357,10 @@ const NutritionTracker = () => {
             validateStatus: () => true,
           }
         );
+        setLoading(false);
       } catch (e) {
         console.error("POST /store error", e);
+        setLoading(false);
       }
     })();
   }, [newfood, isFirstLoad]);
