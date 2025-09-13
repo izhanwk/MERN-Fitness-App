@@ -460,12 +460,8 @@ const NutritionTracker = () => {
   return (
     <>
       {loading ? (
-        <div className="relative flex items-center justify-center min-h-screen">
-          {/* background gradient */}
-          <div className="absolute inset-0  blur-3xl"></div>
-
-          {/* foreground content */}
-          <div className="relative flex flex-col items-center space-y-4">
+        <div className="fixed inset-0 flex items-center justify-center min-h-screen bg-black/40 backdrop-blur-md z-50">
+          <div className="flex flex-col items-center space-y-4">
             <div className="w-16 h-16 border-4 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin"></div>
             <div className="text-white text-xl font-semibold">
               Loading your dashboard...
