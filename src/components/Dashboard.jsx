@@ -459,7 +459,7 @@ const NutritionTracker = () => {
 
   return (
     <>
-      {loading ? (
+      {loading && (
         <div className="fixed inset-0 flex items-center justify-center min-h-screen bg-black/40 backdrop-blur-md z-50">
           <div className="flex flex-col items-center space-y-4">
             <div className="w-16 h-16 border-4 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin"></div>
@@ -468,385 +468,383 @@ const NutritionTracker = () => {
             </div>
           </div>
         </div>
-      ) : (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0 font-dm-sans text-white relative overflow-hidden">
-          {/* background */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          </div>
+      )}
 
-          <DNavbar />
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0 font-dm-sans text-white relative overflow-hidden">
+        {/* background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
 
-          <div className="flex">
-            <div className="flex justify-center w-full relative z-10">
-              <div className="w-full max-w-screen-xl overflow-hidden px-4">
-                <div className="flex justify-center text-center bg-gradient-to-r from-purple-600/50 to-blue-600/50 backdrop-blur-sm border-b border-white/10 py-4 rounded-lg mt-4">
-                  <div className="font-semibold text-lg px-2">
-                    Welcome back,{" "}
-                    <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent font-bold">
-                      {userName}
-                    </span>
-                    <p
-                      className="cursor-pointer font-light text-sm hover:text-yellow-400 transition-colors duration-300 mt-1"
-                      onClick={() => navigate("/edit")}
-                    >
-                      ✏️ Edit your profile
-                    </p>
+        <DNavbar />
+
+        <div className="flex">
+          <div className="flex justify-center w-full relative z-10">
+            <div className="w-full max-w-screen-xl overflow-hidden px-4">
+              <div className="flex justify-center text-center bg-gradient-to-r from-purple-600/50 to-blue-600/50 backdrop-blur-sm border-b border-white/10 py-4 rounded-lg mt-4">
+                <div className="font-semibold text-lg px-2">
+                  Welcome back,{" "}
+                  <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent font-bold">
+                    {userName}
+                  </span>
+                  <p
+                    className="cursor-pointer font-light text-sm hover:text-yellow-400 transition-colors duration-300 mt-1"
+                    onClick={() => navigate("/edit")}
+                  >
+                    ✏️ Edit your profile
+                  </p>
+                </div>
+              </div>
+
+              {/* Manage meals modal */}
+              {showList && (
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto border border-white/20">
+                    <div className="relative rounded shadow-md p-6">
+                      <span className="block text-center font-bold text-xl text-slate-800 mb-4">
+                        Eat List
+                      </span>
+                      <i
+                        className="fa-solid fa-circle-xmark absolute top-4 right-4 text-2xl text-gray-400 cursor-pointer hover:text-red-600 transition-colors duration-300"
+                        onClick={closeEatList}
+                      ></i>
+
+                      <ul className="mt-4 space-y-2">
+                        {newfood.length > 0 ? (
+                          newfood.map((foods, index) => (
+                            <li
+                              key={index}
+                              className="flex justify-between items-center bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl p-4 shadow-lg"
+                            >
+                              <p className="flex-1 truncate pl-3">
+                                {foods.name}
+                              </p>
+                              <span className="ml-4 bg-white/20 px-2 py-1 rounded-full text-sm">
+                                {foods.quantity}
+                              </span>
+                              <button
+                                className="ml-4 bg-red-500 hover:bg-red-600 text-xs text-white px-3 py-1 rounded-full transition-colors duration-300 shadow-md"
+                                onClick={() => removefood(index)}
+                              >
+                                Remove
+                              </button>
+                            </li>
+                          ))
+                        ) : (
+                          <p className="text-center text-gray-500 py-4">
+                            No food items added yet
+                          </p>
+                        )}
+                      </ul>
+                    </div>
                   </div>
                 </div>
+              )}
 
-                {/* Manage meals modal */}
-                {showList && (
-                  <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto border border-white/20">
-                      <div className="relative rounded shadow-md p-6">
-                        <span className="block text-center font-bold text-xl text-slate-800 mb-4">
-                          Eat List
-                        </span>
+              {/* Controls */}
+              <div className="flex flex-col items-center">
+                <div
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-sm px-6 py-3 mt-8 rounded-full flex justify-center items-center cursor-pointer transition-all duration-300 shadow-lg hover:shadow-purple-500/25 font-medium"
+                  onClick={() => setshowList(true)}
+                >
+                  📝 MANAGE YOUR MEALS
+                </div>
+
+                <h2 className="mt-8 font-bold text-3xl text-center px-4">
+                  Your{" "}
+                  <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                    Nutrition
+                  </span>{" "}
+                  Tracker
+                </h2>
+
+                {/* Search / Add */}
+                <div className="flex mt-8 w-full justify-center px-4">
+                  <div className="flex flex-col sm:flex-row w-full max-w-2xl justify-center items-center gap-2">
+                    <div className="flex relative w-full sm:w-auto">
+                      <div
+                        className="w-full sm:w-64 h-12 rounded-xl bg-white/90 backdrop-blur-sm cursor-pointer text-slate-800 text-sm font-semibold flex items-center justify-between px-4 shadow-lg border border-white/20 hover:bg-white transition-all duration-300"
+                        onClick={() => {
+                          searchFood();
+                          start();
+                          rotate();
+                        }}
+                      >
+                        <p className="text-slate-600 truncate">{selectFood}</p>
                         <i
-                          className="fa-solid fa-circle-xmark absolute top-4 right-4 text-2xl text-gray-400 cursor-pointer hover:text-red-600 transition-colors duration-300"
-                          onClick={closeEatList}
+                          className={`fa-solid fa-caret-down text-slate-600 transition-transform duration-300 ${
+                            rotation ? "-rotate-180" : "-rotate-0"
+                          }`}
                         ></i>
+                      </div>
 
-                        <ul className="mt-4 space-y-2">
-                          {newfood.length > 0 ? (
-                            newfood.map((foods, index) => (
-                              <li
-                                key={index}
-                                className="flex justify-between items-center bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl p-4 shadow-lg"
-                              >
-                                <p className="flex-1 truncate pl-3">
-                                  {foods.name}
-                                </p>
-                                <span className="ml-4 bg-white/20 px-2 py-1 rounded-full text-sm">
-                                  {foods.quantity}
-                                </span>
-                                <button
-                                  className="ml-4 bg-red-500 hover:bg-red-600 text-xs text-white px-3 py-1 rounded-full transition-colors duration-300 shadow-md"
-                                  onClick={() => removefood(index)}
-                                >
-                                  Remove
-                                </button>
-                              </li>
-                            ))
-                          ) : (
-                            <p className="text-center text-gray-500 py-4">
-                              No food items added yet
-                            </p>
-                          )}
+                      <div
+                        className={`option absolute w-full sm:w-64 max-h-60 bg-white/95 backdrop-blur-sm z-20 rounded-xl top-14 p-4 overflow-y-scroll shadow-2xl border border-white/20 ${
+                          searchVisiblity ? "block" : "hidden"
+                        }`}
+                        id="big-box"
+                      >
+                        <input
+                          type="text"
+                          placeholder="Search Food"
+                          className="w-full outline-none border-2 rounded-lg text-slate-800 p-3 text-sm border-gray-200 focus:border-yellow-400 transition-colors duration-300 bg-white/80"
+                          value={searchText}
+                          onChange={(e) => searchItems(e.target.value)}
+                        />
+                        <ul className="text-sm mt-2">
+                          {food.map((f, index) => (
+                            <li
+                              key={index}
+                              className="p-3 cursor-pointer hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white rounded-lg text-slate-700 transition-all duration-300"
+                              onClick={() => {
+                                searchFood();
+                                setindexFood(index);
+                                setselectFood(f.name);
+                                rotate();
+                              }}
+                            >
+                              {f.name}
+                            </li>
+                          ))}
                         </ul>
                       </div>
                     </div>
-                  </div>
-                )}
 
-                {/* Controls */}
-                <div className="flex flex-col items-center">
-                  <div
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-sm px-6 py-3 mt-8 rounded-full flex justify-center items-center cursor-pointer transition-all duration-300 shadow-lg hover:shadow-purple-500/25 font-medium"
-                    onClick={() => setshowList(true)}
-                  >
-                    📝 MANAGE YOUR MEALS
-                  </div>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Enter Quantity"
+                      className="w-full sm:w-40 p-3 text-center h-12 rounded-xl bg-white/90 backdrop-blur-sm text-slate-800 text-sm font-semibold outline-none border border-white/20 focus:border-yellow-400 transition-all duration-300 shadow-lg"
+                      value={quantity}
+                      onInput={(e) => setquantity(e.target.value)}
+                    />
 
-                  <h2 className="mt-8 font-bold text-3xl text-center px-4">
-                    Your{" "}
-                    <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                      Nutrition
-                    </span>{" "}
-                    Tracker
-                  </h2>
-
-                  {/* Search / Add */}
-                  <div className="flex mt-8 w-full justify-center px-4">
-                    <div className="flex flex-col sm:flex-row w-full max-w-2xl justify-center items-center gap-2">
-                      <div className="flex relative w-full sm:w-auto">
-                        <div
-                          className="w-full sm:w-64 h-12 rounded-xl bg-white/90 backdrop-blur-sm cursor-pointer text-slate-800 text-sm font-semibold flex items-center justify-between px-4 shadow-lg border border-white/20 hover:bg-white transition-all duration-300"
-                          onClick={() => {
-                            searchFood();
-                            start();
-                            rotate();
-                          }}
-                        >
-                          <p className="text-slate-600 truncate">
-                            {selectFood}
-                          </p>
-                          <i
-                            className={`fa-solid fa-caret-down text-slate-600 transition-transform duration-300 ${
-                              rotation ? "-rotate-180" : "-rotate-0"
-                            }`}
-                          ></i>
-                        </div>
-
-                        <div
-                          className={`option absolute w-full sm:w-64 max-h-60 bg-white/95 backdrop-blur-sm z-20 rounded-xl top-14 p-4 overflow-y-scroll shadow-2xl border border-white/20 ${
-                            searchVisiblity ? "block" : "hidden"
-                          }`}
-                          id="big-box"
-                        >
-                          <input
-                            type="text"
-                            placeholder="Search Food"
-                            className="w-full outline-none border-2 rounded-lg text-slate-800 p-3 text-sm border-gray-200 focus:border-yellow-400 transition-colors duration-300 bg-white/80"
-                            value={searchText}
-                            onChange={(e) => searchItems(e.target.value)}
-                          />
-                          <ul className="text-sm mt-2">
-                            {food.map((f, index) => (
-                              <li
-                                key={index}
-                                className="p-3 cursor-pointer hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white rounded-lg text-slate-700 transition-all duration-300"
-                                onClick={() => {
-                                  searchFood();
-                                  setindexFood(index);
-                                  setselectFood(f.name);
-                                  rotate();
-                                }}
-                              >
-                                {f.name}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-
-                      <input
-                        type="number"
-                        min="0"
-                        placeholder="Enter Quantity"
-                        className="w-full sm:w-40 p-3 text-center h-12 rounded-xl bg-white/90 backdrop-blur-sm text-slate-800 text-sm font-semibold outline-none border border-white/20 focus:border-yellow-400 transition-all duration-300 shadow-lg"
-                        value={quantity}
-                        onInput={(e) => setquantity(e.target.value)}
-                      />
-
-                      <button
-                        className="w-full sm:w-32 h-12 px-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 rounded-xl text-center flex items-center justify-center font-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25"
-                        onClick={(e) => {
-                          if (!quantity || Number(quantity) <= 0) {
-                            e.preventDefault();
-                            return;
-                          }
-                          setFood(indexFood);
-                        }}
-                      >
-                        ➕ Add
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Bars */}
-                  <div className="flex justify-center w-full mt-12 px-4">
-                    <div className="w-full max-w-4xl">
-                      {/* Calories */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-6 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-yellow-400 mb-2 xs:mb-0">
-                          Calories
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${calPercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tcalories}/{Math.round(Crequirement)}
-                        </p>
-                      </div>
-
-                      {/* Proteins */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-blue-400 mb-2 xs:mb-0">
-                          Proteins
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${proPercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tproteins}/{Math.round(proteinReq)}
-                        </p>
-                      </div>
-
-                      {/* Fats */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-red-400 mb-2 xs:mb-0">
-                          Fats
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-red-400 to-red-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${fatsPercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tfats}/{Math.round(fatsreq)}
-                        </p>
-                      </div>
-
-                      {/* Carbs */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-green-400 mb-2 xs:mb-0">
-                          Carbohydrates
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${carbsPercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tcarbs}/{Math.round(carbsreq)}
-                        </p>
-                      </div>
-
-                      {/* Vitamins & Minerals */}
-                      <div className="mt-8 mb-4">
-                        <h3 className="text-xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                          Vitamins &amp; Minerals
-                        </h3>
-                      </div>
-
-                      {/* Vitamin A */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-blue-400 mb-2 xs:mb-0">
-                          Vitamin A
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${vApercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tVA}/{Areq}
-                        </p>
-                      </div>
-
-                      {/* Vitamin B */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-green-400 mb-2 xs:mb-0">
-                          Vitamin B
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${vBpercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tVB}/{Breq}
-                        </p>
-                      </div>
-
-                      {/* Vitamin C */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-yellow-400 mb-2 xs:mb-0">
-                          Vitamin C
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${vCpercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tVC}/{Creq}
-                        </p>
-                      </div>
-
-                      {/* Vitamin E */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-pink-400 mb-2 xs:mb-0">
-                          Vitamin E
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-pink-400 to-pink-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${vEpercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tVE}/15
-                        </p>
-                      </div>
-
-                      {/* Vitamin K */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-purple-400 mb-2 xs:mb-0">
-                          Vitamin K
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${vKpercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tVK}/{Kreq}
-                        </p>
-                      </div>
-
-                      {/* Iron */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-red-400 mb-2 xs:mb-0">
-                          Iron
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-red-400 to-red-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${ironPercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tIron}/{ireq}
-                        </p>
-                      </div>
-
-                      {/* Calcium */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-teal-400 mb-2 xs:mb-0">
-                          Calcium
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${calciumPercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tCalcium}/{calciumReq}
-                        </p>
-                      </div>
-
-                      {/* Magnesium */}
-                      <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                        <p className="w-full xs:w-1/4 font-semibold text-indigo-400 mb-2 xs:mb-0">
-                          Magnesium
-                        </p>
-                        <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
-                          <div
-                            className="h-6 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                            style={{ width: `${magnesiumPercentage}%` }}
-                          />
-                        </div>
-                        <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
-                          {tMagnesium}/{magnesiumReq}
-                        </p>
-                      </div>
-                    </div>
+                    <button
+                      className="w-full sm:w-32 h-12 px-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 rounded-xl text-center flex items-center justify-center font-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+                      onClick={(e) => {
+                        if (!quantity || Number(quantity) <= 0) {
+                          e.preventDefault();
+                          return;
+                        }
+                        setFood(indexFood);
+                      }}
+                    >
+                      ➕ Add
+                    </button>
                   </div>
                 </div>
 
-                {/* end */}
+                {/* Bars */}
+                <div className="flex justify-center w-full mt-12 px-4">
+                  <div className="w-full max-w-4xl">
+                    {/* Calories */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-6 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-yellow-400 mb-2 xs:mb-0">
+                        Calories
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${calPercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tcalories}/{Math.round(Crequirement)}
+                      </p>
+                    </div>
+
+                    {/* Proteins */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-blue-400 mb-2 xs:mb-0">
+                        Proteins
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${proPercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tproteins}/{Math.round(proteinReq)}
+                      </p>
+                    </div>
+
+                    {/* Fats */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-red-400 mb-2 xs:mb-0">
+                        Fats
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-red-400 to-red-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${fatsPercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tfats}/{Math.round(fatsreq)}
+                      </p>
+                    </div>
+
+                    {/* Carbs */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-green-400 mb-2 xs:mb-0">
+                        Carbohydrates
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${carbsPercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tcarbs}/{Math.round(carbsreq)}
+                      </p>
+                    </div>
+
+                    {/* Vitamins & Minerals */}
+                    <div className="mt-8 mb-4">
+                      <h3 className="text-xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        Vitamins &amp; Minerals
+                      </h3>
+                    </div>
+
+                    {/* Vitamin A */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-blue-400 mb-2 xs:mb-0">
+                        Vitamin A
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${vApercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tVA}/{Areq}
+                      </p>
+                    </div>
+
+                    {/* Vitamin B */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-green-400 mb-2 xs:mb-0">
+                        Vitamin B
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${vBpercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tVB}/{Breq}
+                      </p>
+                    </div>
+
+                    {/* Vitamin C */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-yellow-400 mb-2 xs:mb-0">
+                        Vitamin C
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${vCpercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tVC}/{Creq}
+                      </p>
+                    </div>
+
+                    {/* Vitamin E */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-pink-400 mb-2 xs:mb-0">
+                        Vitamin E
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-pink-400 to-pink-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${vEpercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tVE}/15
+                      </p>
+                    </div>
+
+                    {/* Vitamin K */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-purple-400 mb-2 xs:mb-0">
+                        Vitamin K
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${vKpercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tVK}/{Kreq}
+                      </p>
+                    </div>
+
+                    {/* Iron */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-red-400 mb-2 xs:mb-0">
+                        Iron
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-red-400 to-red-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${ironPercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tIron}/{ireq}
+                      </p>
+                    </div>
+
+                    {/* Calcium */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-teal-400 mb-2 xs:mb-0">
+                        Calcium
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${calciumPercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tCalcium}/{calciumReq}
+                      </p>
+                    </div>
+
+                    {/* Magnesium */}
+                    <div className="flex flex-col xs:flex-row justify-start items-center text-base mt-4 w-full bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <p className="w-full xs:w-1/4 font-semibold text-indigo-400 mb-2 xs:mb-0">
+                        Magnesium
+                      </p>
+                      <div className="w-full xs:w-3/5 h-6 rounded-full bg-gray-700 overflow-hidden shadow-inner">
+                        <div
+                          className="h-6 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                          style={{ width: `${magnesiumPercentage}%` }}
+                        />
+                      </div>
+                      <p className="w-full xs:w-1/5 mt-2 xs:mt-0 xs:ml-4 font-semibold text-right">
+                        {tMagnesium}/{magnesiumReq}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* end */}
             </div>
           </div>
         </div>
-      )}
+      </div>
     </>
   );
 };
