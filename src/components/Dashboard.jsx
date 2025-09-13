@@ -345,6 +345,7 @@ const NutritionTracker = () => {
     (async () => {
       try {
         setLoading(true);
+        console.log("Loading started");
         await axios.post(
           `${API_URL}/store`,
           { array: newfood },
@@ -358,8 +359,10 @@ const NutritionTracker = () => {
           }
         );
         setLoading(false);
+        console.log("Loading Ended");
       } catch (e) {
         console.error("POST /store error", e);
+        console.log("Loading Ended");
         setLoading(false);
       }
     })();
