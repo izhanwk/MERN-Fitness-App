@@ -345,7 +345,7 @@ const NutritionTracker = () => {
     (async () => {
       try {
         setLoading(true);
-        console.log("Loading started");
+
         await axios.post(
           `${API_URL}/store`,
           { array: newfood },
@@ -359,10 +359,9 @@ const NutritionTracker = () => {
           }
         );
         setLoading(false);
-        console.log("Loading Ended");
       } catch (e) {
         console.error("POST /store error", e);
-        console.log("Loading Ended");
+
         setLoading(false);
       }
     })();
@@ -461,7 +460,7 @@ const NutritionTracker = () => {
   return (
     <>
       {loading ? (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 blur-3xl">
           <div className="flex flex-col items-center space-y-4">
             <div className="w-16 h-16 border-4 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin"></div>
             <div className="text-white text-xl font-semibold">
