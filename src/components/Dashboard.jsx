@@ -462,7 +462,7 @@ const NutritionTracker = () => {
       {loading ? (
         <div className="relative flex items-center justify-center min-h-screen">
           {/* background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 blur-3xl"></div>
+          <div className="absolute inset-0  blur-3xl"></div>
 
           {/* foreground content */}
           <div className="relative flex flex-col items-center space-y-4">
