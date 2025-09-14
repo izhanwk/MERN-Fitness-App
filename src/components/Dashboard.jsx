@@ -360,6 +360,7 @@ const NutritionTracker = () => {
           }
         );
         setnewfood(initialFood);
+        setLoading(false);
       } catch (e) {
         console.error("POST /store error", e);
 
