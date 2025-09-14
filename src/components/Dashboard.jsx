@@ -331,7 +331,7 @@ const NutritionTracker = () => {
         });
         if (res.status >= 200 && res.status < 300) {
           const data = res.data;
-          setnewfood(data || []);
+          setinitialFood(data || []);
           setIsFirstLoad(false);
         }
       } catch (e) {
