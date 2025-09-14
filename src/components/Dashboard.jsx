@@ -427,7 +427,7 @@ const NutritionTracker = () => {
 
   // remove food
   const removefood = (idx) => {
-    setnewfood((prev) => prev.filter((_, i) => i !== idx));
+    setinitialFood((prev) => prev.filter((_, i) => i !== idx));
   };
 
   // percentages (guard divide-by-zero)
