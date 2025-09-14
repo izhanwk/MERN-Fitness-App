@@ -349,7 +349,7 @@ const NutritionTracker = () => {
 
         await axios.post(
           `${API_URL}/store`,
-          { array: newfood },
+          { array: initialFood },
           {
             headers: {
               "Content-Type": "application/json",
