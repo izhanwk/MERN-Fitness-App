@@ -26,6 +26,7 @@ const NutritionTracker = () => {
   const [originalList, setoriginalList] = useState([]);
   const [foodselection, setfoodselection] = useState([]);
   const [newfood, setnewfood] = useState([]);
+  const [initialFood, setinitialFood] = useState([]);
 
   // ui
   const [selectFood, setselectFood] = useState("Select Food");
@@ -358,14 +359,14 @@ const NutritionTracker = () => {
             validateStatus: () => true,
           }
         );
-        setLoading(false);
+        setnewfood(initialFood);
       } catch (e) {
         console.error("POST /store error", e);
 
         setLoading(false);
       }
     })();
-  }, [newfood, isFirstLoad]);
+  }, [initialFood, isFirstLoad]);
 
   // add food
   const setFood = (index) => {
@@ -374,7 +375,7 @@ const NutritionTracker = () => {
     if (quantity === "" || Number(quantity) <= 0) return;
 
     const newItem = { ...selectedFood, quantity: Number(quantity) };
-    setnewfood((prev) => [...prev, newItem]);
+    setinitialFood((prev) => [...prev, newItem]);
     setquantity("");
   };
 
