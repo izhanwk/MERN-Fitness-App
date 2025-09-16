@@ -442,7 +442,9 @@ app.post("/register", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    const url = `https://mern-fitness-app-production.up.railway.app/${token}`;
+    const baseUrl =
+      process.env.SERVER_BASE_URL || `${req.protocol}://${req.get("host")}`;
+    const url = `${baseUrl}/verify/${token}`;
     console.log(url);
     console.log(process.env.EMAIL_USER);
     console.log(process.env.EMAIL_PASS);
