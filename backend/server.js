@@ -570,8 +570,13 @@ app.post("/forgot-password", async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     await Otp.deleteMany({ email });
     await Otp.create({ email, otp });
-    await transporter.sendMail({
-      from: `"Fitness App" <${process.env.EMAIL_USER}>`,
+    // await transporter.sendMail({
+    //   from: `"Fitness App" <${process.env.EMAIL_USER}>`,
+    //   to: email,
+    //   subject: "Password reset OTP",
+    //   html: `<p>Your OTP for password reset is <b>${otp}</b></p>`,
+    // });
+    await sendGmail({
       to: email,
       subject: "Password reset OTP",
       html: `<p>Your OTP for password reset is <b>${otp}</b></p>`,
