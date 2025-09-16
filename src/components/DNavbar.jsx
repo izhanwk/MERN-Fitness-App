@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // for hamburger icons
 import Loader from "./Loader";
@@ -12,6 +12,8 @@ function DNavbar() {
   const [visible, setvisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const isRefreshing = useRef(false);
+  // const refreshPromiseRef = useRef(null);
 
   const logOut = async () => {
     console.log("Loggin out");
@@ -52,20 +54,86 @@ function DNavbar() {
         localStorage.setItem("token", data.token);
         console.log("New token:", localStorage.getItem("token"));
         console.log("Token refreshed successfully");
-        // alert("Token Refreshed");
+        return data.token;
       } else {
         localStorage.removeItem("token");
         console.log("Login failed");
         alert("Session Expired");
         navigate("/signin");
+        return null;
       }
     } catch (err) {
       console.error("Error occurred:", err);
       localStorage.removeItem("token");
       alert("Session Expired");
       navigate("/signin");
+      return null;
     }
   };
+
+  useEffect(() => {
+    // // Attach axios interceptors: add token to requests, refresh on 403, then retry once
+    // const requestInterceptor = axios.interceptors.request.use((config) => {
+    //   const token = localStorage.getItem("token");
+    //   if (token && !config.headers?.Authorization) {
+    //     config.headers = {
+    //       ...config.headers,
+    //       Authorization: `Bearer ${token}`,
+    //     };
+    //   }
+    //   return config;
+    // });
+
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error?.config;
+        const status = error?.response?.status;
+
+        // Do not try to refresh for refresh-token endpoint itself
+        const isRefreshEndpoint =
+          originalRequest?.url?.includes("/refresh-token");
+
+        if (
+          status === 403 &&
+          originalRequest &&
+          !originalRequest._retry &&
+          !isRefreshEndpoint
+        ) {
+          originalRequest._retry = true;
+
+          try {
+            if (!isRefreshing.current) {
+              isRefreshing.current = true;
+              await refreshtoken();
+            }
+
+            // const newToken = await refreshPromiseRef.current;
+            isRefreshing.current = false;
+            // refreshPromiseRef.current = null;
+
+            // if (newToken) {
+            //   originalRequest.headers = {
+            //     ...originalRequest.headers,
+            //     Authorization: `Bearer ${newToken}`,
+            //   };
+            //   return axios(originalRequest);
+            // }
+          } catch (e) {
+            isRefreshing.current = false;
+            // refreshPromiseRef.current = null;
+          }
+        }
+
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.request.eject(requestInterceptor);
+      axios.interceptors.response.eject(responseInterceptor);
+    };
+  }, []);
 
   useEffect(() => {
     const interValid = setInterval(() => {
@@ -84,14 +152,14 @@ function DNavbar() {
           if (response.status === 200) {
             console.log("Token is valid");
           } else if (response.status === 403) {
-            refreshtoken();
+            await refreshtoken();
           } else {
             logOut();
           }
         } catch (err) {
           if (err.response?.status === 403) {
             // Token expired, try refreshing
-            refreshtoken();
+            await refreshtoken();
           } else {
             console.error("Error in fetchData:", err);
             logOut();
