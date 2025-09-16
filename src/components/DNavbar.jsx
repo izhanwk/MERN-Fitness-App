@@ -13,7 +13,7 @@ function DNavbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const isRefreshing = useRef(false);
-  const refreshPromiseRef = useRef(null);
+  // const refreshPromiseRef = useRef(null);
 
   const logOut = async () => {
     console.log("Loggin out");
@@ -72,17 +72,17 @@ function DNavbar() {
   };
 
   useEffect(() => {
-    // Attach axios interceptors: add token to requests, refresh on 403, then retry once
-    const requestInterceptor = axios.interceptors.request.use((config) => {
-      const token = localStorage.getItem("token");
-      if (token && !config.headers?.Authorization) {
-        config.headers = {
-          ...config.headers,
-          Authorization: `Bearer ${token}`,
-        };
-      }
-      return config;
-    });
+    // // Attach axios interceptors: add token to requests, refresh on 403, then retry once
+    // const requestInterceptor = axios.interceptors.request.use((config) => {
+    //   const token = localStorage.getItem("token");
+    //   if (token && !config.headers?.Authorization) {
+    //     config.headers = {
+    //       ...config.headers,
+    //       Authorization: `Bearer ${token}`,
+    //     };
+    //   }
+    //   return config;
+    // });
 
     const responseInterceptor = axios.interceptors.response.use(
       (response) => response,
@@ -105,23 +105,23 @@ function DNavbar() {
           try {
             if (!isRefreshing.current) {
               isRefreshing.current = true;
-              refreshPromiseRef.current = refreshtoken();
+              await refreshtoken();
             }
 
-            const newToken = await refreshPromiseRef.current;
+            // const newToken = await refreshPromiseRef.current;
             isRefreshing.current = false;
-            refreshPromiseRef.current = null;
+            // refreshPromiseRef.current = null;
 
-            if (newToken) {
-              originalRequest.headers = {
-                ...originalRequest.headers,
-                Authorization: `Bearer ${newToken}`,
-              };
-              return axios(originalRequest);
-            }
+            // if (newToken) {
+            //   originalRequest.headers = {
+            //     ...originalRequest.headers,
+            //     Authorization: `Bearer ${newToken}`,
+            //   };
+            //   return axios(originalRequest);
+            // }
           } catch (e) {
             isRefreshing.current = false;
-            refreshPromiseRef.current = null;
+            // refreshPromiseRef.current = null;
           }
         }
 
@@ -130,7 +130,7 @@ function DNavbar() {
     );
 
     return () => {
-      axios.interceptors.request.eject(requestInterceptor);
+      // axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
     };
   }, []);
