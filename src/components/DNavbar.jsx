@@ -13,7 +13,7 @@ function DNavbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const isRefreshing = useRef(false);
-  // const refreshPromiseRef = useRef(null);
+  const refreshPromiseRef = useRef(null);
 
   const logOut = async () => {
     console.log("Loggin out");
@@ -105,12 +105,12 @@ function DNavbar() {
           try {
             if (!isRefreshing.current) {
               isRefreshing.current = true;
-              await refreshtoken();
+              refreshPromiseRef.current = refreshtoken();
             }
 
             // const newToken = await refreshPromiseRef.current;
             isRefreshing.current = false;
-            // refreshPromiseRef.current = null;
+            refreshPromiseRef.current = null;
 
             // if (newToken) {
             //   originalRequest.headers = {
