@@ -12,6 +12,7 @@ function Sessions() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true); // initial load
   const [actionLoading, setActionLoading] = useState(false);
+  const refreshToken = localStorage.getItem("refreshtoken");
 
   useEffect(() => {
     (async () => {
@@ -54,17 +55,14 @@ function Sessions() {
   const logOutSession = async (id) => {
     setActionLoading(true);
     try {
-      const response = await axios.delete(
-        `${API_URL}/logoutsession?id=${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-          validateStatus: () => true,
-        }
-      );
+      const response = await axios.delete(`${API_URL}/logoutsession?id=${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "ngrok-skip-browser-warning": "true",
+        },
+        validateStatus: () => true,
+      });
 
       if (response.status >= 200 && response.status < 300) {
         setSessions((prev) => prev.filter((s) => s._id !== id));
@@ -114,7 +112,7 @@ function Sessions() {
                   {new Date(session.lastActive).toLocaleString()}
                 </p>
 
-                {session.currentDevice ? (
+                {session.token === refreshToken ? (
                   <span className="inline-flex items-center space-x-2 bg-red-600 opacity-30 px-4 py-2 rounded-lg">
                     Logout
                   </span>
