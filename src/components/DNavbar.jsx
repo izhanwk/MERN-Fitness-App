@@ -72,25 +72,23 @@ function DNavbar() {
   };
 
   useEffect(() => {
-    // // Attach axios interceptors: add token to requests, refresh on 403, then retry once
-    // const requestInterceptor = axios.interceptors.request.use((config) => {
-    //   const token = localStorage.getItem("token");
-    //   if (token && !config.headers?.Authorization) {
-    //     config.headers = {
-    //       ...config.headers,
-    //       Authorization: `Bearer ${token}`,
-    //     };
-    //   }
-    //   return config;
-    // });
+    // Global axios request interceptor: attach access token and refresh token
+    axios.interceptors.request.use((config) => {
+      const refreshToken = localStorage.getItem("refreshtoken");
+
+      config.headers = {
+        ...config.headers,
+        ...(refreshToken && { "X-Refresh-Token": refreshToken }),
+      };
+
+      return config;
+    });
 
     const responseInterceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error?.config;
         const status = error?.response?.status;
-
-        // Do not try to refresh for refresh-token endpoint itself
         const isRefreshEndpoint =
           originalRequest?.url?.includes("/refresh-token");
 
@@ -102,26 +100,32 @@ function DNavbar() {
         ) {
           originalRequest._retry = true;
 
+          // start exactly one refresh; everyone else awaits the same promise
+          let starter = false;
+          if (!isRefreshing.current) {
+            isRefreshing.current = true;
+            refreshPromiseRef.current = refreshtoken(); // MUST return new token
+            starter = true;
+          }
+
+          let newToken;
           try {
-            if (!isRefreshing.current) {
-              isRefreshing.current = true;
-              refreshPromiseRef.current = refreshtoken();
+            newToken = await refreshPromiseRef.current; // wait until refresh finishes
+          } finally {
+            // only the starter clears the lock/promise
+            if (starter) {
+              isRefreshing.current = false;
+              refreshPromiseRef.current = null;
             }
+          }
 
-            // const newToken = await refreshPromiseRef.current;
-            isRefreshing.current = false;
-            refreshPromiseRef.current = null;
-
-            // if (newToken) {
-            //   originalRequest.headers = {
-            //     ...originalRequest.headers,
-            //     Authorization: `Bearer ${newToken}`,
-            //   };
-            //   return axios(originalRequest);
-            // }
-          } catch (e) {
-            isRefreshing.current = false;
-            // refreshPromiseRef.current = null;
+          if (newToken) {
+            // since you removed the request interceptor, set header explicitly on RETRY
+            originalRequest.headers = {
+              ...originalRequest.headers,
+              Authorization: `Bearer ${newToken}`,
+            };
+            return axios(originalRequest); // retry once with fresh token
           }
         }
 
@@ -130,7 +134,6 @@ function DNavbar() {
     );
 
     return () => {
-      // axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
     };
   }, []);

@@ -60,6 +60,9 @@ app.get("/", (req, res) => {
 
 const verifyToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
+  const refreshToken = req.headers["x-refresh-token"];
+
+  console.log("Your refresh token from axios : ", refreshToken);
 
   if (!token) {
     return res.status(403).json({ message: "No Token, Access denied" });
