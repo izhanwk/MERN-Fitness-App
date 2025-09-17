@@ -62,8 +62,6 @@ const verifyToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   const refreshToken = req.headers["x-refresh-token"];
 
-  console.log("Your refresh token from axios : ", refreshToken);
-
   if (!token) {
     return res.status(403).json({ message: "No Token, Access denied" });
   }
@@ -77,11 +75,14 @@ const verifyToken = async (req, res, next) => {
     req.user = decodedToken;
     req.email = decodedToken.email;
     req.userId = decodedToken.userId;
-
+    req.refreshToken = refreshToken;
     // Update lastActive for this session
     const ip = getClientIp(req);
     console.log("IP of device : ", ip);
-    const session = await Sessions.findOne({ userId: req.userId, ip });
+    const session = await Sessions.findOne({
+      userId: req.userId,
+      token: refreshToken,
+    });
 
     if (!session) {
       return res.status(403).json({ message: "Invalid or expired token" });
@@ -91,6 +92,7 @@ const verifyToken = async (req, res, next) => {
     await session.save();
     next();
   } catch (err) {
+    await Sessions.deleteOne({ userId: req.userId, token: refreshToken });
     return res.status(403).json({ message: "Invalid or expired token" });
   }
 };
@@ -269,7 +271,7 @@ app.post("/signin", async (req, res) => {
                     userId: user._id,
                     device,
                     ip,
-                    token,
+                    token: refreshToken,
                     createdAt: new Date(),
                     lastActive: new Date(),
                   });
@@ -306,7 +308,7 @@ app.post("/signin", async (req, res) => {
                   userId: user._id,
                   device,
                   ip,
-                  token,
+                  token: refreshToken,
                   createdAt: new Date(),
                   lastActive: new Date(),
                 });
@@ -524,17 +526,13 @@ app.get("/sessions", verifyToken, async (req, res) => {
 
 app.get("/logout", verifyToken, async (req, res) => {
   try {
-    const agent = useragent.parse(req.headers["user-agent"]);
-    const device = `${agent.os.toString()} ${agent.toAgent()}`;
-    const ip = getClientIp(req);
+    // const agent = useragent.parse(req.headers["user-agent"]);
+    // const device = `${agent.os.toString()} ${agent.toAgent()}`;
+    // const ip = getClientIp(req);
     // console.log(req.email);
     const user = await Data.findOne({ email: req.email });
     // Delete the session linked to this token
-    await Sessions.deleteOne({
-      userId: user.id,
-      ip,
-      device: device,
-    });
+    await Sessions.deleteOne({ userId: req.userId, token: req.refreshToken });
 
     return res
       .status(200)
