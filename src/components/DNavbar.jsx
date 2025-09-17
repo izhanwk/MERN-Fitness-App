@@ -73,12 +73,19 @@ function DNavbar() {
 
   useEffect(() => {
     // Global axios request interceptor: attach access token and refresh token
-    axios.interceptors.request.use((config) => {
+    const requestInterceptor = axios.interceptors.request.use((config) => {
+      const accessToken = localStorage.getItem("token");
       const refreshToken = localStorage.getItem("refreshtoken");
+
+      // Do not attach Authorization for refresh endpoint
+      const isRefresh = config.url?.includes("/refresh-token");
 
       config.headers = {
         ...config.headers,
-        ...(refreshToken && { "X-Refresh-Token": refreshToken }),
+        ...(!isRefresh && accessToken
+          ? { Authorization: `Bearer ${accessToken}` }
+          : {}),
+        ...(refreshToken && { "x-refresh-token": refreshToken }),
       };
 
       return config;
@@ -134,6 +141,7 @@ function DNavbar() {
     );
 
     return () => {
+      axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
     };
   }, []);
