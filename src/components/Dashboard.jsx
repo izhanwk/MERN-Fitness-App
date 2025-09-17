@@ -114,6 +114,11 @@ const NutritionTracker = () => {
           validateStatus: () => true,
         });
         const data = res.data;
+        if (res.status < 200 || res.status >= 300) {
+          alert("Token expired");
+          navigate("/signin");
+          return;
+        }
         setuserData((prev) => ({ ...prev, ...data }));
         setmode(data.mode);
         setuserName(data.name || "");
