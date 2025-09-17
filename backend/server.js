@@ -249,23 +249,23 @@ app.post("/signin", async (req, res) => {
                 const ip = getClientIp(req);
 
                 if (!user.height || !user.weight || !user.activity) {
-                  const existing = await Sessions.findOne({
-                    userId: user._id,
-                    device: device,
-                    ip,
-                  });
-                  if (existing) {
-                    console.log("Session already exist");
-                    return res.status(302).json({
-                      success: true,
-                      data: {
-                        userId: user.id,
-                        email: user.email,
-                        token: token,
-                        refresh: refreshToken,
-                      },
-                    });
-                  }
+                  // const existing = await Sessions.findOne({
+                  //   userId: user._id,
+                  //   device: device,
+                  //   ip,
+                  // });
+                  // if (existing) {
+                  //   console.log("Session already exist");
+                  //   return res.status(302).json({
+                  //     success: true,
+                  //     data: {
+                  //       userId: user.id,
+                  //       email: user.email,
+                  //       token: token,
+                  //       refresh: refreshToken,
+                  //     },
+                  //   });
+                  // }
                   console.log("Session not exist");
                   const newSession = new Sessions({
                     userId: user._id,
@@ -286,23 +286,23 @@ app.post("/signin", async (req, res) => {
                     },
                   });
                 }
-                const existing = await Sessions.findOne({
-                  userId: user._id,
-                  device: device,
-                  ip,
-                });
-                if (existing) {
-                  console.log("Session already exist");
-                  return res.status(200).json({
-                    success: true,
-                    data: {
-                      userId: user.id,
-                      email: user.email,
-                      token: token,
-                      refresh: refreshToken,
-                    },
-                  });
-                }
+                // const existing = await Sessions.findOne({
+                //   userId: user._id,
+                //   device: device,
+                //   ip,
+                // });
+                // if (existing) {
+                //   console.log("Session already exist");
+                //   return res.status(200).json({
+                //     success: true,
+                //     data: {
+                //       userId: user.id,
+                //       email: user.email,
+                //       token: token,
+                //       refresh: refreshToken,
+                //     },
+                //   });
+                // }
                 console.log("Session not exist");
                 const newSession = new Sessions({
                   userId: user._id,

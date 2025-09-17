@@ -16,22 +16,7 @@ import Sessions from "./components/Sessions.jsx";
 import Changepassword from "./components/Changepassword.jsx";
 import { Navigate } from "react-router-dom";
 import Edit from "./components/Edit.jsx";
-import axios from "axios";
 const token = localStorage.getItem("token");
-
-// Ensure every request sends both access token and refresh token
-axios.interceptors.request.use((config) => {
-  const accessToken = localStorage.getItem("token");
-  const refreshToken = localStorage.getItem("refreshtoken");
-
-  config.headers = {
-    ...config.headers,
-    ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-    ...(refreshToken && { "x-refresh-token": refreshToken }),
-  };
-
-  return config;
-});
 
 const router = createBrowserRouter(
   [
