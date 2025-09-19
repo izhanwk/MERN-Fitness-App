@@ -8,6 +8,7 @@ function SDNavbar() {
   const navigate = useNavigate();
   const logOut = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshtoken");
     navigate("/signin");
   };
   const show = () => {

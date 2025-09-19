@@ -14,6 +14,24 @@ function DNavbar() {
   const [loading, setLoading] = useState(false);
   const isRefreshing = useRef(false);
   const refreshPromiseRef = useRef(null);
+  const sessionExpiredRef = useRef(false);
+
+  const clearStoredTokens = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshtoken");
+  };
+
+  const handleSessionExpiry = () => {
+    const alreadyHandled = sessionExpiredRef.current;
+    sessionExpiredRef.current = true;
+    clearStoredTokens();
+
+    if (!alreadyHandled) {
+      alert("Session Expired");
+      setLoading(false);
+      navigate("/signin");
+    }
+  };
 
   const logOut = async () => {
     console.log("Loggin out");
@@ -26,7 +44,7 @@ function DNavbar() {
       },
       validateStatus: () => true,
     });
-    localStorage.removeItem("token");
+    clearStoredTokens();
     setLoading(false);
     navigate("/signin");
   };
@@ -56,17 +74,13 @@ function DNavbar() {
         console.log("Token refreshed successfully");
         return data.token;
       } else {
-        localStorage.removeItem("token");
         console.log("Login failed");
-        alert("Session Expired");
-        navigate("/signin");
+        handleSessionExpiry();
         return null;
       }
     } catch (err) {
       console.error("Error occurred:", err);
-      localStorage.removeItem("token");
-      alert("Session Expired");
-      navigate("/signin");
+      handleSessionExpiry();
       return null;
     }
   };

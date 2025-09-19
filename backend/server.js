@@ -100,30 +100,45 @@ const verifyToken = async (req, res, next) => {
 app.post("/refresh-token", async (req, res) => {
   const refresh = req.body.refreshtoken;
   console.log("token : ", refresh);
+
   if (!refresh) {
     return res.status(401).json({ message: "No refresh token provided" });
-  } else {
-    jwt.verify(refresh, refreshkey, async (err, decoded) => {
-      if (err) {
-        return res.status(403).json({ message: "Invalid or expired token" });
-      } else {
-        const user = await Data.findOne({ email: decoded.email });
-        if (!user || user.refreshtoken !== refresh) {
-          return res.status(403).json({ message: "Invalid refresh token" });
-        } else {
-          let token = jwt.sign(
-            {
-              userId: user.id,
-              email: user.email,
-            },
-            secretkey,
-            { expiresIn: "5m" }
-          );
-          // console.log("worked");
-          return res.status(200).json({ token });
-        }
-      }
-    });
+  }
+
+  try {
+    const decoded = jwt.verify(refresh, refreshkey);
+    const user = await Data.findOne({ email: decoded.email });
+
+    if (!user || user.refreshtoken !== refresh) {
+      await Sessions.deleteOne({ token: refresh });
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+      },
+      secretkey,
+      { expiresIn: "5m" }
+    );
+
+    return res.status(200).json({ token });
+  } catch (err) {
+    console.error("Refresh token verification failed:", err);
+    try {
+      await Sessions.deleteOne({ token: refresh });
+    } catch (cleanupError) {
+      console.error("Error cleaning up invalid session:", cleanupError);
+    }
+
+    if (err.name === "TokenExpiredError" || err.name === "JsonWebTokenError") {
+      return res.status(403).json({ message: "Invalid or expired token" });
+    }
+
+    return res
+      .status(500)
+      .json({ message: "Server error while validating refresh token" });
   }
 });
 
