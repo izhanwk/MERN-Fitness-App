@@ -119,6 +119,13 @@ function DNavbar() {
           } finally {
             // only the starter clears the lock/promise
             if (starter) {
+              if (!refreshPromiseRef.current) {
+                localStorage.removeItem("token");
+                console.log("Login failed");
+                showAlert("Session Expired", "error", "Authentication Failed");
+                navigate("/signin");
+                return null;
+              }
               isRefreshing.current = false;
               refreshPromiseRef.current = null;
             }
