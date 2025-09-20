@@ -5,10 +5,12 @@ import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
 import axios from "axios";
 import Loader from "./Loader";
+import { useAlert } from "./Alert";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Goals() {
+  const { showAlert, Alert } = useAlert();
   const {
     register,
     handleSubmit,
@@ -49,15 +51,15 @@ function Goals() {
         validateStatus: () => true,
       });
       if (response.status >= 200 && response.status < 300) {
-        alert("Your goal has been submitted successfully!");
+        showAlert("Your goal has been submitted successfully!", "success", "Goal Set");
         buttonClick();
       }
       if (response.status < 200 || response.status >= 300) {
-        alert("An error occurred from server. Please login again.");
+        showAlert("An error occurred from server. Please login again.", "error", "Server Error");
       }
     } catch (err) {
       console.error(err);
-      alert("Problem while connecting with server");
+      showAlert("Problem while connecting with server", "error", "Connection Error");
     } finally {
       setLoading(false);
     }
@@ -65,6 +67,7 @@ function Goals() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
+      <Alert />
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>

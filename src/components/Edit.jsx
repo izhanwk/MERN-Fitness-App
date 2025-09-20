@@ -3,11 +3,13 @@ import DNavbar from "./DNavbar";
 import axios from "axios";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
+import { useAlert } from "./Alert";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Edit() {
   const navigate = useNavigate();
+  const { showAlert, Alert } = useAlert();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [goaltype, setgoaltype] = useState([]);
@@ -67,7 +69,7 @@ function Edit() {
         setInitialForm(normalized);
       } catch (e) {
         console.error(e);
-        alert("Could not load your info.");
+        showAlert("Could not load your info.", "error", "Load Failed");
       } finally {
         setLoading(false);
       }
@@ -146,10 +148,10 @@ function Edit() {
       setForm(next);
       setInitialForm(next);
 
-      alert("Profile updated successfully!");
+      showAlert("Profile updated successfully!", "success", "Update Successful");
     } catch (e) {
       console.error(e);
-      alert("There was a problem saving your changes.");
+      showAlert("There was a problem saving your changes.", "error", "Save Failed");
     } finally {
       setSaving(false);
     }
@@ -203,6 +205,7 @@ function Edit() {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 font-dm-sans overflow-hidden">
+      <Alert />
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-32 -right-24 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute -bottom-32 -left-24 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000" />

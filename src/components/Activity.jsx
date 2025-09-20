@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
+import { useAlert } from "./Alert";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Activity() {
+  const { showAlert, Alert } = useAlert();
   const [activityLevel, setActivityLevel] = useState(0);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -28,14 +30,14 @@ function Activity() {
       );
 
       if (response.status >= 200 && response.status < 300) {
-        alert("Activity level saved successfully!");
+        showAlert("Activity level saved successfully!", "success", "Activity Set");
         navigate("/dashboard");
       } else {
-        alert("An error occurred while saving your activity level.");
+        showAlert("An error occurred while saving your activity level.", "error", "Save Failed");
       }
     } catch (err) {
       console.error(err);
-      alert("A problem occurred while connecting to the server.");
+      showAlert("A problem occurred while connecting to the server.", "error", "Connection Error");
     } finally {
       setLoading(false);
     }
@@ -163,6 +165,7 @@ function Activity() {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 font-dm-sans overflow-hidden">
+      <Alert />
       {/* Subtle animated blobs */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-32 -right-24 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />

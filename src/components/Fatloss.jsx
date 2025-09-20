@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import SDNavbar from "./SDNavbar";
 import axios from "axios";
 import Loader from "./Loader";
+import { useAlert } from "./Alert";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Fatloss() {
+  const { showAlert, Alert } = useAlert();
   const [fatlossMode, setFatlossMode] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -29,14 +31,14 @@ function Fatloss() {
       );
 
       if (response.status >= 200 && response.status < 300) {
-        alert("Mode saved successfully!");
+        showAlert("Mode saved successfully!", "success", "Save Successful");
         navigate("/activity");
       } else {
-        alert("An error occurred while saving your mode.");
+        showAlert("An error occurred while saving your mode.", "error", "Save Failed");
       }
     } catch (err) {
       console.error(err);
-      alert("A problem occurred while connecting to the server.");
+      showAlert("A problem occurred while connecting to the server.", "error", "Connection Error");
     } finally {
       setLoading(false);
     }
@@ -51,6 +53,7 @@ function Fatloss() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
+      <Alert />
       {/* Animated background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>

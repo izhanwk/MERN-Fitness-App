@@ -3,10 +3,12 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
+import { useAlert } from "./Alert";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Data() {
+  const { showAlert, Alert } = useAlert();
   const {
     register,
     handleSubmit,
@@ -29,7 +31,7 @@ function Data() {
       });
       console.log("Connected");
       if (response.status >= 200 && response.status < 300) {
-        alert("Your data has been submitted successfully!");
+        showAlert("Your data has been submitted successfully!", "success", "Data Saved");
         navigate("/goals");
       } else if (response.status === 403) {
         const data = response.data;
@@ -39,7 +41,7 @@ function Data() {
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Oops! There was a problem submitting your data.");
+      showAlert("Oops! There was a problem submitting your data.", "error", "Submission Failed");
     } finally {
       setLoading(false);
     }
@@ -48,6 +50,7 @@ function Data() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
       {loading && <Loader />}
+      <Alert />
       <div className="w-full max-w-md bg-gradient-to-br from-purple-900/70 to-indigo-900/70 backdrop-blur-md rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
         <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600">
           <h2 className="text-white text-lg font-bold text-center py-2">

@@ -5,10 +5,12 @@ import DNavbar from "./DNavbar";
 import { LogOut } from "lucide-react";
 import axios from "axios";
 import Loader from "./Loader";
+import { useAlert } from "./Alert";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Sessions() {
+  const { showAlert, Alert } = useAlert();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true); // initial load
   const [actionLoading, setActionLoading] = useState(false);
@@ -68,11 +70,11 @@ function Sessions() {
         setSessions((prev) => prev.filter((s) => s._id !== id));
       } else {
         const data = response.data;
-        alert(data.message || "Error deleting session");
+        showAlert(data.message || "Error deleting session", "error", "Delete Failed");
       }
     } catch (error) {
       console.error("Error deleting session:", error);
-      alert("Server error");
+      showAlert("Server error", "error", "Connection Error");
     } finally {
       setActionLoading(false);
     }
@@ -81,6 +83,7 @@ function Sessions() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
       {(loading || actionLoading) && <Loader />}
+      <Alert />
       <DNavbar />
       <div className="max-w-4xl mx-auto px-6 py-10">
         <h1 className="text-3xl font-bold mb-6 text-center">Active Sessions</h1>

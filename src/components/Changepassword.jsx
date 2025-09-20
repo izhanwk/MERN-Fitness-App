@@ -3,10 +3,12 @@ import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
+import { useAlert } from "./Alert";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Changepassword() {
+  const { showAlert, Alert } = useAlert();
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
@@ -33,7 +35,7 @@ function Changepassword() {
       if (res.status >= 200 && res.status < 300) {
         setOtpSent(true);
       } else {
-        alert("Failed to send OTP");
+        showAlert("Failed to send OTP", "error", "OTP Failed");
       }
     } catch (err) {
       console.error(err);
@@ -45,7 +47,7 @@ function Changepassword() {
   const changePassword = async (e) => {
     e.preventDefault();
     if (password !== confirm) {
-      alert("Passwords do not match");
+      showAlert("Passwords do not match", "error", "Password Mismatch");
       return;
     }
     setLoading(true);
@@ -62,11 +64,11 @@ function Changepassword() {
         }
       );
       if (res.status >= 200 && res.status < 300) {
-        alert("Password updated");
+        showAlert("Password updated successfully!", "success", "Password Changed");
         navigate("/signin");
       } else {
         const data = res.data;
-        alert(data.message || "Error updating password");
+        showAlert(data.message || "Error updating password", "error", "Update Failed");
       }
     } catch (err) {
       console.error(err);
@@ -78,6 +80,7 @@ function Changepassword() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {loading && <Loader />}
+      <Alert />
       <Navbar />
       <div className="flex w-screen items-center justify-center pt-10">
         <form
