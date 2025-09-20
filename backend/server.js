@@ -107,9 +107,15 @@ app.post("/refresh-token", async (req, res) => {
 
   try {
     const decoded = jwt.verify(refresh, refreshkey);
-    const user = await Data.findOne({ email: decoded.email });
+    
+    // Find session by refresh token instead of checking user.refreshtoken
+    const session = await Sessions.findOne({ token: refresh });
+    if (!session) {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
 
-    if (!user || user.refreshtoken !== refresh) {
+    const user = await Data.findOne({ email: decoded.email });
+    if (!user) {
       await Sessions.deleteOne({ token: refresh });
       return res.status(403).json({ message: "Invalid refresh token" });
     }
@@ -257,8 +263,7 @@ app.post("/signin", async (req, res) => {
                   { expiresIn: "7d" }
                 );
 
-                user.refreshtoken = refreshToken;
-                user.save();
+                // Don't overwrite user.refreshtoken - store per session instead
                 const agent = useragent.parse(req.headers["user-agent"]);
                 const device = `${agent.os.toString()} ${agent.toAgent()}`;
                 const ip = getClientIp(req);
