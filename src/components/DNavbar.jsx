@@ -119,25 +119,29 @@ function DNavbar() {
           } finally {
             // only the starter clears the lock/promise
             if (starter) {
-              if (!refreshPromiseRef.current) {
-                localStorage.removeItem("token");
-                console.log("Login failed");
-                showAlert("Session Expired", "error", "Authentication Failed");
-                navigate("/signin");
-                return null;
-              }
               isRefreshing.current = false;
               refreshPromiseRef.current = null;
             }
           }
 
           if (newToken) {
-            // since you removed the request interceptor, set header explicitly on RETRY
-            originalRequest.headers = {
-              ...originalRequest.headers,
-              Authorization: `Bearer ${newToken}`,
-            };
-            return axios(originalRequest); // retry once with fresh token
+            try {
+              // since you removed the request interceptor, set header explicitly on RETRY
+              originalRequest.headers = {
+                ...originalRequest.headers,
+                Authorization: `Bearer ${newToken}`,
+              };
+              return axios(originalRequest); // retry once with fresh token
+            } catch (err) {
+              // check if the retry failed with 403
+              if (err?.response?.status === 403) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("refreshToken");
+                console.log("Login failed");
+                showAlert("Session Expired", "error", "Authentication Failed");
+                navigate("/signin");
+              }
+            }
           }
         }
 
