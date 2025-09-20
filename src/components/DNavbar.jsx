@@ -14,24 +14,6 @@ function DNavbar() {
   const [loading, setLoading] = useState(false);
   const isRefreshing = useRef(false);
   const refreshPromiseRef = useRef(null);
-  const sessionExpiredRef = useRef(false);
-
-  const clearStoredTokens = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshtoken");
-  };
-
-  const handleSessionExpiry = () => {
-    const alreadyHandled = sessionExpiredRef.current;
-    sessionExpiredRef.current = true;
-    clearStoredTokens();
-
-    if (!alreadyHandled) {
-      alert("Session Expired");
-      setLoading(false);
-      navigate("/signin");
-    }
-  };
 
   const logOut = async () => {
     console.log("Loggin out");
@@ -44,7 +26,7 @@ function DNavbar() {
       },
       validateStatus: () => true,
     });
-    clearStoredTokens();
+    localStorage.removeItem("token");
     setLoading(false);
     navigate("/signin");
   };
@@ -74,32 +56,29 @@ function DNavbar() {
         console.log("Token refreshed successfully");
         return data.token;
       } else {
+        localStorage.removeItem("token");
         console.log("Login failed");
-        handleSessionExpiry();
+        alert("Session Expired");
+        navigate("/signin");
         return null;
       }
     } catch (err) {
       console.error("Error occurred:", err);
-      handleSessionExpiry();
+      localStorage.removeItem("token");
+      alert("Session Expired");
+      navigate("/signin");
       return null;
     }
   };
 
   useEffect(() => {
     // Global axios request interceptor: attach access token and refresh token
-    const requestInterceptor = axios.interceptors.request.use((config) => {
-      const accessToken = localStorage.getItem("token");
+    axios.interceptors.request.use((config) => {
       const refreshToken = localStorage.getItem("refreshtoken");
-
-      // Do not attach Authorization for refresh endpoint
-      const isRefresh = config.url?.includes("/refresh-token");
 
       config.headers = {
         ...config.headers,
-        ...(!isRefresh && accessToken
-          ? { Authorization: `Bearer ${accessToken}` }
-          : {}),
-        ...(refreshToken && { "x-refresh-token": refreshToken }),
+        ...(refreshToken && { "X-Refresh-Token": refreshToken }),
       };
 
       return config;
@@ -155,7 +134,6 @@ function DNavbar() {
     );
 
     return () => {
-      axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
     };
   }, []);
