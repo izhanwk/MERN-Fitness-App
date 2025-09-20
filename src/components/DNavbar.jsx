@@ -33,6 +33,7 @@ function DNavbar() {
 
   const refreshtoken = async () => {
     try {
+      setLoading(true);
       const refreshToken = localStorage.getItem("refreshtoken");
       console.log("Our refresh token:", refreshToken);
 
@@ -68,6 +69,8 @@ function DNavbar() {
       alert("Session Expired");
       navigate("/signin");
       return null;
+    } finally {
+      setLoading(false);
     }
   };
 
