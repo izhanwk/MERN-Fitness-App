@@ -219,7 +219,7 @@ function Edit() {
                 Edit Profile
               </h1>
               <p className="text-purple-100/90 text-sm md:text-base mt-1">
-                Update your info below. Fields marked with * are required.
+                Update your info below
               </p>
             </div>
 
@@ -491,8 +491,7 @@ function Edit() {
               </div>
 
               <p className="text-[11px] text-purple-300/80 mt-4">
-                Password and refresh token are hidden for your security. Use the
-                “Change Password” flow to update it.
+                You can easily update your infodata from here
               </p>
             </form>
           </div>

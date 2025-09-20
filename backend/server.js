@@ -107,7 +107,7 @@ app.post("/refresh-token", async (req, res) => {
 
   try {
     const decoded = jwt.verify(refresh, refreshkey);
-    
+
     // Find session by refresh token instead of checking user.refreshtoken
     const session = await Sessions.findOne({ token: refresh });
     if (!session) {
@@ -636,6 +636,8 @@ app.get("/editdata", verifyToken, async (req, res) => {
   const email = req.email;
   const user = await Data.findOne({ email: email });
   if (user) {
+    delete user.password;
+    delete user.refreshtoken;
     return res.status(200).json(user);
   }
 });
