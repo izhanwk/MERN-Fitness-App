@@ -37,6 +37,7 @@ function DNavbar() {
     try {
       setLoading(true);
       const refreshToken = localStorage.getItem("refreshtoken");
+      console.log("Our refresh token:", refreshToken);
 
       const response = await axios.post(
         `${API_URL}/refresh-token`,
@@ -47,21 +48,29 @@ function DNavbar() {
             Authorization: `Bearer ${refreshToken}`,
             "ngrok-skip-browser-warning": "true",
           },
-          // ⚠️ IMPORTANT: remove validateStatus override
-          // so axios REJECTS non-2xx responses (like 403)
+          validateStatus: () => true,
         }
       );
 
-      // success → store and return the new access token
-      const data = response.data;
-      localStorage.setItem("token", data.token);
-      return data.token;
-    } catch (err) {
-      // Make sure the interceptor sees a 403-like error
-      if (!err.response) {
-        err.response = { status: 403 };
+      if (response.status === 200) {
+        const data = response.data;
+        localStorage.setItem("token", data.token);
+        console.log("New token:", localStorage.getItem("token"));
+        console.log("Token refreshed successfully");
+        return data.token;
+      } else {
+        localStorage.removeItem("token");
+        console.log("Login failed");
+        showAlert("Session Expired", "error", "Authentication Failed");
+        navigate("/signin");
+        return null;
       }
-      throw err; // pass it back to the interceptor
+    } catch (err) {
+      console.error("Error occurred:", err);
+      localStorage.removeItem("token");
+      showAlert("Session Expired", "error", "Authentication Failed");
+      navigate("/signin");
+      return null;
     } finally {
       setLoading(false);
     }
