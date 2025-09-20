@@ -115,7 +115,17 @@ function DNavbar() {
 
           let newToken;
           try {
-            newToken = await refreshPromiseRef.current; // wait until refresh finishes
+            newToken = await refreshPromiseRef.current;
+          } catch (refreshErr) {
+            if (refreshErr?.response?.status === 403) {
+              // only sign out if refresh returned 403
+              localStorage.removeItem("token");
+              localStorage.removeItem("refreshToken");
+              showAlert("Session Expired", "error", "Authentication Failed");
+              navigate("/signin");
+            }
+            // bubble up the refresh error
+            return Promise.reject(refreshErr);
           } finally {
             // only the starter clears the lock/promise
             if (starter) {
@@ -123,25 +133,13 @@ function DNavbar() {
               refreshPromiseRef.current = null;
             }
           }
-
           if (newToken) {
-            try {
-              // since you removed the request interceptor, set header explicitly on RETRY
-              originalRequest.headers = {
-                ...originalRequest.headers,
-                Authorization: `Bearer ${newToken}`,
-              };
-              return axios(originalRequest); // retry once with fresh token
-            } catch (err) {
-              // check if the retry failed with 403
-              if (err?.response?.status === 403) {
-                localStorage.removeItem("token");
-                localStorage.removeItem("refreshToken");
-                console.log("Login failed");
-                showAlert("Session Expired", "error", "Authentication Failed");
-                navigate("/signin");
-              }
-            }
+            // since you removed the request interceptor, set header explicitly on RETRY
+            originalRequest.headers = {
+              ...originalRequest.headers,
+              Authorization: `Bearer ${newToken}`,
+            };
+            return axios(originalRequest); // retry once with fresh token
           }
         }
 
