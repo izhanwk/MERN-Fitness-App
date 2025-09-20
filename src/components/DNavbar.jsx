@@ -109,7 +109,7 @@ function DNavbar() {
           let starter = false;
           if (!isRefreshing.current) {
             isRefreshing.current = true;
-            refreshPromiseRef.current = refreshtoken(); // MUST return new token
+            refreshPromiseRef.current = refreshtoken(); // MUST return new token (or throw with .response.status)
             starter = true;
           }
 
@@ -124,22 +124,35 @@ function DNavbar() {
               showAlert("Session Expired", "error", "Authentication Failed");
               navigate("/signin");
             }
-            // bubble up the refresh error
             return Promise.reject(refreshErr);
           } finally {
-            // only the starter clears the lock/promise
             if (starter) {
               isRefreshing.current = false;
               refreshPromiseRef.current = null;
             }
           }
+
           if (newToken) {
-            // since you removed the request interceptor, set header explicitly on RETRY
-            originalRequest.headers = {
-              ...originalRequest.headers,
-              Authorization: `Bearer ${newToken}`,
-            };
-            return axios(originalRequest); // retry once with fresh token
+            try {
+              // set header explicitly on RETRY
+              originalRequest.headers = {
+                ...(originalRequest.headers || {}),
+                Authorization: `Bearer ${newToken}`,
+              };
+              // optional: keep defaults in sync for future requests
+              axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+
+              return await axios(originalRequest); // retry once with fresh token
+            } catch (retryErr) {
+              // 🔴 only sign out if the RETRY failed with 403
+              if (retryErr?.response?.status === 403) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("refreshToken");
+                showAlert("Session Expired", "error", "Authentication Failed");
+                navigate("/signin");
+              }
+              return Promise.reject(retryErr);
+            }
           }
         }
 
