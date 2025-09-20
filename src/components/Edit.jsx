@@ -148,10 +148,18 @@ function Edit() {
       setForm(next);
       setInitialForm(next);
 
-      showAlert("Profile updated successfully!", "success", "Update Successful");
+      showAlert(
+        "Profile updated successfully!",
+        "success",
+        "Update Successful"
+      );
     } catch (e) {
       console.error(e);
-      showAlert("There was a problem saving your changes.", "error", "Save Failed");
+      showAlert(
+        "There was a problem saving your changes.",
+        "error",
+        "Save Failed"
+      );
     } finally {
       setSaving(false);
     }
@@ -482,12 +490,11 @@ function Edit() {
                 <button
                   type="submit"
                   disabled={!isDirty || saving}
-                  className={[
-                    "px-5 py-2.5 rounded-xl font-semibold transition",
+                  className={`px-5 py-2.5 rounded-xl font-semibold transition ${
                     !isDirty || saving
                       ? "bg-yellow-400/40 text-black/60 cursor-not-allowed"
-                      : "bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:opacity-95",
-                  ].join(" ")}
+                      : "bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:opacity-95"
+                  }`}
                 >
                   {saving ? "Saving…" : "Save Changes"}
                 </button>
