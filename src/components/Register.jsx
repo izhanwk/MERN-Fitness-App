@@ -4,10 +4,12 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
+import { useAlert } from "./Alert";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Register() {
+  const { showAlert, Alert } = useAlert();
   const {
     register,
     handleSubmit,
@@ -30,7 +32,7 @@ function Register() {
         validateStatus: () => true,
       });
       if (response.status >= 200 && response.status < 300) {
-        alert("Registration Successful check your email");
+        showAlert("Registration Successful! Please check your email for verification.", "success", "Account Created");
         navigate("/signin");
       } else if (response.status === 503) {
         setError("email", {
@@ -40,7 +42,7 @@ function Register() {
       }
     } catch (error) {
       console.error(error);
-      alert("Oops! There occurred a problem");
+      showAlert("Oops! There occurred a problem", "error", "Registration Failed");
     } finally {
       setLoading(false);
     }
@@ -49,6 +51,7 @@ function Register() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
       {loading && <Loader />}
+      <Alert />
       <Navbar />
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">

@@ -5,11 +5,13 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
+import { useAlert } from "./Alert";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Signin() {
   const navigate = useNavigate();
+  const { showAlert, Alert } = useAlert();
   const {
     register,
     handleSubmit,
@@ -30,7 +32,7 @@ function Signin() {
       });
 
       if (response.status === 302) {
-        alert("Incomplete profile, redirecting...");
+        showAlert("Incomplete profile, redirecting...", "info", "Profile Setup Required");
         const responseData = response.data;
         const email = responseData.email;
         localStorage.setItem("token", responseData.data.token);
@@ -57,7 +59,7 @@ function Signin() {
         });
       }
     } catch (err) {
-      alert("An error occurred. Please try again.");
+      showAlert("An error occurred. Please try again.", "error", "Connection Error");
       console.error(err);
     } finally {
       setLoading(false);
@@ -67,6 +69,7 @@ function Signin() {
   return (
     <>
       {loading && <Loader />}
+      <Alert />
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0 font-dm-sans relative overflow-hidden">
         <Navbar />
 

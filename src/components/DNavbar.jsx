@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // for hamburger icons
 import Loader from "./Loader";
+import { useAlert } from "./Alert";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function DNavbar() {
   const navigate = useNavigate();
+  const { showAlert, Alert } = useAlert();
   const [visible2, setvisible2] = useState(false);
   const [visible, setvisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -59,14 +61,14 @@ function DNavbar() {
       } else {
         localStorage.removeItem("token");
         console.log("Login failed");
-        alert("Session Expired");
+        showAlert("Session Expired", "error", "Authentication Failed");
         navigate("/signin");
         return null;
       }
     } catch (err) {
       console.error("Error occurred:", err);
       localStorage.removeItem("token");
-      alert("Session Expired");
+      showAlert("Session Expired", "error", "Authentication Failed");
       navigate("/signin");
       return null;
     } finally {
@@ -190,6 +192,7 @@ function DNavbar() {
   return (
     <div className="relative">
       {loading && <Loader />}
+      <Alert />
       {/* Modal for Contact/About/Guide */}
       {visible2 && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex justify-center items-center">
