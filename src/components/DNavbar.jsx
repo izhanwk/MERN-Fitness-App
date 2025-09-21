@@ -21,16 +21,21 @@ function DNavbar() {
     console.log("Loggin out");
     setLoading(true);
     const token = localStorage.getItem("token");
-    await axios.get(`${API_URL}/logout`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "ngrok-skip-browser-warning": "true",
-      },
-      validateStatus: () => true,
-    });
-    localStorage.removeItem("token");
-    setLoading(false);
-    navigate("/signin");
+    try {
+      await axios.get(`${API_URL}/logout`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
+        },
+      });
+    } catch (error) {
+      console.error("Logout request failed:", error);
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshtoken");
+      setLoading(false);
+      navigate("/signin");
+    }
   };
 
   const refreshtoken = async () => {
@@ -48,26 +53,18 @@ function DNavbar() {
             Authorization: `Bearer ${refreshToken}`,
             "ngrok-skip-browser-warning": "true",
           },
-          validateStatus: () => true,
         }
       );
 
-      if (response.status === 200) {
-        const data = response.data;
-        localStorage.setItem("token", data.token);
-        console.log("New token:", localStorage.getItem("token"));
-        console.log("Token refreshed successfully");
-        return data.token;
-      } else {
-        localStorage.removeItem("token");
-        console.log("Login failed");
-        showAlert("Session Expired", "error", "Authentication Failed");
-        navigate("/signin");
-        return null;
-      }
+      const data = response.data;
+      localStorage.setItem("token", data.token);
+      console.log("New token:", localStorage.getItem("token"));
+      console.log("Token refreshed successfully");
+      return data.token;
     } catch (err) {
       console.error("Error occurred:", err);
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshtoken");
       showAlert("Session Expired", "error", "Authentication Failed");
       navigate("/signin");
       return null;
@@ -120,7 +117,7 @@ function DNavbar() {
             if (refreshErr?.response?.status === 403) {
               // only sign out if refresh returned 403
               localStorage.removeItem("token");
-              localStorage.removeItem("refreshToken");
+              localStorage.removeItem("refreshtoken");
               showAlert("Session Expired", "error", "Authentication Failed");
               navigate("/signin");
             }
@@ -165,15 +162,10 @@ function DNavbar() {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
             },
-            validateStatus: () => true,
           });
 
           if (response.status === 200) {
             console.log("Token is valid");
-          } else if (response.status === 403) {
-            await refreshtoken();
-          } else {
-            logOut();
           }
         } catch (err) {
           if (err.response?.status === 403) {
