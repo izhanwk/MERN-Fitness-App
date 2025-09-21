@@ -133,26 +133,15 @@ function DNavbar() {
           }
 
           if (newToken) {
-            try {
-              // set header explicitly on RETRY
-              originalRequest.headers = {
-                ...(originalRequest.headers || {}),
-                Authorization: `Bearer ${newToken}`,
-              };
-              // optional: keep defaults in sync for future requests
-              axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+            // set header explicitly on RETRY
+            originalRequest.headers = {
+              ...(originalRequest.headers || {}),
+              Authorization: `Bearer ${newToken}`,
+            };
+            // optional: keep defaults in sync for future requests
+            axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
 
-              return await axios(originalRequest); // retry once with fresh token
-            } catch (retryErr) {
-              // 🔴 only sign out if the RETRY failed with 403
-              if (retryErr?.response?.status === 403) {
-                localStorage.removeItem("token");
-                localStorage.removeItem("refreshToken");
-                showAlert("Session Expired", "error", "Authentication Failed");
-                navigate("/signin");
-              }
-              return Promise.reject(retryErr);
-            }
+            return await axios(originalRequest); // retry once with fresh token
           }
         }
 
@@ -165,43 +154,43 @@ function DNavbar() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   const interValid = setInterval(() => {
-  //     const fetchData = async () => {
-  //       try {
-  //         const token = localStorage.getItem("token");
+  useEffect(() => {
+    const interValid = setInterval(() => {
+      const fetchData = async () => {
+        try {
+          const token = localStorage.getItem("token");
 
-  //         const response = await axios.get(`${API_URL}/getdata`, {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //             "ngrok-skip-browser-warning": "true",
-  //           },
-  //           validateStatus: () => true,
-  //         });
+          const response = await axios.get(`${API_URL}/getdata`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            validateStatus: () => true,
+          });
 
-  //         if (response.status === 200) {
-  //           console.log("Token is valid");
-  //         } else if (response.status === 403) {
-  //           await refreshtoken();
-  //         } else {
-  //           logOut();
-  //         }
-  //       } catch (err) {
-  //         if (err.response?.status === 403) {
-  //           // Token expired, try refreshing
-  //           await refreshtoken();
-  //         } else {
-  //           console.error("Error in fetchData:", err);
-  //           logOut();
-  //         }
-  //       }
-  //     };
+          if (response.status === 200) {
+            console.log("Token is valid");
+          } else if (response.status === 403) {
+            await refreshtoken();
+          } else {
+            logOut();
+          }
+        } catch (err) {
+          if (err.response?.status === 403) {
+            // Token expired, try refreshing
+            await refreshtoken();
+          } else {
+            console.error("Error in fetchData:", err);
+            logOut();
+          }
+        }
+      };
 
-  //     fetchData();
-  //   }, 60000); // Runs every 60 seconds
+      fetchData();
+    }, 60000); // Runs every 60 seconds
 
-  //   return () => clearInterval(interValid);
-  // }, []);
+    return () => clearInterval(interValid);
+  }, []);
 
   const show = () => {
     setvisible(!visible);
