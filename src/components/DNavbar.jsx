@@ -37,8 +37,6 @@ function DNavbar() {
     try {
       setLoading(true);
       const refreshToken = localStorage.getItem("refreshtoken");
-      console.log("Our refresh token:", refreshToken);
-
       const response = await axios.post(
         `${API_URL}/refresh-token`,
         { refreshtoken: refreshToken },
@@ -48,42 +46,41 @@ function DNavbar() {
             Authorization: `Bearer ${refreshToken}`,
             "ngrok-skip-browser-warning": "true",
           },
-          validateStatus: () => true,
+          // IMPORTANT: do NOT override validateStatus so 4xx/5xx reject normally
         }
       );
 
       if (response.status === 200) {
         const data = response.data;
         localStorage.setItem("token", data.token);
-        console.log("New token:", localStorage.getItem("token"));
-        console.log("Token refreshed successfully");
+        // keep axios defaults in sync for subsequent requests
+        axios.defaults.headers.common.Authorization = `Bearer ${data.token}`;
         return data.token;
-      } else {
-        localStorage.removeItem("token");
-        console.log("Login failed");
-        showAlert("Session Expired", "error", "Authentication Failed");
-        navigate("/signin");
-        return null;
       }
+
+      const err = new Error("Refresh failed");
+      err.response = { status: response.status };
+      throw err;
     } catch (err) {
-      console.error("Error occurred:", err);
-      localStorage.removeItem("token");
-      showAlert("Session Expired", "error", "Authentication Failed");
-      navigate("/signin");
-      return null;
+      // if it wasn't an HTTP error, shape it like a 403 so interceptor can handle
+      if (!err.response) err.response = { status: 403 };
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Global axios request interceptor: attach access token and refresh token
-    axios.interceptors.request.use((config) => {
+    // Request interceptor: attach refresh token header if present
+    const reqId = axios.interceptors.request.use((config) => {
       const refreshToken = localStorage.getItem("refreshtoken");
+      const accessToken = localStorage.getItem("token");
 
       config.headers = {
         ...config.headers,
+        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
         ...(refreshToken && { "X-Refresh-Token": refreshToken }),
+        "ngrok-skip-browser-warning": "true",
       };
 
       return config;
@@ -109,7 +106,7 @@ function DNavbar() {
           let starter = false;
           if (!isRefreshing.current) {
             isRefreshing.current = true;
-            refreshPromiseRef.current = refreshtoken(); // MUST return new token (or throw with .response.status)
+            refreshPromiseRef.current = refreshtoken(); // returns token or throws
             starter = true;
           }
 
@@ -117,13 +114,8 @@ function DNavbar() {
           try {
             newToken = await refreshPromiseRef.current;
           } catch (refreshErr) {
-            if (refreshErr?.response?.status === 403) {
-              // only sign out if refresh returned 403
-              localStorage.removeItem("token");
-              localStorage.removeItem("refreshToken");
-              showAlert("Session Expired", "error", "Authentication Failed");
-              navigate("/signin");
-            }
+            // only sign out immediately if refresh itself returned 403
+            if (refreshErr?.response?.status === 403) hardLogout();
             return Promise.reject(refreshErr);
           } finally {
             if (starter) {
@@ -133,15 +125,18 @@ function DNavbar() {
           }
 
           if (newToken) {
-            // set header explicitly on RETRY
-            originalRequest.headers = {
-              ...(originalRequest.headers || {}),
-              Authorization: `Bearer ${newToken}`,
-            };
-            // optional: keep defaults in sync for future requests
-            axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
-
-            return await axios(originalRequest); // retry once with fresh token
+            try {
+              // set header explicitly on the RETRY
+              originalRequest.headers = {
+                ...(originalRequest.headers || {}),
+                Authorization: `Bearer ${newToken}`,
+              };
+              return await axios(originalRequest); // retry once with fresh token
+            } catch (retryErr) {
+              // if the retried call still returns 403, logout immediately
+              if (retryErr?.response?.status === 403) hardLogout();
+              return Promise.reject(retryErr);
+            }
           }
         }
 
@@ -150,48 +145,10 @@ function DNavbar() {
     );
 
     return () => {
+      axios.interceptors.request.eject(reqId);
       axios.interceptors.response.eject(responseInterceptor);
     };
-  }, []);
-
-  useEffect(() => {
-    const interValid = setInterval(() => {
-      const fetchData = async () => {
-        try {
-          const token = localStorage.getItem("token");
-
-          const response = await axios.get(`${API_URL}/getdata`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "ngrok-skip-browser-warning": "true",
-            },
-            validateStatus: () => true,
-          });
-
-          if (response.status === 200) {
-            console.log("Token is valid");
-          } else if (response.status === 403) {
-            await refreshtoken();
-          } else {
-            logOut();
-          }
-        } catch (err) {
-          if (err.response?.status === 403) {
-            // Token expired, try refreshing
-            await refreshtoken();
-          } else {
-            console.error("Error in fetchData:", err);
-            logOut();
-          }
-        }
-      };
-
-      fetchData();
-    }, 60000); // Runs every 60 seconds
-
-    return () => clearInterval(interValid);
-  }, []);
-
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const show = () => {
     setvisible(!visible);
   };
