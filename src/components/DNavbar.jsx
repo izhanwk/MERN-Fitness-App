@@ -113,6 +113,7 @@ function DNavbar() {
           let newToken;
           try {
             newToken = await refreshPromiseRef.current;
+            console.log("Token message : ", newToken);
           } catch (refreshErr) {
             if (refreshErr?.response?.status === 403) {
               // only sign out if refresh returned 403
