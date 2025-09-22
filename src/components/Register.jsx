@@ -32,7 +32,11 @@ function Register() {
         validateStatus: () => true,
       });
       if (response.status >= 200 && response.status < 300) {
-        showAlert("Registration Successful! Please check your email for verification.", "success", "Account Created");
+        showAlert(
+          `Registration Successful! Please check ${response.data} for verification.`,
+          "success",
+          "Account Created"
+        );
         navigate("/signin");
       } else if (response.status === 503) {
         setError("email", {
@@ -42,7 +46,11 @@ function Register() {
       }
     } catch (error) {
       console.error(error);
-      showAlert("Oops! There occurred a problem", "error", "Registration Failed");
+      showAlert(
+        "Oops! There occurred a problem",
+        "error",
+        "Registration Failed"
+      );
     } finally {
       setLoading(false);
     }

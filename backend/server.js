@@ -489,7 +489,7 @@ app.post("/register", async (req, res) => {
       html: `<h3>Click below to verify your email:</h3>
              <a href="${url}">${url}</a>`,
     });
-    res.status(200).send("Verification email sent! Please check your inbox.");
+    res.status(200).send(email);
   } catch (err) {
     console.error("Error sending verification email : ", err);
     res.status(400).send("Registration failed : ", err);
