@@ -75,7 +75,7 @@ function DNavbar() {
 
   useEffect(() => {
     // Global axios request interceptor: attach access token and refresh token
-    axios.interceptors.request.use((config) => {
+    const requestInterceptor = axios.interceptors.request.use((config) => {
       const refreshToken = localStorage.getItem("refreshtoken");
 
       config.headers = {
@@ -86,62 +86,95 @@ function DNavbar() {
       return config;
     });
 
+    const handleAuthFailure = async (originalRequest, response) => {
+      const status = response?.status;
+      const isRefreshEndpoint = originalRequest?.url?.includes(
+        "/refresh-token"
+      );
+
+      if (
+        (status === 401 || status === 403) &&
+        originalRequest &&
+        !originalRequest._retry &&
+        !isRefreshEndpoint
+      ) {
+        originalRequest._retry = true;
+
+        // ensure only a single refresh runs; others await the same promise
+        let starter = false;
+        if (!isRefreshing.current) {
+          isRefreshing.current = true;
+          refreshPromiseRef.current = refreshtoken();
+          starter = true;
+        }
+
+        let newToken = null;
+        try {
+          newToken = await refreshPromiseRef.current;
+        } finally {
+          if (starter) {
+            isRefreshing.current = false;
+            refreshPromiseRef.current = null;
+          }
+        }
+
+        if (newToken) {
+          originalRequest.headers = {
+            ...(originalRequest.headers || {}),
+            Authorization: `Bearer ${newToken}`,
+          };
+
+          axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+
+          return axios(originalRequest);
+        }
+
+        const err = new Error("Forbidden");
+        err.config = originalRequest;
+        err.response = response;
+        throw err;
+      }
+
+      if ((status === 401 || status === 403) && !isRefreshEndpoint) {
+        const err = new Error("Forbidden");
+        err.config = originalRequest;
+        err.response = response;
+        throw err;
+      }
+
+      return null;
+    };
+
     const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
+      async (response) => {
+        try {
+          const retryResponse = await handleAuthFailure(
+            response?.config,
+            response
+          );
+          if (retryResponse) {
+            return retryResponse;
+          }
+        } catch (err) {
+          return Promise.reject(err);
+        }
+
+        return response;
+      },
       async (error) => {
         const originalRequest = error?.config;
-        const status = error?.response?.status;
-        const isRefreshEndpoint =
-          originalRequest?.url?.includes("/refresh-token");
+        const response = error?.response;
 
-        if (
-          status === 403 &&
-          originalRequest &&
-          !originalRequest._retry &&
-          !isRefreshEndpoint
-        ) {
-          console.log("failed response came");
-          originalRequest._retry = true;
-
-          // start exactly one refresh; everyone else awaits the same promise
-          let starter = false;
-          if (!isRefreshing.current) {
-            isRefreshing.current = true;
-            refreshPromiseRef.current = refreshtoken(); // MUST return new token (or throw with .response.status)
-            starter = true;
+        try {
+          const retryResponse = await handleAuthFailure(
+            originalRequest,
+            response
+          );
+          if (retryResponse) {
+            return retryResponse;
           }
-
-          let newToken;
-          try {
-            newToken = await refreshPromiseRef.current;
-            console.log("Token message : ", newToken);
-          } catch (refreshErr) {
-            if (refreshErr?.response?.status === 403) {
-              // only sign out if refresh returned 403
-              localStorage.removeItem("token");
-              localStorage.removeItem("refreshtoken");
-              showAlert("Session Expired", "error", "Authentication Failed");
-              navigate("/signin");
-            }
-            return Promise.reject(refreshErr);
-          } finally {
-            if (starter) {
-              isRefreshing.current = false;
-              refreshPromiseRef.current = null;
-            }
-          }
-
-          if (newToken) {
-            // set header explicitly on RETRY
-            originalRequest.headers = {
-              ...(originalRequest.headers || {}),
-              Authorization: `Bearer ${newToken}`,
-            };
-            // optional: keep defaults in sync for future requests
-            axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
-
-            return await axios(originalRequest); // retry once with fresh token
-          }
+        } catch (err) {
+          return Promise.reject(err);
         }
 
         return Promise.reject(error);
@@ -149,6 +182,7 @@ function DNavbar() {
     );
 
     return () => {
+      axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
     };
   }, []);
