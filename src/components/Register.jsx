@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
@@ -20,6 +20,15 @@ function Register() {
   const password = watch("password");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const redirectTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -35,9 +44,17 @@ function Register() {
         showAlert(
           `Registration Successful! Please check ${response.data} for verification.`,
           "success",
-          "Account Created"
+          "Account Created",
+          4000
         );
-        navigate("/signin");
+
+        if (redirectTimeoutRef.current) {
+          clearTimeout(redirectTimeoutRef.current);
+        }
+
+        redirectTimeoutRef.current = setTimeout(() => {
+          navigate("/signin");
+        }, 4000);
       } else if (response.status === 503) {
         setError("email", {
           type: "server",
