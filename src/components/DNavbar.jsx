@@ -145,22 +145,7 @@ function DNavbar() {
     };
 
     const responseInterceptor = axios.interceptors.response.use(
-      async (response) => {
-        try {
-          console.log("Response status : ", response.status);
-          const retryResponse = await handleAuthFailure(
-            response?.config,
-            response
-          );
-          if (retryResponse) {
-            return retryResponse;
-          }
-        } catch (err) {
-          return Promise.reject(err);
-        }
-
-        return response;
-      },
+      async (response) => response,
       async (error) => {
         const originalRequest = error?.config;
         const response = error?.response;
