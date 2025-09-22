@@ -138,18 +138,33 @@ function DNavbar() {
         const err = new Error("Forbidden");
         err.config = originalRequest;
         err.response = response;
-        return Promise.reject(err);
+        throw err;
       }
 
       return null;
     };
 
     const responseInterceptor = axios.interceptors.response.use(
-      async (response) => response,
+      async (response) => {
+        try {
+          console.log("Response status : ", response.status);
+          const retryResponse = await handleAuthFailure(
+            response?.config,
+            response
+          );
+          if (retryResponse) {
+            return retryResponse;
+          }
+        } catch (err) {
+          return Promise.reject(err);
+        }
+
+        return response;
+      },
       async (error) => {
         const originalRequest = error?.config;
         const response = error?.response;
-        console.log("Failed Response status : ", response.status);
+
         try {
           const retryResponse = await handleAuthFailure(
             originalRequest,
