@@ -40,7 +40,6 @@ function DNavbar() {
 
   const refreshtoken = async () => {
     try {
-      setLoading(true);
       const refreshToken = localStorage.getItem("refreshtoken");
       console.log("Our refresh token:", refreshToken);
 
@@ -68,8 +67,6 @@ function DNavbar() {
       showAlert("Session Expired", "error", "Authentication Failed");
       navigate("/signin");
       return null;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -88,12 +85,11 @@ function DNavbar() {
 
     const handleAuthFailure = async (originalRequest, response) => {
       const status = response?.status;
-      const isRefreshEndpoint = originalRequest?.url?.includes(
-        "/refresh-token"
-      );
+      const isRefreshEndpoint =
+        originalRequest?.url?.includes("/refresh-token");
 
       if (
-        (status === 401 || status === 403) &&
+        status === 403 &&
         originalRequest &&
         !originalRequest._retry &&
         !isRefreshEndpoint
@@ -135,7 +131,7 @@ function DNavbar() {
         throw err;
       }
 
-      if ((status === 401 || status === 403) && !isRefreshEndpoint) {
+      if (status === 403 && !isRefreshEndpoint) {
         const err = new Error("Forbidden");
         err.config = originalRequest;
         err.response = response;
@@ -146,21 +142,7 @@ function DNavbar() {
     };
 
     const responseInterceptor = axios.interceptors.response.use(
-      async (response) => {
-        try {
-          const retryResponse = await handleAuthFailure(
-            response?.config,
-            response
-          );
-          if (retryResponse) {
-            return retryResponse;
-          }
-        } catch (err) {
-          return Promise.reject(err);
-        }
-
-        return response;
-      },
+      async (response) => response,
       async (error) => {
         const originalRequest = error?.config;
         const response = error?.response;
