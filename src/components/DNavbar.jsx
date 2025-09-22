@@ -40,6 +40,7 @@ function DNavbar() {
 
   const refreshtoken = async () => {
     try {
+      setLoading(true);
       const refreshToken = localStorage.getItem("refreshtoken");
       console.log("Our refresh token:", refreshToken);
 
@@ -67,6 +68,8 @@ function DNavbar() {
       showAlert("Session Expired", "error", "Authentication Failed");
       navigate("/signin");
       return null;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -142,7 +145,21 @@ function DNavbar() {
     };
 
     const responseInterceptor = axios.interceptors.response.use(
-      async (response) => response,
+      async (response) => {
+        try {
+          const retryResponse = await handleAuthFailure(
+            response?.config,
+            response
+          );
+          if (retryResponse) {
+            return retryResponse;
+          }
+        } catch (err) {
+          return Promise.reject(err);
+        }
+
+        return response;
+      },
       async (error) => {
         const originalRequest = error?.config;
         const response = error?.response;
