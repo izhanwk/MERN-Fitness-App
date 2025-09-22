@@ -45,7 +45,7 @@ function Register() {
           `Registration Successful! Please check ${response.data} for verification.`,
           "success",
           "Account Created",
-          4000
+          8000
         );
 
         if (redirectTimeoutRef.current) {
@@ -54,7 +54,7 @@ function Register() {
 
         redirectTimeoutRef.current = setTimeout(() => {
           navigate("/signin");
-        }, 4000);
+        }, 8000);
       } else if (response.status === 503) {
         setError("email", {
           type: "server",
