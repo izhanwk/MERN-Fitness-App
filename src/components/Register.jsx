@@ -33,7 +33,7 @@ function Register() {
       });
       if (response.status >= 200 && response.status < 300) {
         showAlert(
-          `Registration Successful! Please check  for verification.`,
+          `Registration Successful! Please check ${response.data} for verification.`,
           "success",
           "Account Created"
         );
