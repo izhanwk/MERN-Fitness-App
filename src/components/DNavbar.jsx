@@ -1,196 +1,77 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // for hamburger icons
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { api } from "./api";
 
 function DNavbar() {
   const navigate = useNavigate();
   const { showAlert, Alert } = useAlert();
+
   const [visible2, setvisible2] = useState(false);
   const [visible, setvisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const isRefreshing = useRef(false);
-  const refreshPromiseRef = useRef(null);
 
-  const logOut = async () => {
-    console.log("Loggin out");
-    setLoading(true);
-    const token = localStorage.getItem("token");
-    try {
-      await axios.get(`${API_URL}/logout`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "ngrok-skip-browser-warning": "true",
-        },
-      });
-    } catch (error) {
-      console.error("Logout request failed:", error);
-    } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshtoken");
-      setLoading(false);
-      navigate("/signin");
-    }
+  // local-only logout (no network)
+  const logOutLocal = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshtoken");
+    navigate("/signin");
   };
 
-  const refreshtoken = async () => {
-    try {
-      setLoading(true);
-      const refreshToken = localStorage.getItem("refreshtoken");
-      console.log("Our refresh token:", refreshToken);
-
-      const response = await axios.post(
-        `${API_URL}/refresh-token`,
-        { refreshtoken: refreshToken },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${refreshToken}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
-      );
-
-      const data = response.data;
-      localStorage.setItem("token", data.token);
-      console.log("New token:", localStorage.getItem("token"));
-      console.log("Token refreshed successfully");
-      return data.token;
-    } catch (err) {
-      console.error("Error occurred:", err);
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshtoken");
-      showAlert("Session Expired", "error", "Authentication Failed");
-      navigate("/signin");
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // OPTIONAL: component-level catch to react to forced logout from anywhere
   useEffect(() => {
-    // Global axios request interceptor: attach access token and refresh token
-    axios.interceptors.request.use((config) => {
-      const refreshToken = localStorage.getItem("refreshtoken");
-
-      config.headers = {
-        ...config.headers,
-        ...(refreshToken && { "X-Refresh-Token": refreshToken }),
-      };
-
-      return config;
-    });
-
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error?.config;
-        const status = error?.response?.status;
-        const isRefreshEndpoint =
-          originalRequest?.url?.includes("/refresh-token");
-
-        if (
-          status === 403 &&
-          originalRequest &&
-          !originalRequest._retry &&
-          !isRefreshEndpoint
-        ) {
-          originalRequest._retry = true;
-
-          // start exactly one refresh; everyone else awaits the same promise
-          let starter = false;
-          if (!isRefreshing.current) {
-            isRefreshing.current = true;
-            refreshPromiseRef.current = refreshtoken(); // MUST return new token (or throw with .response.status)
-            starter = true;
-          }
-
-          let newToken;
-          try {
-            newToken = await refreshPromiseRef.current;
-            console.log("Token message : ", newToken);
-          } catch (refreshErr) {
-            if (refreshErr?.response?.status === 403) {
-              // only sign out if refresh returned 403
-              localStorage.removeItem("token");
-              localStorage.removeItem("refreshtoken");
-              showAlert("Session Expired", "error", "Authentication Failed");
-              navigate("/signin");
-            }
-            return Promise.reject(refreshErr);
-          } finally {
-            if (starter) {
-              isRefreshing.current = false;
-              refreshPromiseRef.current = null;
-            }
-          }
-
-          if (newToken) {
-            // set header explicitly on RETRY
-            originalRequest.headers = {
-              ...(originalRequest.headers || {}),
-              Authorization: `Bearer ${newToken}`,
-            };
-            // optional: keep defaults in sync for future requests
-            axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
-
-            return await axios(originalRequest); // retry once with fresh token
-          }
+    const eject = api.interceptors.response.use(
+      (r) => r,
+      (err) => {
+        if (err?._forceLogout) {
+          showAlert("Session Expired", "error", "Authentication Failed");
+          logOutLocal();
+          return Promise.reject(err);
         }
-
-        return Promise.reject(error);
+        return Promise.reject(err);
       }
     );
-
-    return () => {
-      axios.interceptors.response.eject(responseInterceptor);
-    };
+    return () => api.interceptors.response.eject(eject);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const interValid = setInterval(() => {
-      const fetchData = async () => {
-        try {
-          const token = localStorage.getItem("token");
-
-          const response = await axios.get(`${API_URL}/getdata`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "ngrok-skip-browser-warning": "true",
-            },
-          });
-
-          if (response.status === 200) {
-            console.log("Token is valid");
-          }
-        } catch (err) {
-          if (err.response?.status === 403) {
-            // Token expired, try refreshing
-            await refreshtoken();
-          } else {
-            console.error("Error in fetchData:", err);
-            logOut();
-          }
-        }
-      };
-
-      fetchData();
-    }, 60000); // Runs every 60 seconds
-
-    return () => clearInterval(interValid);
-  }, []);
-
-  const show = () => {
-    setvisible(!visible);
+  // Example protected call; triggers immediate logout if session is revoked
+  const handleProtectedCall = async () => {
+    try {
+      setLoading(true);
+      await api.get("/getdata"); // tokens auto-attached
+    } catch (err) {
+      if (err?._forceLogout) return; // already logged out
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const session_Function = async () => {
+  // call once on mount if you want an immediate check/fetch
+  useEffect(() => {
+    handleProtectedCall();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const show = () => setvisible(!visible);
+
+  const session_Function = () => {
     navigate("/sessions");
+  };
+
+  const handleLogoutClick = async () => {
+    try {
+      setLoading(true);
+      // best-effort server logout; ok if it 401s (e.g., already revoked)
+      await api.get("/logout").catch(() => {});
+    } finally {
+      setLoading(false);
+      logOutLocal();
+    }
   };
 
   return (
@@ -365,7 +246,7 @@ function DNavbar() {
             </p>
             <div
               className="bg-gradient-to-r from-red-500 to-red-600 text-center rounded-lg py-2 mt-3 cursor-pointer hover:from-red-400 hover:to-red-500 text-white font-medium transition-all duration-300"
-              onClick={logOut}
+              onClick={handleLogoutClick}
             >
               Yes
             </div>
