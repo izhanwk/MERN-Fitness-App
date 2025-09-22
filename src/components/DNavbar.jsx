@@ -138,7 +138,7 @@ function DNavbar() {
         const err = new Error("Forbidden");
         err.config = originalRequest;
         err.response = response;
-        throw err;
+        return Promise.reject(err);
       }
 
       return null;
@@ -164,7 +164,7 @@ function DNavbar() {
       async (error) => {
         const originalRequest = error?.config;
         const response = error?.response;
-
+        console.log("Failed Response status : ", response.status);
         try {
           const retryResponse = await handleAuthFailure(
             originalRequest,
