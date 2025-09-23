@@ -16,7 +16,7 @@ function Protectedroute2({ children }) {
       });
       console.log(response.data);
       if (response.data === "Complete") {
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
       }
     })();
   }, [navigate]);
