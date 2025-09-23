@@ -189,9 +189,10 @@ function Signin() {
           script?.removeEventListener("load", handleLoad);
         };
       }
-      return () => undefined;
+      // return () => undefined;
     }
 
+    console.log("Creating button");
     script = document.createElement("script");
     script.src = scriptSrc;
     script.async = true;

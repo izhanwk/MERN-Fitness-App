@@ -23,6 +23,7 @@ const dataSchema = new mongoose.Schema({
     default: "local",
   },
   avatar: String,
+  profileComplete: null,
 });
 
 const Data = mongoose.model("Data", dataSchema, "Registeration Data");

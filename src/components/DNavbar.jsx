@@ -42,7 +42,7 @@ function DNavbar() {
 
   const refreshtoken = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
       const sessionId = localStorage.getItem("sessionId");
       console.log("Our session ID:", sessionId);
       if (!sessionId) {
@@ -74,7 +74,7 @@ function DNavbar() {
       navigate("/signin");
       return null;
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 

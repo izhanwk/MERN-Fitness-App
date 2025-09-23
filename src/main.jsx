@@ -17,6 +17,7 @@ import Changepassword from "./components/Changepassword.jsx";
 import { Navigate } from "react-router-dom";
 import Edit from "./components/Edit.jsx";
 const token = localStorage.getItem("token");
+import Protectedroute2 from "./components/Proctectedroute2.jsx";
 
 const router = createBrowserRouter(
   [
@@ -48,7 +49,9 @@ const router = createBrowserRouter(
       path: "/goals",
       element: (
         <Protectedroute>
-          <Goals />
+          <Protectedroute2>
+            <Goals />
+          </Protectedroute2>
         </Protectedroute>
       ),
     },
@@ -56,7 +59,9 @@ const router = createBrowserRouter(
       path: "/musclegain",
       element: (
         <Protectedroute>
-          <Musclegain />
+          <Protectedroute2>
+            <Musclegain />
+          </Protectedroute2>
         </Protectedroute>
       ),
     },
@@ -64,7 +69,9 @@ const router = createBrowserRouter(
       path: "/fatloss",
       element: (
         <Protectedroute>
-          <Fatloss />
+          <Protectedroute2>
+            <Fatloss />
+          </Protectedroute2>
         </Protectedroute>
       ),
     },
@@ -72,7 +79,9 @@ const router = createBrowserRouter(
       path: "/activity",
       element: (
         <Protectedroute>
-          <Activity />
+          <Protectedroute2>
+            <Activity />
+          </Protectedroute2>
         </Protectedroute>
       ),
     },

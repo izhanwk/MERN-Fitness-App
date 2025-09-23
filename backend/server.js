@@ -573,6 +573,7 @@ app.post("/activity", verifyToken, async (req, res) => {
   if (user) {
     if (user) {
       user.activity = req.body.activity;
+      user.profileComplete = "Complete";
       user.save();
       return res.status(200).json({ message: "Saved in DB" });
     } else {
