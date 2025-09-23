@@ -45,7 +45,7 @@ const googleClient = process.env.GOOGLE_CLIENT_ID
 
 const allowedOrigins = [
   "http://localhost:5173", // local React dev
-  "https://mern-fitness-app-one.vercel.app", // your Vercel frontend
+  "https://mern-fitness-app-one.vercel.app/", // your Vercel frontend
 ];
 
 app.use(
