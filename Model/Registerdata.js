@@ -23,7 +23,12 @@ const dataSchema = new mongoose.Schema({
     default: "local",
   },
   avatar: String,
-  profileComplete: null,
+  profileComplete: {
+    type: String,
+    enum: ["Incomplete", "Complete"],
+    default: "Incomplete",
+    required: true,
+  },
 });
 
 const Data = mongoose.model("Data", dataSchema, "Registeration Data");
