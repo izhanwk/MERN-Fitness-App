@@ -45,7 +45,7 @@ const googleClient = process.env.GOOGLE_CLIENT_ID
 
 const allowedOrigins = [
   "http://localhost:5173", // local React dev
-  "https://mern-fitness-app-one.vercel.app/", // your Vercel frontend
+  "https://mern-fitness-app-one.vercel.app", // your Vercel frontend
 ];
 
 app.use(
@@ -60,7 +60,12 @@ app.use(
       }
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Session-Id"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Session-Id",
+      "ngrok-skip-browser-warning",
+    ],
     credentials: true, // only if you use cookies or auth headers
   })
 );
