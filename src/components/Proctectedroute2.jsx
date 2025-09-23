@@ -1,29 +1,41 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { api } from "./api";
 
 function Protectedroute2({ children }) {
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL;
+  const [shouldRenderChildren, setShouldRenderChildren] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    let isActive = true;
+
     (async () => {
       try {
-        const response = await axios.get(`${API_URL}/checkData`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log(response.data);
+        const response = await api.get("/checkData");
+
+        if (!isActive) return;
+
         if (response.status === 200) {
           navigate("/dashboard", { replace: true });
+        } else {
+          setShouldRenderChildren(true);
         }
       } catch (err) {
+        if (!isActive) return;
+
         console.error(err);
+        setShouldRenderChildren(true);
       }
     })();
+
+    return () => {
+      isActive = false;
+    };
   }, [navigate]);
+
+  if (!shouldRenderChildren) {
+    return null;
+  }
 
   return children;
 }
