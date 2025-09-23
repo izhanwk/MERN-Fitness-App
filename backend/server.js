@@ -277,8 +277,25 @@ app.post("/store", verifyToken, async (req, res) => {
 
 app.get("/getfood", verifyToken, async (req, res) => {
   try {
-    const foodItems = await Foods.find();
-    return res.status(200).json(foodItems);
+    const limit = Math.max(parseInt(req.query.limit, 10) || 15, 1);
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const searchTerm = req.query.search ? req.query.search.trim() : "";
+    const skip = (page - 1) * limit;
+
+    const query = searchTerm
+      ? {
+          name: { $regex: searchTerm, $options: "i" },
+        }
+      : {};
+
+    const [items, total] = await Promise.all([
+      Foods.find(query).skip(skip).limit(limit),
+      Foods.countDocuments(query),
+    ]);
+
+    const hasMore = skip + items.length < total;
+
+    return res.status(200).json({ items, hasMore, total });
   } catch (err) {
     return res.status(500).json({ message: "Error occured: ", err });
   }
