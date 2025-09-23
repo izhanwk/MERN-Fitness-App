@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-import { jwtDecode } from "jwt-decode";
 import DNavbar from "./DNavbar";
 import { LogOut } from "lucide-react";
 import axios from "axios";
@@ -14,25 +13,24 @@ function Sessions() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true); // initial load
   const [actionLoading, setActionLoading] = useState(false);
-  const refreshToken = localStorage.getItem("refreshtoken");
+  const currentSessionId = localStorage.getItem("sessionId");
 
   useEffect(() => {
     (async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) {
+        const sessionId = localStorage.getItem("sessionId");
+        if (!token || !sessionId) {
           setLoading(false);
           return console.error("No token in localStorage");
         }
 
-        const decoded = jwtDecode(token);
-        console.log("Decoded token:", decoded);
-
         const response = await axios.get(
-          `${API_URL}/sessions?id=${decoded.userId}`,
+          `${API_URL}/sessions`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "X-Session-Id": sessionId,
               "ngrok-skip-browser-warning": "true",
             },
             validateStatus: () => true,
@@ -57,10 +55,21 @@ function Sessions() {
   const logOutSession = async (id) => {
     setActionLoading(true);
     try {
+      if (id === currentSessionId) {
+        showAlert(
+          "You’re currently using this session.",
+          "info",
+          "Active Session"
+        );
+        return;
+      }
+
+      const sessionId = localStorage.getItem("sessionId");
       const response = await axios.delete(`${API_URL}/logoutsession?id=${id}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          ...(sessionId && { "X-Session-Id": sessionId }),
           "ngrok-skip-browser-warning": "true",
         },
         validateStatus: () => true,
@@ -115,9 +124,10 @@ function Sessions() {
                   {new Date(session.lastActive).toLocaleString()}
                 </p>
 
-                {session.token === refreshToken ? (
-                  <span className="inline-flex items-center space-x-2 bg-red-600 opacity-30 px-4 py-2 rounded-lg">
-                    Logout
+                {session.currentDevice || session._id === currentSessionId ? (
+                  <span className="inline-flex items-center space-x-2 bg-red-600/40 px-4 py-2 rounded-lg cursor-not-allowed">
+                    <LogOut size={18} />
+                    <span>Current Session</span>
                   </span>
                 ) : (
                   <button

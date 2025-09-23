@@ -108,7 +108,7 @@ function Edit() {
         goal: form.goal || null,
         mode: form.mode || null,
         activity: form.activity === "" ? null : Number(form.activity),
-        // array/password/refreshtoken/verified not edited here
+        // array/password/session info/verified not edited here
       };
 
       const response = await axios.put(`${API_URL}/editdata`, payload, {

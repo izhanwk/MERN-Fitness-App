@@ -21,10 +21,12 @@ function DNavbar() {
     console.log("Loggin out");
     setLoading(true);
     const token = localStorage.getItem("token");
+    const sessionId = localStorage.getItem("sessionId");
     try {
       await axios.get(`${API_URL}/logout`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          ...(sessionId && { "X-Session-Id": sessionId }),
           "ngrok-skip-browser-warning": "true",
         },
       });
@@ -32,7 +34,7 @@ function DNavbar() {
       console.error("Logout request failed:", error);
     } finally {
       localStorage.removeItem("token");
-      localStorage.removeItem("refreshtoken");
+      localStorage.removeItem("sessionId");
       setLoading(false);
       navigate("/signin");
     }
@@ -41,16 +43,19 @@ function DNavbar() {
   const refreshtoken = async () => {
     try {
       setLoading(true);
-      const refreshToken = localStorage.getItem("refreshtoken");
-      console.log("Our refresh token:", refreshToken);
+      const sessionId = localStorage.getItem("sessionId");
+      console.log("Our session ID:", sessionId);
+      if (!sessionId) {
+        throw new Error("No active session");
+      }
 
       const response = await axios.post(
         `${API_URL}/refresh-token`,
-        { refreshtoken: refreshToken },
+        { sessionId },
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${refreshToken}`,
+            ...(sessionId && { "X-Session-Id": sessionId }),
             "ngrok-skip-browser-warning": "true",
           },
         }
@@ -64,7 +69,7 @@ function DNavbar() {
     } catch (err) {
       console.error("Error occurred:", err);
       localStorage.removeItem("token");
-      localStorage.removeItem("refreshtoken");
+      localStorage.removeItem("sessionId");
       showAlert("Session Expired", "error", "Authentication Failed");
       navigate("/signin");
       return null;
@@ -74,13 +79,13 @@ function DNavbar() {
   };
 
   useEffect(() => {
-    // Global axios request interceptor: attach access token and refresh token
+    // Global axios request interceptor: attach access token and session id
     const requestInterceptor = axios.interceptors.request.use((config) => {
-      const refreshToken = localStorage.getItem("refreshtoken");
+      const sessionId = localStorage.getItem("sessionId");
 
       config.headers = {
         ...config.headers,
-        ...(refreshToken && { "X-Refresh-Token": refreshToken }),
+        ...(sessionId && { "X-Session-Id": sessionId }),
       };
 
       return config;
@@ -192,10 +197,12 @@ function DNavbar() {
       const fetchData = async () => {
         try {
           const token = localStorage.getItem("token");
+          const sessionId = localStorage.getItem("sessionId");
 
           const response = await axios.get(`${API_URL}/getdata`, {
             headers: {
               Authorization: `Bearer ${token}`,
+              ...(sessionId && { "X-Session-Id": sessionId }),
               "ngrok-skip-browser-warning": "true",
             },
           });

@@ -16,6 +16,13 @@ const dataSchema = new mongoose.Schema({
   activity: Number,
   array: Array,
   refreshtoken: String,
+  googleId: String,
+  authProvider: {
+    type: String,
+    enum: ["local", "google"],
+    default: "local",
+  },
+  avatar: String,
 });
 
 const Data = mongoose.model("Data", dataSchema, "Registeration Data");

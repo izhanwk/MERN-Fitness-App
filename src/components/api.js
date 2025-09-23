@@ -10,12 +10,12 @@ export const api = axios.create({
 // ---- Request: attach tokens on EVERY call ----
 api.interceptors.request.use((config) => {
   const access = localStorage.getItem("token");
-  const refresh = localStorage.getItem("refreshtoken");
+  const sessionId = localStorage.getItem("sessionId");
 
   config.headers = {
     ...config.headers,
     ...(access && { Authorization: `Bearer ${access}` }),
-    ...(refresh && { "X-Refresh-Token": refresh }),
+    ...(sessionId && { "X-Session-Id": sessionId }),
     "ngrok-skip-browser-warning": "true",
   };
   return config;
@@ -67,15 +67,15 @@ api.interceptors.response.use(
         isRefreshing = true;
         refreshPromise = (async () => {
           try {
-            const refreshToken = localStorage.getItem("refreshtoken");
-            if (!refreshToken) throw new Error("No refresh token");
+            const sessionId = localStorage.getItem("sessionId");
+            if (!sessionId) throw new Error("No active session");
             const resp = await axios.post(
               `${API_URL}/refresh-token`,
-              { refreshtoken: refreshToken },
+              { sessionId },
               {
                 headers: {
                   "Content-Type": "application/json",
-                  Authorization: `Bearer ${refreshToken}`,
+                  ...(sessionId && { "X-Session-Id": sessionId }),
                   "ngrok-skip-browser-warning": "true",
                 },
               }
