@@ -43,7 +43,27 @@ const googleClient = process.env.GOOGLE_CLIENT_ID
   ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
   : null;
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173", // local React dev
+  "https://mern-fitness-app-one.vercel.app", // your Vercel frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Session-Id"],
+    credentials: true, // only if you use cookies or auth headers
+  })
+);
 
 const getClientIp = (req) =>
   req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.ip;
