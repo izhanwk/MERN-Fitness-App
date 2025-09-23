@@ -88,7 +88,6 @@ function Signin() {
 
   const handleGoogleCredentialResponse = useCallback(
     async (response) => {
-      console.log(" inside handleGoogleCredentialResponse");
       const credential = response?.credential;
       if (!credential) {
         showAlert(
@@ -151,6 +150,7 @@ function Signin() {
   );
 
   useEffect(() => {
+    console.log(" inside use effect");
     if (!GOOGLE_CLIENT_ID || !googleButtonRef.current) {
       return;
     }
