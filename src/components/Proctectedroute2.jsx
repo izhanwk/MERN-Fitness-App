@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "./api";
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Protectedroute2({ children }) {
   const navigate = useNavigate();
@@ -11,7 +13,17 @@ function Protectedroute2({ children }) {
 
     (async () => {
       try {
-        const response = await api.get("/checkData");
+        const token = localStorage.getItem("token");
+        const sessionId = localStorage.getItem("sessionId");
+
+        const response = await axios.get(`${API_URL}/checkData`, {
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+            ...(sessionId && { "X-Session-Id": sessionId }),
+            "ngrok-skip-browser-warning": "true",
+          },
+          validateStatus: () => true,
+        });
 
         if (!isActive) return;
 
