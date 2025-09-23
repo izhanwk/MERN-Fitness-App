@@ -12,6 +12,7 @@ import Sessions from "../Model/Sessions.js";
 import Otp from "../Model/Otp.js";
 import useragent from "useragent";
 import { sendGmail } from "./gmailSender.js";
+import { OAuth2Client } from "google-auth-library";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -38,6 +39,10 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const googleClient = process.env.GOOGLE_CLIENT_ID
+  ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+  : null;
+
 app.use(cors());
 
 const getClientIp = (req) =>
@@ -60,63 +65,87 @@ app.get("/", (req, res) => {
 
 const verifyToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
-  const refreshToken = req.headers["x-refresh-token"];
+  const sessionId = req.headers["x-session-id"];
 
   if (!token) {
     return res.status(403).json({ message: "No Token, Access denied" });
   }
 
-  try {
-    // Verify token
+  if (!sessionId) {
+    return res.status(403).json({ message: "No session, Access denied" });
+  }
 
+  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+    return res.status(403).json({ message: "Invalid or expired session" });
+  }
+
+  try {
     const decodedToken = jwt.verify(token, secretkey);
 
-    // Attach decoded info to request
     req.user = decodedToken;
     req.email = decodedToken.email;
     req.userId = decodedToken.userId;
-    req.refreshToken = refreshToken;
-    // Update lastActive for this session
+    req.sessionId = sessionId;
+
     const ip = getClientIp(req);
     console.log("IP of device : ", ip);
+
     const session = await Sessions.findOne({
-      userId: req.userId,
-      token: refreshToken,
+      _id: sessionId,
+      userId: decodedToken.userId,
     });
 
     if (!session) {
-      return res.status(403).json({ message: "Invalid or expired token" });
+      return res.status(403).json({ message: "Invalid or expired session" });
     }
 
     session.lastActive = new Date();
+    session.currentDevice = true;
     await session.save();
+
+    await Sessions.updateMany(
+      { userId: decodedToken.userId, _id: { $ne: sessionId } },
+      { $set: { currentDevice: false } }
+    );
+
     next();
   } catch (err) {
-    // await Sessions.deleteOne({ userId: req.userId, token: refreshToken });
+    console.error("Token verification error:", err);
     return res.status(403).json({ message: "Invalid or expired token" });
   }
 };
 
 app.post("/refresh-token", async (req, res) => {
-  const refresh = req.body.refreshtoken;
-  console.log("token : ", refresh);
+  const { sessionId } = req.body;
 
-  if (!refresh) {
-    return res.status(401).json({ message: "No refresh token provided" });
+  if (!sessionId) {
+    return res.status(401).json({ message: "No session provided" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+    return res.status(403).json({ message: "Invalid or expired session" });
   }
 
   try {
-    const decoded = jwt.verify(refresh, refreshkey);
+    const session = await Sessions.findById(sessionId);
 
-    // Find session by refresh token instead of checking user.refreshtoken
-    const session = await Sessions.findOne({ token: refresh });
     if (!session) {
-      return res.status(403).json({ message: "Invalid refresh token" });
+      return res.status(403).json({ message: "Invalid or expired session" });
     }
 
-    const user = await Data.findOne({ email: decoded.email });
+    const decoded = jwt.verify(session.token, refreshkey);
+
+    if (session.userId.toString() !== decoded.userId) {
+      await Sessions.deleteOne({ _id: sessionId });
+      return res.status(403).json({ message: "Invalid or expired session" });
+    }
+
+    const user =
+      (await Data.findById(decoded.userId)) ||
+      (await Data.findOne({ email: decoded.email }));
+
     if (!user) {
-      await Sessions.deleteOne({ token: refresh });
+      await Sessions.deleteOne({ _id: sessionId });
       return res.status(403).json({ message: "Invalid refresh token" });
     }
 
@@ -129,22 +158,26 @@ app.post("/refresh-token", async (req, res) => {
       { expiresIn: "5m" }
     );
 
+    session.lastActive = new Date();
+    await session.save();
+
     return res.status(200).json({ token });
   } catch (err) {
-    console.error("Refresh token verification failed:", err);
-    try {
-      await Sessions.deleteOne({ token: refresh });
-    } catch (cleanupError) {
-      console.error("Error cleaning up invalid session:", cleanupError);
-    }
+    console.error("Session refresh failed:", err);
 
     if (err.name === "TokenExpiredError" || err.name === "JsonWebTokenError") {
+      try {
+        await Sessions.deleteOne({ _id: sessionId });
+      } catch (cleanupError) {
+        console.error("Error cleaning up invalid session:", cleanupError);
+      }
+
       return res.status(403).json({ message: "Invalid or expired token" });
     }
 
     return res
       .status(500)
-      .json({ message: "Server error while validating refresh token" });
+      .json({ message: "Server error while validating session" });
   }
 });
 
@@ -294,8 +327,10 @@ app.post("/signin", async (req, res) => {
                     token: refreshToken,
                     createdAt: new Date(),
                     lastActive: new Date(),
+                    currentDevice: true,
                   });
                   await newSession.save();
+                  const sessionId = newSession._id.toString();
                   return res.status(302).json({
                     success: true,
                     data: {
@@ -303,6 +338,7 @@ app.post("/signin", async (req, res) => {
                       email: user.email,
                       token: token,
                       refresh: refreshToken,
+                      sessionId,
                     },
                   });
                 }
@@ -331,8 +367,10 @@ app.post("/signin", async (req, res) => {
                   token: refreshToken,
                   createdAt: new Date(),
                   lastActive: new Date(),
+                  currentDevice: true,
                 });
                 await newSession.save();
+                const sessionId = newSession._id.toString();
                 return res.status(200).json({
                   success: true,
                   data: {
@@ -340,6 +378,7 @@ app.post("/signin", async (req, res) => {
                     email: user.email,
                     token: token,
                     refresh: refreshToken,
+                    sessionId,
                   },
                 });
               } catch (JWSerr) {
@@ -362,6 +401,123 @@ app.post("/signin", async (req, res) => {
     .catch((err) => {
       return res.status(500).json({ message: "An error occurred", err });
     });
+});
+
+app.post("/signin/google", async (req, res) => {
+  try {
+    if (!googleClient) {
+      return res
+        .status(503)
+        .json({ message: "Google sign-in is not configured" });
+    }
+
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ message: "Missing Google credential" });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload?.email;
+    const googleId = payload?.sub;
+    const name = payload?.name;
+    const picture = payload?.picture;
+
+    if (!email || !googleId) {
+      return res
+        .status(400)
+        .json({ message: "Unable to verify Google account" });
+    }
+
+    let user = await Data.findOne({ email });
+
+    if (!user) {
+      user = new Data({
+        email,
+        password: null,
+        verified: true,
+        name: name || email,
+        googleId,
+        authProvider: "google",
+        avatar: picture,
+      });
+    } else {
+      user.googleId = user.googleId || googleId;
+      user.authProvider = "google";
+      if (!user.verified) {
+        user.verified = true;
+      }
+      if (!user.name && name) {
+        user.name = name;
+      }
+      if (picture && !user.avatar) {
+        user.avatar = picture;
+      }
+    }
+
+    await user.save();
+
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+      },
+      secretkey,
+      { expiresIn: "5m" }
+    );
+
+    const refreshToken = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+      },
+      refreshkey,
+      { expiresIn: "7d" }
+    );
+
+    const agent = useragent.parse(req.headers["user-agent"]);
+    const device = `${agent.os.toString()} ${agent.toAgent()}`;
+    const ip = getClientIp(req);
+
+    const newSession = new Sessions({
+      userId: user._id,
+      device,
+      ip,
+      token: refreshToken,
+      createdAt: new Date(),
+      lastActive: new Date(),
+      currentDevice: true,
+    });
+    await newSession.save();
+    const sessionId = newSession._id.toString();
+
+    const responsePayload = {
+      success: true,
+      data: {
+        userId: user.id,
+        email: user.email,
+        token,
+        refresh: refreshToken,
+        sessionId,
+      },
+    };
+
+    if (!user.height || !user.weight || !user.activity) {
+      return res.status(302).json(responsePayload);
+    }
+
+    return res.status(200).json(responsePayload);
+  } catch (error) {
+    console.error("Google sign-in failed:", error);
+    return res
+      .status(500)
+      .json({ message: "Failed to sign in with Google" });
+  }
 });
 
 app.post("/data", verifyToken, async (req, res) => {
@@ -531,29 +687,36 @@ app.get("/verify/:token", async (req, res) => {
 });
 
 app.get("/sessions", verifyToken, async (req, res) => {
-  const userId = req.query.id;
-  const ip = getClientIp(req);
+  try {
+    const userId = req.userId;
+    const currentSessionId = req.sessionId;
 
-  const sessions = await Sessions.find({ userId });
-  sessions.forEach((session) => {
-    if (session.ip === ip) {
-      session.currentDevice = true;
-    }
-  });
-  console.log(sessions);
-  res.status(200).json(sessions);
+    const sessions = await Sessions.find({ userId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const sanitizedSessions = sessions.map((session) => {
+      const { token, __v, ...rest } = session;
+      const id = session._id.toString();
+      return {
+        ...rest,
+        _id: id,
+        userId: session.userId.toString(),
+        currentDevice:
+          !!currentSessionId && currentSessionId.toString() === id,
+      };
+    });
+
+    return res.status(200).json(sanitizedSessions);
+  } catch (error) {
+    console.error("Error fetching sessions:", error);
+    return res.status(500).json({ message: "Error fetching sessions" });
+  }
 });
 
 app.get("/logout", verifyToken, async (req, res) => {
   try {
-    // const agent = useragent.parse(req.headers["user-agent"]);
-    // const device = `${agent.os.toString()} ${agent.toAgent()}`;
-    // const ip = getClientIp(req);
-    // console.log(req.email);
-    const user = await Data.findOne({ email: req.email });
-    // Delete the session linked to this token
-    await Sessions.deleteOne({ userId: req.userId, token: req.refreshToken });
-
+    await Sessions.deleteOne({ _id: req.sessionId, userId: req.userId });
     return res
       .status(200)
       .json({ message: "Logged out successfully, session removed" });
@@ -567,16 +730,25 @@ app.delete("/logoutsession", verifyToken, async (req, res) => {
   try {
     const id = req.query.id;
     console.log("Deleting session:", id);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid session identifier" });
+    }
 
-    const deleted = await Sessions.deleteOne({ _id: id });
+    if (id === req.sessionId) {
+      return res.status(400).json({ message: "Cannot revoke active session" });
+    }
 
-    if (deleted.deletedCount > 0) {
-      return res
-        .status(200)
-        .json({ message: "Killed the session successfully" });
-    } else {
+    const session = await Sessions.findOne({ _id: id, userId: req.userId });
+
+    if (!session) {
       return res.status(404).json({ message: "Session not found" });
     }
+
+    await session.deleteOne();
+
+    return res
+      .status(200)
+      .json({ message: "Killed the session successfully" });
   } catch (error) {
     console.error("Error deleting session:", error);
     return res.status(500).json({ message: "Server error deleting session" });

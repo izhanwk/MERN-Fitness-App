@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -8,6 +8,7 @@ import Loader from "./Loader";
 import { useAlert } from "./Alert";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 function Signin() {
   const navigate = useNavigate();
@@ -19,6 +20,20 @@ function Signin() {
     formState: { errors },
   } = useForm();
   const [loading, setLoading] = useState(false);
+  const googleButtonRef = useRef(null);
+
+  const persistSession = useCallback((session) => {
+    if (!session) return;
+    if (session.token) {
+      localStorage.setItem("token", session.token);
+    }
+    if (session.sessionId) {
+      localStorage.setItem("sessionId", session.sessionId);
+    } else {
+      localStorage.removeItem("sessionId");
+    }
+    localStorage.removeItem("refreshtoken");
+  }, []);
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -32,32 +47,33 @@ function Signin() {
       });
 
       if (response.status === 302) {
-        showAlert("Incomplete profile, redirecting...", "info", "Profile Setup Required");
-        const responseData = response.data;
-        const email = responseData.email;
-        localStorage.setItem("token", responseData.data.token);
-        localStorage.setItem("refreshtoken", responseData.data.refresh);
-        navigate("/signup/userdata", { state: { email } });
+        const sessionData = response.data?.data;
+        persistSession(sessionData);
+        showAlert(
+          "Incomplete profile, redirecting...",
+          "info",
+          "Profile Setup Required"
+        );
+        const emailForSetup = sessionData?.email || data.email;
+        navigate("/signup/userdata", { state: { email: emailForSetup } });
         return;
       }
 
       if (response.status >= 200 && response.status < 300) {
-        const responseData = response.data;
-        localStorage.setItem("token", responseData.data.token);
-        localStorage.setItem("refreshtoken", responseData.data.refresh);
-        console.log(`${localStorage.getItem("refreshtoken")}`);
+        persistSession(response.data?.data);
         navigate("/dashboard");
-      } else {
-        const errorData = response.data;
-        setError("email", {
-          type: "server",
-          message: errorData.message || "You provided wrong data",
-        });
-        setError("password", {
-          type: "server",
-          message: errorData.message || "You provided wrong data",
-        });
+        return;
       }
+
+      const errorData = response.data;
+      setError("email", {
+        type: "server",
+        message: errorData?.message || "You provided wrong data",
+      });
+      setError("password", {
+        type: "server",
+        message: errorData?.message || "You provided wrong data",
+      });
     } catch (err) {
       showAlert("An error occurred. Please try again.", "error", "Connection Error");
       console.error(err);
@@ -65,6 +81,123 @@ function Signin() {
       setLoading(false);
     }
   };
+
+  const handleGoogleCredentialResponse = useCallback(
+    async (response) => {
+      const credential = response?.credential;
+      if (!credential) {
+        showAlert(
+          "Google authentication failed. Please try again.",
+          "error",
+          "Google Sign-In"
+        );
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const googleResponse = await axios.post(
+          `${API_URL}/signin/google`,
+          { credential },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "true",
+            },
+            validateStatus: () => true,
+          }
+        );
+
+        if (googleResponse.status === 302) {
+          const sessionData = googleResponse.data?.data;
+          persistSession(sessionData);
+          showAlert(
+            "Incomplete profile, redirecting...",
+            "info",
+            "Profile Setup Required"
+          );
+          const emailForSetup = sessionData?.email;
+          navigate("/signup/userdata", { state: { email: emailForSetup } });
+          return;
+        }
+
+        if (googleResponse.status >= 200 && googleResponse.status < 300) {
+          persistSession(googleResponse.data?.data);
+          navigate("/dashboard");
+          return;
+        }
+
+        const message =
+          googleResponse.data?.message ||
+          "Unable to sign in with Google. Please try another method.";
+        showAlert(message, "error", "Google Sign-In Failed");
+      } catch (error) {
+        console.error("Google sign-in error:", error);
+        showAlert(
+          "We couldn’t reach Google sign-in. Please try again.",
+          "error",
+          "Google Sign-In Failed"
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [navigate, persistSession, showAlert]
+  );
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || !googleButtonRef.current) {
+      return;
+    }
+
+    const scriptSrc = "https://accounts.google.com/gsi/client";
+
+    const renderGoogleButton = () => {
+      if (window.google && googleButtonRef.current) {
+        googleButtonRef.current.innerHTML = "";
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleCredentialResponse,
+        });
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: "outline",
+          size: "large",
+          width: "100%",
+        });
+      }
+    };
+
+    let script = document.querySelector(`script[src="${scriptSrc}"]`);
+    const handleLoad = () => {
+      if (script) {
+        script.dataset.loaded = "true";
+      }
+      renderGoogleButton();
+    };
+
+    if (script) {
+      if (script.dataset.loaded) {
+        renderGoogleButton();
+      } else {
+        script.addEventListener("load", handleLoad);
+        return () => {
+          script?.removeEventListener("load", handleLoad);
+        };
+      }
+      return () => undefined;
+    }
+
+    script = document.createElement("script");
+    script.src = scriptSrc;
+    script.async = true;
+    script.defer = true;
+    script.addEventListener("load", handleLoad);
+    document.body.appendChild(script);
+
+    return () => {
+      script.removeEventListener("load", handleLoad);
+    };
+  }, [handleGoogleCredentialResponse]);
 
   return (
     <>
@@ -256,6 +389,27 @@ function Signin() {
                     </span>
                     <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-orange-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
                   </button>
+                </div>
+
+                <div className="w-full pt-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="h-px flex-1 bg-white/20"></span>
+                    <span className="text-xs uppercase tracking-widest text-purple-200">
+                      or continue with
+                    </span>
+                    <span className="h-px flex-1 bg-white/20"></span>
+                  </div>
+                  <div className="flex justify-center">
+                    <div
+                      ref={googleButtonRef}
+                      className="w-full flex justify-center"
+                    ></div>
+                  </div>
+                  {!GOOGLE_CLIENT_ID && (
+                    <p className="text-xs text-center text-purple-200">
+                      Google sign-in is temporarily unavailable.
+                    </p>
+                  )}
                 </div>
 
                 <div className="text-center pt-3 md:pt-4">
