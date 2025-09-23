@@ -779,6 +779,19 @@ app.post("/forgot-password", async (req, res) => {
   }
 });
 
+app.get("/checkData", verifyToken, async (req, res) => {
+  const email = req.email;
+  try {
+    const user = await Data.findOne({ email: email });
+    if (user.profileComplete === "Complete") {
+      return res.status(200).json({ message: "Completed" });
+    } else {
+      return res.status(210).json({ message: "Not completed" });
+    }
+  } catch (err) {
+    return res.status(500).json({ message: "Not Completed" });
+  }
+});
 app.post("/change-password", async (req, res) => {
   const { email, otp, password } = req.body;
   try {

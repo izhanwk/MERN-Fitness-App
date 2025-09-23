@@ -9,14 +9,18 @@ function Protectedroute2({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
     (async () => {
-      const response = await axios.get(`${API_URL}/checkData`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(response.data);
-      if (response.data === "Complete") {
-        navigate("/dashboard", { replace: true });
+      try {
+        const response = await axios.get(`${API_URL}/checkData`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(response.data);
+        if (response.status === 200) {
+          navigate("/dashboard", { replace: true });
+        }
+      } catch (err) {
+        console.error(err);
       }
     })();
   }, [navigate]);
