@@ -75,7 +75,11 @@ function Signin() {
         message: errorData?.message || "You provided wrong data",
       });
     } catch (err) {
-      showAlert("An error occurred. Please try again.", "error", "Connection Error");
+      showAlert(
+        "An error occurred. Please try again.",
+        "error",
+        "Connection Error"
+      );
       console.error(err);
     } finally {
       setLoading(false);
@@ -84,6 +88,7 @@ function Signin() {
 
   const handleGoogleCredentialResponse = useCallback(
     async (response) => {
+      console.log(" inside handleGoogleCredentialResponse");
       const credential = response?.credential;
       if (!credential) {
         showAlert(

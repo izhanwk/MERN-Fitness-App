@@ -514,9 +514,7 @@ app.post("/signin/google", async (req, res) => {
     return res.status(200).json(responsePayload);
   } catch (error) {
     console.error("Google sign-in failed:", error);
-    return res
-      .status(500)
-      .json({ message: "Failed to sign in with Google" });
+    return res.status(500).json({ message: "Failed to sign in with Google" });
   }
 });
 
@@ -702,8 +700,7 @@ app.get("/sessions", verifyToken, async (req, res) => {
         ...rest,
         _id: id,
         userId: session.userId.toString(),
-        currentDevice:
-          !!currentSessionId && currentSessionId.toString() === id,
+        currentDevice: !!currentSessionId && currentSessionId.toString() === id,
       };
     });
 
@@ -746,9 +743,7 @@ app.delete("/logoutsession", verifyToken, async (req, res) => {
 
     await session.deleteOne();
 
-    return res
-      .status(200)
-      .json({ message: "Killed the session successfully" });
+    return res.status(200).json({ message: "Killed the session successfully" });
   } catch (error) {
     console.error("Error deleting session:", error);
     return res.status(500).json({ message: "Server error deleting session" });
