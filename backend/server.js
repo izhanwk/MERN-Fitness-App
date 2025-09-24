@@ -289,6 +289,7 @@ app.get("/getfood2", verifyToken, async (req, res) => {
     const page = parseInt(req.query.page) || 1; // default page = 1
     const limit = 15;
     const skip = (page - 1) * limit;
+    console.log("Page : ", page);
 
     const foodItems = await Foods.find().skip(skip).limit(limit);
     console.log("FOod items : ", foodItems.length);
