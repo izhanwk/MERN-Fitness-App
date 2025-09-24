@@ -100,13 +100,19 @@ const NutritionTracker = () => {
     const el = sBox.current;
     if (!el) return;
 
-    const calculateThumb = () => {
-      const visible = el.clientHeight;
-      const total = el.scrollHeight;
-      const track = el.offsetHeight;
-      const thumb = (visible / total) * track;
-      console.log("Scrollbar thumb length:", thumb);
-    };
+    const visible = el.clientHeight; // visible height
+    const total = el.scrollHeight; // total content height
+    const track = el.offsetHeight; // scrollbar track height
+    const thumb = (visible / total) * track; // scrollbar thumb length
+
+    const scrollTop = el.scrollTop; // how much has been scrolled
+    const maxScrollTop = total - visible; // max scroll distance
+
+    // position of thumb (from top of track)
+    const thumbPosition = (scrollTop / maxScrollTop) * (track - thumb);
+
+    console.log("Thumb length:", thumb);
+    console.log("Thumb position from top:", thumbPosition);
 
     // initial call
     calculateThumb();
