@@ -291,7 +291,11 @@ app.get("/getfood2", verifyToken, async (req, res) => {
     const skip = (page - 1) * limit;
     console.log("Page : ", page);
 
-    const foodItems = await Foods.find().skip(skip).limit(limit);
+    const foodItems = await Foods.find()
+      .sort({ _id: 1 }) // order by creation
+      .skip(skip)
+      .limit(limit);
+
     console.log("FOod items : ", foodItems.length);
     return res.status(200).json(foodItems);
   } catch (err) {
