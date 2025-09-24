@@ -140,7 +140,7 @@ const NutritionTracker = () => {
   const fetchFood = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_URL}/getfood2`, {
+      const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true",
@@ -149,7 +149,7 @@ const NutritionTracker = () => {
       });
       const data = res.data;
       if (res.status >= 200 && res.status < 300) {
-        setfood(data);
+        setfood((prev) => [prev, ...data]);
         setfoodselection((prev) => [...prev, ...data]);
         setoriginalList(data);
         reachedBottom = false;
