@@ -284,6 +284,20 @@ app.get("/getfood", verifyToken, async (req, res) => {
   }
 });
 
+app.get("/getfood2", verifyToken, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1; // default page = 1
+    const limit = 15;
+    const skip = (page - 1) * limit;
+
+    const foodItems = await Foods.find().skip(skip).limit(limit);
+
+    return res.status(200).json(foodItems);
+  } catch (err) {
+    return res.status(500).json({ message: "Error occurred", err });
+  }
+});
+
 app.post("/signin", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
