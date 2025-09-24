@@ -111,8 +111,9 @@ const NutritionTracker = () => {
 
       // position of thumb (from top of track)
       const thumbPosition = (scrollTop / maxScrollTop) * (track - thumb);
+      const TOTAL = track - thumb;
 
-      console.log("Total :", track);
+      console.log("Total :", TOTAL);
       console.log("Thumb position from top:", thumbPosition);
     };
 
