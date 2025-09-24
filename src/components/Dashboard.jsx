@@ -103,7 +103,7 @@ const NutritionTracker = () => {
     const thumb = (visible / total) * track; // scrollbar handle length
 
     console.log("Scrollbar thumb length:", thumb);
-  }, []);
+  }, [sBox]);
 
   // initial token log (optional)
   useEffect(() => {
