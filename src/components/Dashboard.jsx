@@ -136,11 +136,12 @@ const NutritionTracker = () => {
       el.removeEventListener("scroll", calculateThumb);
     };
   }, []);
-  let divClick = false;
+  const divClick = useRef(false);
   const fetchFood = async () => {
-    if (divClick) {
+    console.log("Inside Function");
+    if (divClick.current) {
       setfood([]);
-      divClick = false;
+      divClick.current = false;
       return;
     }
     try {
@@ -158,7 +159,7 @@ const NutritionTracker = () => {
         setfoodselection((prev) => [...prev, ...data]);
         setoriginalList(data);
         reachedBottom = false;
-        divClick = true;
+        divClick.current = true;
       } else {
         console.log("Problem while fetching food data");
       }
@@ -174,6 +175,7 @@ const NutritionTracker = () => {
   const isFirstRender = useRef(true);
 
   useEffect(() => {
+    console.log("Inside useEffect");
     if (isFirstRender.current) {
       isFirstRender.current = false; // skip first render
       return;
