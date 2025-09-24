@@ -140,7 +140,7 @@ const NutritionTracker = () => {
   const fetchFood = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
+      const res = await axios.get(`${API_URL}/getfood2?page=1`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true",
