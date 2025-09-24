@@ -165,7 +165,14 @@ const NutritionTracker = () => {
     console.log(food);
   }, [food]);
 
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false; // skip first render
+      return;
+    }
+
     const fetchFood = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -176,11 +183,12 @@ const NutritionTracker = () => {
           },
           validateStatus: () => true,
         });
-        const data = res.data;
+
         if (res.status >= 200 && res.status < 300) {
+          const data = res.data;
           setfood((prev) => [...prev, ...data]);
           setfoodselection((prev) => [...prev, ...data]);
-          setoriginalList(data);
+          if (page === 1) setoriginalList(data); // only overwrite on first page
           reachedBottom = false;
         } else {
           console.log("Problem while fetching food data");
@@ -189,6 +197,7 @@ const NutritionTracker = () => {
         console.error("Error in fetchFood:", err);
       }
     };
+
     fetchFood();
   }, [page]);
 
