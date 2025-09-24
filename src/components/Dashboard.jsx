@@ -136,8 +136,13 @@ const NutritionTracker = () => {
       el.removeEventListener("scroll", calculateThumb);
     };
   }, []);
-
+  const divClick = useRef(false);
   const fetchFood = async () => {
+    if (divClick.current) {
+      setfood([]);
+      divClick.current = false;
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/getfood2?page=1`, {
@@ -158,6 +163,8 @@ const NutritionTracker = () => {
       }
     } catch (err) {
       console.error("Error in fetchFood:", err);
+    } finally {
+      divClick.current = true;
     }
   };
 
