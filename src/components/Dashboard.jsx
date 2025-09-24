@@ -97,16 +97,27 @@ const NutritionTracker = () => {
   const [magnesiumPercentage, setmagnesiumPercentage] = useState(0);
 
   useEffect(() => {
-    if (!sBox.current) return; // guard
-
     const el = sBox.current;
-    const visible = el.clientHeight; // visible height of the box
-    const total = el.scrollHeight; // total scrollable content
-    const track = el.offsetHeight; // scrollbar track length
-    const thumb = (visible / total) * track; // scrollbar handle length
+    if (!el) return;
 
-    console.log("Scrollbar thumb length:", thumb);
-  }, [sBox]);
+    const calculateThumb = () => {
+      const visible = el.clientHeight;
+      const total = el.scrollHeight;
+      const track = el.offsetHeight;
+      const thumb = (visible / total) * track;
+      console.log("Scrollbar thumb length:", thumb);
+    };
+
+    // initial call
+    calculateThumb();
+
+    // recalc on scroll
+    el.addEventListener("scroll", calculateThumb);
+
+    return () => {
+      el.removeEventListener("scroll", calculateThumb);
+    };
+  }, []);
 
   // initial token log (optional)
   useEffect(() => {
