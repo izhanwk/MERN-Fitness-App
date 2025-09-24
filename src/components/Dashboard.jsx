@@ -660,6 +660,7 @@ const NutritionTracker = () => {
                           searchFood();
                           start();
                           rotate();
+                          fetchFood();
                         }}
                       >
                         <p className="text-slate-600 truncate">{selectFood}</p>
@@ -676,7 +677,6 @@ const NutritionTracker = () => {
                         }`}
                         ref={sBox}
                         id="big-box"
-                        onClick={fetchFood}
                       >
                         <input
                           type="text"
