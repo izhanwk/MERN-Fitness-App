@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import DNavbar from "./DNavbar";
 import axios from "axios";
@@ -97,67 +97,100 @@ const NutritionTracker = () => {
   const [calciumPercentage, setcalciumPercentage] = useState(0);
   const [magnesiumPercentage, setmagnesiumPercentage] = useState(0);
 
-  const reachedBottomRef = useRef(false);
+  let reachedBottom = false;
   useEffect(() => {
     const el = sBox.current;
     if (!el) return;
 
-    const handleScroll = () => {
-      if (reachedBottomRef.current) return;
+    const calculateThumb = () => {
+      if (reachedBottom) true;
+      const visible = el.clientHeight; // visible height
+      const total = el.scrollHeight; // total content height
+      const track = el.offsetHeight; // scrollbar track height
+      const thumb = (visible / total) * track; // scrollbar thumb length
 
-      const { scrollTop, scrollHeight, clientHeight } = el;
-      if (scrollHeight <= clientHeight) return;
+      const scrollTop = el.scrollTop; // how much has been scrolled
+      const maxScrollTop = total - visible; // max scroll distance
 
-      if (scrollTop + clientHeight >= scrollHeight - 2) {
-        reachedBottomRef.current = true;
-        setpage((prev) => prev + 1);
+      // position of thumb (from top of track)
+      const thumbPosition = (scrollTop / maxScrollTop) * (track - thumb);
+      const TOTAL = track - thumb;
+
+      if (thumbPosition >= TOTAL) {
+        setpage(page + 1);
+        console.log("Reached Bottom : ", reachedBottom);
+        reachedBottom = true;
       }
+
+      // console.log("Total :", TOTAL);
+      // console.log("Thumb position from top:", thumbPosition);
     };
 
-    el.addEventListener("scroll", handleScroll);
+    // initial call
+    calculateThumb();
+
+    // recalc on scroll
+    el.addEventListener("scroll", calculateThumb);
 
     return () => {
-      el.removeEventListener("scroll", handleScroll);
+      el.removeEventListener("scroll", calculateThumb);
     };
   }, []);
 
-  const fetchFood = useCallback(async (pageToLoad) => {
-    const nextPage = pageToLoad ?? 1;
-
+  const fetchFood = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_URL}/getfood2?page=${nextPage}`, {
+      const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true",
         },
         validateStatus: () => true,
       });
-
-      const data = Array.isArray(res.data) ? res.data : [];
-
+      const data = res.data;
       if (res.status >= 200 && res.status < 300) {
-        if (data.length > 0) {
-          setfood((prev) => [...prev, ...data]);
-          setfoodselection((prev) => [...prev, ...data]);
-          setoriginalList((prev) => [...prev, ...data]);
-          reachedBottomRef.current = false;
-        } else {
-          reachedBottomRef.current = true; // no more data available
-        }
+        setfood((prev) => [...prev, ...data]);
+        setfoodselection((prev) => [...prev, ...data]);
+        setoriginalList(data);
+        reachedBottom = false;
       } else {
-        console.log("Problem while fetching food data", res.status);
-        reachedBottomRef.current = false;
+        console.log("Problem while fetching food data");
       }
     } catch (err) {
       console.error("Error in fetchFood:", err);
-      reachedBottomRef.current = false;
     }
-  }, []);
+  };
 
   useEffect(() => {
-    fetchFood(page);
-  }, [page, fetchFood]);
+    console.log(food);
+  }, [food]);
+
+  useEffect(() => {
+    const fetchFood = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          validateStatus: () => true,
+        });
+        const data = res.data;
+        if (res.status >= 200 && res.status < 300) {
+          setfood((prev) => [...prev, ...data]);
+          setfoodselection((prev) => [...prev, ...data]);
+          setoriginalList(data);
+          reachedBottom = false;
+        } else {
+          console.log("Problem while fetching food data");
+        }
+      } catch (err) {
+        console.error("Error in fetchFood:", err);
+      }
+    };
+    fetchFood();
+  }, [page]);
 
   // initial token log (optional)
   useEffect(() => {
