@@ -149,7 +149,7 @@ const NutritionTracker = () => {
       });
       const data = res.data;
       if (res.status >= 200 && res.status < 300) {
-        setfood((prev) => [prev, ...data]);
+        setfood((prev) => [...prev, ...data]);
         setfoodselection((prev) => [...prev, ...data]);
         setoriginalList(data);
         reachedBottom = false;
