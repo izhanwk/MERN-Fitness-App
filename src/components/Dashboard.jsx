@@ -136,11 +136,11 @@ const NutritionTracker = () => {
       el.removeEventListener("scroll", calculateThumb);
     };
   }, []);
-  const divClick = useRef(false);
+  let divClick = false;
   const fetchFood = async () => {
-    if (divClick.current) {
+    if (divClick) {
       setfood([]);
-      divClick.current = false;
+      divClick = false;
       return;
     }
     try {
@@ -158,7 +158,7 @@ const NutritionTracker = () => {
         setfoodselection((prev) => [...prev, ...data]);
         setoriginalList(data);
         reachedBottom = false;
-        divClick.current = true;
+        divClick = true;
       } else {
         console.log("Problem while fetching food data");
       }
