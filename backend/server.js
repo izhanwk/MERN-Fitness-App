@@ -291,7 +291,7 @@ app.get("/getfood2", verifyToken, async (req, res) => {
     const skip = (page - 1) * limit;
 
     const foodItems = await Foods.find().skip(skip).limit(limit);
-
+    console.log("FOod items : ", foodItems);
     return res.status(200).json(foodItems);
   } catch (err) {
     return res.status(500).json({ message: "Error occurred", err });
