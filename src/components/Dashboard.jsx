@@ -137,6 +137,31 @@ const NutritionTracker = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchFood = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${API_URL}/getfood`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          validateStatus: () => true,
+        });
+        const data = res.data;
+        if (res.status >= 200 && res.status < 300) {
+          console.log(data);
+          reachedBottom = false;
+        } else {
+          console.log("Problem while fetching food data");
+        }
+      } catch (err) {
+        console.error("Error in fetchFood:", err);
+      }
+    };
+    fetchFood();
+  }, [page]);
+
   // initial token log (optional)
   useEffect(() => {
     const token = localStorage.getItem("token");
