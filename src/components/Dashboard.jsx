@@ -43,6 +43,7 @@ const NutritionTracker = () => {
   // user
   const [userData, setuserData] = useState({});
   const [userName, setuserName] = useState("");
+  const [page, setpage] = useState(1);
 
   // normalized/derived user fields (all METRIC: kg + cm)
   const [weight, setweight] = useState(0); // kg
@@ -96,11 +97,13 @@ const NutritionTracker = () => {
   const [calciumPercentage, setcalciumPercentage] = useState(0);
   const [magnesiumPercentage, setmagnesiumPercentage] = useState(0);
 
+  let reachedBottom = false;
   useEffect(() => {
     const el = sBox.current;
     if (!el) return;
 
     const calculateThumb = () => {
+      if (reachedBottom) true;
       const visible = el.clientHeight; // visible height
       const total = el.scrollHeight; // total content height
       const track = el.offsetHeight; // scrollbar track height
@@ -113,8 +116,13 @@ const NutritionTracker = () => {
       const thumbPosition = (scrollTop / maxScrollTop) * (track - thumb);
       const TOTAL = track - thumb;
 
-      console.log("Total :", TOTAL);
-      console.log("Thumb position from top:", thumbPosition);
+      if (thumbPosition >= TOTAL) {
+        setpage(page + 1);
+        reachedBottom = true;
+      }
+
+      // console.log("Total :", TOTAL);
+      // console.log("Thumb position from top:", thumbPosition);
     };
 
     // initial call
@@ -127,6 +135,10 @@ const NutritionTracker = () => {
       el.removeEventListener("scroll", calculateThumb);
     };
   }, []);
+
+  useEffect(() => {
+    console.log("Reached Bottom : ", reachedBottom);
+  }, [reachedBottom]);
 
   // initial token log (optional)
   useEffect(() => {
