@@ -169,7 +169,7 @@ const NutritionTracker = () => {
   };
 
   useEffect(() => {
-    console.log(food);
+    console.log("Food :", food);
   }, [food]);
 
   const isFirstRender = useRef(true);
