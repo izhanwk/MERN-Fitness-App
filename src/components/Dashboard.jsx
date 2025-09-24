@@ -118,6 +118,7 @@ const NutritionTracker = () => {
 
       if (thumbPosition >= TOTAL) {
         setpage(page + 1);
+        console.log("Reached Bottom : ", reachedBottom);
         reachedBottom = true;
       }
 
@@ -135,10 +136,6 @@ const NutritionTracker = () => {
       el.removeEventListener("scroll", calculateThumb);
     };
   }, []);
-
-  useEffect(() => {
-    console.log("Reached Bottom : ", reachedBottom);
-  }, [reachedBottom]);
 
   // initial token log (optional)
   useEffect(() => {
