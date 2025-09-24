@@ -162,6 +162,10 @@ const NutritionTracker = () => {
   };
 
   useEffect(() => {
+    console.log(food);
+  }, [food]);
+
+  useEffect(() => {
     const fetchFood = async () => {
       try {
         const token = localStorage.getItem("token");
