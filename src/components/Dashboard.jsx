@@ -27,6 +27,7 @@ const NutritionTracker = () => {
   const [foodselection, setfoodselection] = useState([]);
   const [newfood, setnewfood] = useState([]);
   const [initialFood, setinitialFood] = useState([]);
+  const sBox = useRef(null);
 
   // ui
   const [selectFood, setselectFood] = useState("Select Food");
@@ -94,6 +95,15 @@ const NutritionTracker = () => {
   const [ironPercentage, setironPercentage] = useState(0);
   const [calciumPercentage, setcalciumPercentage] = useState(0);
   const [magnesiumPercentage, setmagnesiumPercentage] = useState(0);
+
+  useEffect(() => {
+    const visible = sBox.clientHeight; // visible height of the box
+    const total = sBox.scrollHeight; // total scrollable content
+    const track = sBox.offsetHeight; // scrollbar track length
+    const thumb = (visible / total) * track; // scrollbar handle length
+
+    console.log("Scrollbar thumb length:", thumb);
+  }, []);
 
   // initial token log (optional)
   useEffect(() => {
@@ -585,6 +595,7 @@ const NutritionTracker = () => {
                         className={`option absolute w-full sm:w-64 max-h-60 bg-white/95 backdrop-blur-sm z-20 rounded-xl top-14 p-4 overflow-y-scroll shadow-2xl border border-white/20 ${
                           searchVisiblity ? "block" : "hidden"
                         }`}
+                        ref={sBox}
                         id="big-box"
                       >
                         <input
