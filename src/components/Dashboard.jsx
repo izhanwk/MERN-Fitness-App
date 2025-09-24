@@ -158,13 +158,12 @@ const NutritionTracker = () => {
         setfoodselection((prev) => [...prev, ...data]);
         setoriginalList(data);
         reachedBottom = false;
+        divClick.current = true;
       } else {
         console.log("Problem while fetching food data");
       }
     } catch (err) {
       console.error("Error in fetchFood:", err);
-    } finally {
-      divClick.current = true;
     }
   };
 
