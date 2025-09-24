@@ -149,7 +149,9 @@ const NutritionTracker = () => {
       });
       const data = res.data;
       if (res.status >= 200 && res.status < 300) {
-        console.log(data);
+        setfood(data);
+        setfoodselection((prev) => [...prev, ...data]);
+        setoriginalList(data);
         reachedBottom = false;
       } else {
         console.log("Problem while fetching food data");
@@ -241,7 +243,7 @@ const NutritionTracker = () => {
 
     (async () => {
       await fetchData();
-      await fetchFood();
+      // await fetchFood();
       setLoading(false);
     })();
   }, [navigate]);
