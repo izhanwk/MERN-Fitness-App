@@ -1,10 +1,9 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import DNavbar from "./DNavbar";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const FOOD_PAGE_SIZE = 15;
 
 // Map activity labels (or use numeric factors directly)
 const ACTIVITY = {
@@ -24,139 +23,21 @@ const NutritionTracker = () => {
 
   // data
   const [food, setfood] = useState([]);
+  const [originalList, setoriginalList] = useState([]);
+  const [foodselection, setfoodselection] = useState([]);
   const [newfood, setnewfood] = useState([]);
   const [initialFood, setinitialFood] = useState([]);
 
   // ui
   const [selectFood, setselectFood] = useState("Select Food");
   const [searchText, setsearchText] = useState("");
+  const [searchStart, setsearchStart] = useState(true);
   const [searchVisiblity, setsearchVisiblity] = useState(false);
   const [showList, setshowList] = useState(false);
   const [rotation, setrotation] = useState(false);
-  const [foodPage, setFoodPage] = useState(1);
-  const [hasMoreFood, setHasMoreFood] = useState(true);
-  const [isFetchingFood, setIsFetchingFood] = useState(false);
-  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [indexFood, setindexFood] = useState(0);
   const [quantity, setquantity] = useState("");
   const [loading, setLoading] = useState(true);
-
-  const searchContainerRef = useRef(null);
-  const dropdownRef = useRef(null);
-  const latestRequestRef = useRef(0);
-
-  const fetchFoodPage = useCallback(
-    async ({ page, searchTerm, reset = false }) => {
-      if ((isFetchingFood && !reset) || !page) return;
-
-      const token = localStorage.getItem("token");
-      const requestId = ++latestRequestRef.current;
-
-      setIsFetchingFood(true);
-
-      try {
-        const params = new URLSearchParams({
-          page: String(page),
-          limit: String(FOOD_PAGE_SIZE),
-        });
-
-        if (searchTerm) params.append("search", searchTerm);
-
-        const res = await axios.get(`${API_URL}/getfood?${params.toString()}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-          validateStatus: () => true,
-        });
-
-        if (requestId !== latestRequestRef.current) return;
-
-        if (res.status >= 200 && res.status < 300) {
-          const payload = res.data;
-          let items = [];
-          let hasMore = false;
-
-          if (Array.isArray(payload)) {
-            items = payload;
-            hasMore = items.length === FOOD_PAGE_SIZE;
-          } else if (payload && typeof payload === "object") {
-            items = payload.items || [];
-            if (typeof payload.hasMore === "boolean") {
-              hasMore = payload.hasMore;
-            } else if (typeof payload.total === "number") {
-              hasMore = (page - 1) * FOOD_PAGE_SIZE + items.length < payload.total;
-            } else {
-              hasMore = items.length === FOOD_PAGE_SIZE;
-            }
-          }
-
-          setfood((prev) => (reset ? items : [...prev, ...items]));
-          setFoodPage(page);
-          setHasMoreFood(hasMore);
-        } else {
-          if (reset) setfood([]);
-          console.log("Problem while fetching food data");
-        }
-      } catch (err) {
-        console.error("Error in fetchFood:", err);
-      } finally {
-        if (requestId === latestRequestRef.current) {
-          setIsFetchingFood(false);
-        }
-      }
-    },
-    [isFetchingFood]
-  );
-
-  const resetFoodList = useCallback(
-    (term = "") => {
-      setActiveSearchTerm(term);
-      setfood([]);
-      setFoodPage(1);
-      setHasMoreFood(true);
-      return fetchFoodPage({ page: 1, searchTerm: term, reset: true });
-    },
-    [fetchFoodPage]
-  );
-
-  const closeSearchDropdown = useCallback(() => {
-    setsearchVisiblity(false);
-    setrotation(false);
-  }, []);
-
-  const toggleSearchDropdown = useCallback(() => {
-    setsearchVisiblity((prev) => {
-      const next = !prev;
-      setrotation(next);
-      if (next) {
-        setsearchText("");
-        resetFoodList("");
-      }
-      return next;
-    });
-  }, [resetFoodList]);
-
-  const handleSearchChange = useCallback(
-    (input) => {
-      setsearchText(input);
-      resetFoodList(input);
-    },
-    [resetFoodList]
-  );
-
-  const handleDropdownScroll = useCallback(
-    (event) => {
-      if (!hasMoreFood || isFetchingFood) return;
-
-      const target = event.target;
-      if (target.scrollTop + target.clientHeight >= target.scrollHeight - 10) {
-        const nextPage = foodPage + 1;
-        fetchFoodPage({ page: nextPage, searchTerm: activeSearchTerm });
-      }
-    },
-    [activeSearchTerm, fetchFoodPage, foodPage, hasMoreFood, isFetchingFood]
-  );
 
   // user
   const [userData, setuserData] = useState({});
@@ -246,32 +127,35 @@ const NutritionTracker = () => {
       }
     };
 
-    (async () => {
+    const fetchFood = async () => {
       try {
-        await fetchData();
-        await resetFoodList("");
-      } finally {
-        setLoading(false);
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${API_URL}/getfood`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          validateStatus: () => true,
+        });
+        const data = res.data;
+        if (res.status >= 200 && res.status < 300) {
+          setfood(data);
+          setfoodselection((prev) => [...prev, ...data]);
+          setoriginalList(data);
+        } else {
+          console.log("Problem while fetching food data");
+        }
+      } catch (err) {
+        console.error("Error in fetchFood:", err);
       }
+    };
+
+    (async () => {
+      await fetchData();
+      await fetchFood();
+      setLoading(false);
     })();
-  }, [navigate, resetFoodList]);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        searchVisiblity &&
-        searchContainerRef.current &&
-        !searchContainerRef.current.contains(event.target)
-      ) {
-        closeSearchDropdown();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [closeSearchDropdown, searchVisiblity]);
+  }, [navigate]);
 
   // normalize user fields to METRIC (kg + cm) + gender/activity/dob
   useEffect(() => {
@@ -410,6 +294,26 @@ const NutritionTracker = () => {
     setuserName(userData?.name || "");
   }, [userData]);
 
+  // search UI helpers
+  const start = () => {
+    setsearchStart((s) => !s);
+    setsearchText("");
+    setfood(originalList);
+  };
+  const searchFood = () => setsearchVisiblity((v) => !v);
+  const rotate = () => setrotation((r) => !r);
+
+  // search list
+  const searchItems = (input) => {
+    setsearchText(input);
+    if (!input) return setfood(originalList);
+    const filtered = originalList.filter((item) =>
+      Object.values(item).join("").toLowerCase().includes(input.toLowerCase())
+    );
+    setfood(filtered);
+  };
+
+  const eatList = () => setshowList(true);
   const closeEatList = () => setshowList(false);
 
   // initial load: restore stored foods
@@ -660,13 +564,14 @@ const NutritionTracker = () => {
                 {/* Search / Add */}
                 <div className="flex mt-8 w-full justify-center px-4">
                   <div className="flex flex-col sm:flex-row w-full max-w-2xl justify-center items-center gap-2">
-                    <div
-                      className="flex relative w-full sm:w-auto"
-                      ref={searchContainerRef}
-                    >
+                    <div className="flex relative w-full sm:w-auto">
                       <div
                         className="w-full sm:w-64 h-12 rounded-xl bg-white/90 backdrop-blur-sm cursor-pointer text-slate-800 text-sm font-semibold flex items-center justify-between px-4 shadow-lg border border-white/20 hover:bg-white transition-all duration-300"
-                        onClick={toggleSearchDropdown}
+                        onClick={() => {
+                          searchFood();
+                          start();
+                          rotate();
+                        }}
                       >
                         <p className="text-slate-600 truncate">{selectFood}</p>
                         <i
@@ -681,36 +586,29 @@ const NutritionTracker = () => {
                           searchVisiblity ? "block" : "hidden"
                         }`}
                         id="big-box"
-                        ref={dropdownRef}
-                        onScroll={handleDropdownScroll}
                       >
                         <input
                           type="text"
                           placeholder="Search Food"
                           className="w-full outline-none border-2 rounded-lg text-slate-800 p-3 text-sm border-gray-200 focus:border-yellow-400 transition-colors duration-300 bg-white/80"
                           value={searchText}
-                          onChange={(e) => handleSearchChange(e.target.value)}
+                          onChange={(e) => searchItems(e.target.value)}
                         />
                         <ul className="text-sm mt-2">
                           {food.map((f, index) => (
                             <li
-                              key={f._id || index}
+                              key={index}
                               className="p-3 cursor-pointer hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white rounded-lg text-slate-700 transition-all duration-300"
                               onClick={() => {
-                                closeSearchDropdown();
+                                searchFood();
                                 setindexFood(index);
                                 setselectFood(f.name);
+                                rotate();
                               }}
                             >
                               {f.name}
                             </li>
                           ))}
-                          {!food.length && !isFetchingFood && (
-                            <li className="p-3 text-slate-500">No food found</li>
-                          )}
-                          {isFetchingFood && (
-                            <li className="p-3 text-slate-500">Loading...</li>
-                          )}
                         </ul>
                       </div>
                     </div>
