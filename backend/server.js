@@ -289,6 +289,7 @@ app.get("/getfood2", verifyToken, async (req, res) => {
   try {
     console.log("Page : ", page);
     const totalLength = await Foods.countDocuments({});
+    console.log("Length of document : ", totalLength);
     const limit = 15;
     const skip = limit * page;
     const products = await Foods.find({}).skip(skip).limit(limit);
