@@ -139,7 +139,6 @@ const NutritionTracker = () => {
   const divClick = useRef(false);
   let fetchingFood = false;
   const fetchFood = async () => {
-    fetchingFood = true;
     console.log("Inside Function : ", divClick.current);
     if (divClick.current) {
       setfood([]);
@@ -148,7 +147,7 @@ const NutritionTracker = () => {
       return;
     }
     if (fetchingFood) {
-      console.log("returned because fetchingFood");
+      fetchingFood = true;
       return;
     }
     try {
