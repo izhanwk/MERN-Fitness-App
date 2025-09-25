@@ -285,30 +285,19 @@ app.get("/getfood", verifyToken, async (req, res) => {
 });
 
 app.get("/getfood2", verifyToken, async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // default page = 1
   try {
-    const page = parseInt(req.query.page, 10) || 1; // default page = 1
-
-    const pageSizes = [15, 5];
-    const getPageSize = (index) =>
-      index < pageSizes.length ? pageSizes[index] : pageSizes.at(-1);
-
-    const limit = getPageSize(page - 1);
-    const skip = Array.from({ length: Math.max(page - 1, 0) }).reduce(
-      (total, _, idx) => total + getPageSize(idx),
-      0
-    );
-
-    console.log("Page : ", page, "Skip : ", skip, "Limit : ", limit);
-
-    const foodItems = await Foods.find()
-      .sort({ _id: 1 }) // order by creation
-      .skip(skip)
-      .limit(limit);
-
-    console.log("Food items : ", foodItems.length);
-    return res.status(200).json(foodItems);
+    const totalLength = await Products.countDocuments({});
+    const limit = 20;
+    const skip = limit * req.body.page;
+    const products = await Products.find({}).skip(skip).limit(limit);
+    const response = products.map((product) => ({
+      ...product.toObject(),
+      showMore: totalLength > skip + products.length,
+    }));
+    return res.status(200).json(response);
   } catch (err) {
-    return res.status(500).json({ message: "Error occurred", err });
+    return res.status(200).json({ message: "An error occured" });
   }
 });
 

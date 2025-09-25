@@ -43,7 +43,7 @@ const NutritionTracker = () => {
   // user
   const [userData, setuserData] = useState({});
   const [userName, setuserName] = useState("");
-  const [page, setpage] = useState(1);
+  const [page, setpage] = useState(0);
 
   // normalized/derived user fields (all METRIC: kg + cm)
   const [weight, setweight] = useState(0); // kg
@@ -146,7 +146,7 @@ const NutritionTracker = () => {
     }
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_URL}/getfood2?page=1`, {
+      const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true",
@@ -155,6 +155,7 @@ const NutritionTracker = () => {
       });
       const data = res.data;
       if (res.status >= 200 && res.status < 300) {
+        console.log("Data recieved : ", data);
         setfood((prev) => [...prev, ...data]);
         setfoodselection((prev) => [...prev, ...data]);
         setoriginalList(data);
