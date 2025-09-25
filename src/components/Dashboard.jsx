@@ -147,6 +147,7 @@ const NutritionTracker = () => {
       return;
     }
     if (fetchingFood) {
+      console.log("stopped so fetching");
       fetchingFood = true;
       return;
     }
