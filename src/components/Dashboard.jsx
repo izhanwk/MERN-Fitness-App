@@ -24,7 +24,7 @@ const NutritionTracker = () => {
   // data
   const [food, setfood] = useState([]);
   const [originalList, setoriginalList] = useState([]);
-  const [foodselection, setfoodselection] = useState([]);
+  // const [foodselection, setfoodselection] = useState([]);
   const [newfood, setnewfood] = useState([]);
   const [initialFood, setinitialFood] = useState([]);
   const sBox = useRef(null);
@@ -141,6 +141,7 @@ const NutritionTracker = () => {
     console.log("Inside Function : ", divClick.current);
     if (divClick.current) {
       setfood([]);
+      setoriginalList([]);
       divClick.current = false;
       return;
     }
@@ -157,7 +158,7 @@ const NutritionTracker = () => {
       if (res.status >= 200 && res.status < 300) {
         console.log("Data recieved : ", page, data);
         setfood((prev) => [...prev, ...data]);
-        setfoodselection((prev) => [...prev, ...data]);
+        // setfoodselection((prev) => [...prev, ...data]);
         setoriginalList(data);
         reachedBottom = false;
         divClick.current = true;
@@ -197,7 +198,7 @@ const NutritionTracker = () => {
           const data = res.data;
           console.log("scroll data ", data);
           setfood((prev) => [...prev, ...data]);
-          setfoodselection((prev) => [...prev, ...data]);
+          // setfoodselection((prev) => [...prev, ...data]);
           if (page === 1) setoriginalList(data); // only overwrite on first page
           reachedBottom = false;
         } else {
@@ -209,7 +210,7 @@ const NutritionTracker = () => {
     };
 
     fetchFood();
-  }, [page, food]);
+  }, [page]);
 
   // initial token log (optional)
   useEffect(() => {
@@ -256,7 +257,7 @@ const NutritionTracker = () => {
         const data = res.data;
         if (res.status >= 200 && res.status < 300) {
           setfood(data);
-          setfoodselection((prev) => [...prev, ...data]);
+          // setfoodselection((prev) => [...prev, ...data]);
           setoriginalList(data);
         } else {
           console.log("Problem while fetching food data");
