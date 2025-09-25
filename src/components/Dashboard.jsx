@@ -155,7 +155,7 @@ const NutritionTracker = () => {
       });
       const data = res.data;
       if (res.status >= 200 && res.status < 300) {
-        console.log("Data recieved : ", data);
+        console.log("Data recieved : ", page, data);
         setfood((prev) => [...prev, ...data]);
         setfoodselection((prev) => [...prev, ...data]);
         setoriginalList(data);
@@ -195,6 +195,7 @@ const NutritionTracker = () => {
 
         if (res.status >= 200 && res.status < 300) {
           const data = res.data;
+          console.log("scroll data ", data);
           setfood((prev) => [...prev, ...data]);
           setfoodselection((prev) => [...prev, ...data]);
           if (page === 1) setoriginalList(data); // only overwrite on first page
