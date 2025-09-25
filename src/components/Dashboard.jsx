@@ -138,7 +138,7 @@ const NutritionTracker = () => {
   }, []);
   const divClick = useRef(false);
   const fetchFood = async () => {
-    console.log("Inside Function");
+    console.log("Inside Function : ", divClick.current);
     if (divClick.current) {
       setfood([]);
       divClick.current = false;
