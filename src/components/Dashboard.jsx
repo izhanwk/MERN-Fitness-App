@@ -137,12 +137,17 @@ const NutritionTracker = () => {
     };
   }, []);
   const divClick = useRef(false);
+  let fetchingFood = false;
   const fetchFood = async () => {
+    fetchingFood = true;
     console.log("Inside Function : ", divClick.current);
     if (divClick.current) {
       setfood([]);
       setoriginalList([]);
       divClick.current = false;
+      return;
+    }
+    if (fetchingFood) {
       return;
     }
     try {
@@ -162,6 +167,7 @@ const NutritionTracker = () => {
         setoriginalList(data);
         reachedBottom = false;
         divClick.current = true;
+        fetchingFood = false;
       } else {
         console.log("Problem while fetching food data");
       }
