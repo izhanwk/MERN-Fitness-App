@@ -209,7 +209,7 @@ const NutritionTracker = () => {
     };
 
     fetchFood();
-  }, [page]);
+  }, [page, food]);
 
   // initial token log (optional)
   useEffect(() => {
