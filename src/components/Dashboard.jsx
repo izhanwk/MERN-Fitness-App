@@ -148,6 +148,7 @@ const NutritionTracker = () => {
       return;
     }
     if (fetchingFood) {
+      console.log("returned because fetchingFood");
       return;
     }
     try {
