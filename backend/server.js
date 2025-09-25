@@ -287,14 +287,16 @@ app.get("/getfood", verifyToken, async (req, res) => {
 app.get("/getfood2", verifyToken, async (req, res) => {
   const page = parseInt(req.query.page) || 1; // default page = 1
   try {
-    const totalLength = await Products.countDocuments({});
-    const limit = 20;
-    const skip = limit * req.body.page;
-    const products = await Products.find({}).skip(skip).limit(limit);
+    const totalLength = await Foods.countDocuments({});
+    const limit = 15;
+    const skip = limit * page;
+    const products = await Foods.find({}).skip(skip).limit(limit);
     const response = products.map((product) => ({
       ...product.toObject(),
       showMore: totalLength > skip + products.length,
     }));
+    console.log("Our response : ", response);
+    console.log("Response length : ", response.length);
     return res.status(200).json(response);
   } catch (err) {
     return res.status(200).json({ message: "An error occured" });
