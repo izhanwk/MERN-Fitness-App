@@ -43,7 +43,7 @@ const NutritionTracker = () => {
   // user
   const [userData, setuserData] = useState({});
   const [userName, setuserName] = useState("");
-  const [page, setpage] = useState(0);
+  const [page, setpage] = useState(1);
 
   // normalized/derived user fields (all METRIC: kg + cm)
   const [weight, setweight] = useState(0); // kg
