@@ -146,6 +146,7 @@ const NutritionTracker = () => {
       setfood([]);
       setoriginalList([]);
       divClick.current = false;
+      console.log("Divclick is active");
       return;
     }
 
