@@ -158,7 +158,6 @@ const NutritionTracker = () => {
 
     // Mark as fetching
     fetchingFood.current = true;
-    divClick.current = true;
 
     try {
       const token = localStorage.getItem("token");
