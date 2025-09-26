@@ -158,6 +158,7 @@ const NutritionTracker = () => {
 
     // Mark as fetching
     fetchingFood.current = true;
+    divClick.current = true;
 
     try {
       const token = localStorage.getItem("token");
@@ -176,7 +177,7 @@ const NutritionTracker = () => {
         setfood((prev) => [...prev, ...data]);
         setoriginalList(data);
         reachedBottom = false;
-        divClick.current = true;
+        divClick.current = false;
       } else {
         console.log("Problem while fetching food data");
       }
