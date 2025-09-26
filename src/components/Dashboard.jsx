@@ -704,7 +704,7 @@ const NutritionTracker = () => {
                         className="w-full sm:w-64 h-12 rounded-xl bg-white/90 backdrop-blur-sm cursor-pointer text-slate-800 text-sm font-semibold flex items-center justify-between px-4 shadow-lg border border-white/20 hover:bg-white transition-all duration-300"
                         onClick={() => {
                           searchFood();
-                          start();
+                          // start();
                           rotate();
                           fetchFood();
                         }}
