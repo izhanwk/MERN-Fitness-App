@@ -138,19 +138,26 @@ const NutritionTracker = () => {
   }, []);
   const divClick = useRef(false);
   const fetchingFood = useRef(false);
+
   const fetchFood = async () => {
     console.log("Inside Function : ", divClick.current);
+
     if (divClick.current) {
       setfood([]);
       setoriginalList([]);
       divClick.current = false;
       return;
     }
+
+    // If already fetching, exit early
     if (fetchingFood.current) {
-      console.log("stopped so fetching");
-      fetchingFood.current = true;
+      console.log("Already fetching, skipping new call");
       return;
     }
+
+    // Mark as fetching
+    fetchingFood.current = true;
+
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
@@ -160,20 +167,23 @@ const NutritionTracker = () => {
         },
         validateStatus: () => true,
       });
+
       const data = res.data;
+
       if (res.status >= 200 && res.status < 300) {
-        console.log("Data recieved : ", page, data);
+        console.log("Data received:", page, data);
         setfood((prev) => [...prev, ...data]);
-        // setfoodselection((prev) => [...prev, ...data]);
         setoriginalList(data);
         reachedBottom = false;
         divClick.current = true;
-        fetchingFood.current = false;
       } else {
         console.log("Problem while fetching food data");
       }
     } catch (err) {
       console.error("Error in fetchFood:", err);
+    } finally {
+      // Always reset, even on error
+      fetchingFood.current = false;
     }
   };
 
