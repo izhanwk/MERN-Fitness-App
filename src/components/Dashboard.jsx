@@ -97,7 +97,7 @@ const NutritionTracker = () => {
   const [calciumPercentage, setcalciumPercentage] = useState(0);
   const [magnesiumPercentage, setmagnesiumPercentage] = useState(0);
 
-  let reachedBottom = false;
+  const reachedBottom = useRef(false);
   useEffect(() => {
     const el = sBox.current;
     if (!el) return;
