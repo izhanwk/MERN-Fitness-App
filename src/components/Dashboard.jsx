@@ -120,7 +120,7 @@ const NutritionTracker = () => {
       const TOTAL = track - thumb;
 
       if (thumbPosition >= TOTAL) {
-        reachedBottom = true;
+        // reachedBottom = true;
         setpage(page + 1);
         console.log("Reached Bottom : ", reachedBottom);
       }
@@ -178,7 +178,7 @@ const NutritionTracker = () => {
         console.log("Data received:", page, data);
         setfood((prev) => [...prev, ...data]);
         setoriginalList(data);
-        reachedBottom = false;
+        // reachedBottom = false;
       } else {
         console.log("Problem while fetching food data");
       }
