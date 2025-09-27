@@ -120,9 +120,9 @@ const NutritionTracker = () => {
       const TOTAL = track - thumb;
 
       if (thumbPosition >= TOTAL) {
+        reachedBottom = true;
         setpage(page + 1);
         console.log("Reached Bottom : ", reachedBottom);
-        reachedBottom = true;
       }
 
       // console.log("Total :", TOTAL);
