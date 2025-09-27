@@ -103,7 +103,10 @@ const NutritionTracker = () => {
     if (!el) return;
 
     const calculateThumb = () => {
-      if (reachedBottom) return;
+      if (reachedBottom) {
+        console.log("Reached the BOTTOM");
+        return;
+      }
       const visible = el.clientHeight; // visible height
       const total = el.scrollHeight; // total content height
       const track = el.offsetHeight; // scrollbar track height
@@ -219,6 +222,7 @@ const NutritionTracker = () => {
           // setfoodselection((prev) => [...prev, ...data]);
           if (page === 1) setoriginalList(data); // only overwrite on first page
           if (data.length > 0) {
+            console.log("Greater than 0");
             reachedBottom = false;
           }
         } else {
