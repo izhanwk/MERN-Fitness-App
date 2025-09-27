@@ -103,41 +103,27 @@ const NutritionTracker = () => {
     if (!el) return;
 
     const calculateThumb = () => {
-      if (reachedBottom) {
-        console.log("Reached the BOTTOM");
-        return;
-      }
-      const visible = el.clientHeight; // visible height
-      const total = el.scrollHeight; // total content height
-      const track = el.offsetHeight; // scrollbar track height
-      const thumb = (visible / total) * track; // scrollbar thumb length
+      if (reachedBottom.current) return; // already loading
 
-      const scrollTop = el.scrollTop; // how much has been scrolled
-      const maxScrollTop = total - visible; // max scroll distance
+      const visible = el.clientHeight;
+      const total = el.scrollHeight;
+      const track = el.offsetHeight;
+      const thumb = (visible / total) * track;
 
-      // position of thumb (from top of track)
+      const scrollTop = el.scrollTop;
+      const maxScrollTop = total - visible;
       const thumbPosition = (scrollTop / maxScrollTop) * (track - thumb);
       const TOTAL = track - thumb;
 
       if (thumbPosition >= TOTAL) {
-        // reachedBottom = true;
-        setpage(page + 1);
-        console.log("Reached Bottom : ", reachedBottom);
+        reachedBottom.current = true; // lock to prevent spamming
+        setPage((prev) => prev + 1); // always uses latest page
+        console.log("Reached bottom → loading page:", page + 1);
       }
-
-      // console.log("Total :", TOTAL);
-      // console.log("Thumb position from top:", thumbPosition);
     };
 
-    // initial call
-    calculateThumb();
-
-    // recalc on scroll
     el.addEventListener("scroll", calculateThumb);
-
-    return () => {
-      el.removeEventListener("scroll", calculateThumb);
-    };
+    return () => el.removeEventListener("scroll", calculateThumb);
   }, []);
   const divClick = useRef(false);
   const fetchingFood = useRef(false);
