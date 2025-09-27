@@ -176,7 +176,6 @@ const NutritionTracker = () => {
         setfood((prev) => [...prev, ...data]);
         setoriginalList(data);
         reachedBottom = false;
-        divClick.current = false;
       } else {
         console.log("Problem while fetching food data");
       }
@@ -184,6 +183,7 @@ const NutritionTracker = () => {
       console.error("Error in fetchFood:", err);
     } finally {
       // Always reset, even on error
+      divClick.current = true;
       fetchingFood.current = false;
     }
   };
