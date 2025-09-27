@@ -117,7 +117,7 @@ const NutritionTracker = () => {
 
       if (thumbPosition >= TOTAL) {
         reachedBottom.current = true; // lock to prevent spamming
-        setPage((prev) => prev + 1); // always uses latest page
+        setpage((prev) => prev + 1); // always uses latest page
         console.log("Reached bottom → loading page:", page + 1);
       }
     };
