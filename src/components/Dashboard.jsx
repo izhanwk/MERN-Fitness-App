@@ -141,11 +141,14 @@ const NutritionTracker = () => {
   }, []);
   const divClick = useRef(false);
   const fetchingFood = useRef(false);
-
+  const controllerRef = useRef(null);
   const fetchFood = async () => {
     console.log("Inside Function : ", divClick.current);
 
     if (divClick.current) {
+      if (controllerRef.current) {
+        controllerRef.current.abort();
+      }
       setfood([]);
       setoriginalList([]);
       divClick.current = false;
@@ -161,7 +164,7 @@ const NutritionTracker = () => {
 
     // Mark as fetching
     fetchingFood.current = true;
-
+    controllerRef.current = new AbortController();
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
@@ -170,6 +173,7 @@ const NutritionTracker = () => {
           "ngrok-skip-browser-warning": "true",
         },
         validateStatus: () => true,
+        signal: controllerRef.current.signal,
       });
 
       const data = res.data;
