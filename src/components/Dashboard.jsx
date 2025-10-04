@@ -146,7 +146,7 @@ const NutritionTracker = () => {
   //Fetch Food Function
 
   useEffect(() => {
-    console.log("Fetching Food : ", fetchFood);
+    console.log("Fetching Food : ", fetchingFood.current);
   }, [fetchingFood]);
 
   const fetchFood = async () => {
