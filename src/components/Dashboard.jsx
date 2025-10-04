@@ -145,6 +145,10 @@ const NutritionTracker = () => {
 
   //Fetch Food Function
 
+  useEffect(() => {
+    console.log("Fetching Food : ", fetchFood);
+  }, [fetchingFood]);
+
   const fetchFood = async () => {
     console.log("Inside Function");
 
@@ -164,14 +168,6 @@ const NutritionTracker = () => {
 
     // Mark as fetching
     fetchingFood.current = true;
-    setstart2(true);
-  };
-
-  useEffect(() => {
-    if (!start2) {
-      return;
-    }
-
     const axiosGet = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -203,7 +199,13 @@ const NutritionTracker = () => {
       }
     };
     axiosGet();
-  }, [start2]);
+  };
+
+  // useEffect(() => {
+  //   if (!start2) {
+  //     return;
+  //   }
+  // }, [start2]);
 
   const isFirstRender = useRef(true);
 
