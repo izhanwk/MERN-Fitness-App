@@ -146,7 +146,7 @@ const NutritionTracker = () => {
   //Fetch Food Function
 
   const fetchFood = async () => {
-    console.log("Inside Function");
+    console.log("Inside Function and fetching food : ", fetchingFood.current);
 
     // If already fetching, exit early
     if (fetchingFood.current) {
