@@ -103,7 +103,7 @@ const NutritionTracker = () => {
     if (!el) return;
 
     const calculateThumb = () => {
-      if (reachedBottom) {
+      if (reachedBottom.current) {
         console.log("Reached the BOTTOM");
         return;
       }
@@ -139,22 +139,14 @@ const NutritionTracker = () => {
       el.removeEventListener("scroll", calculateThumb);
     };
   }, []);
-  const divClick = useRef(false);
+  // const divClick = useRef(false);
   const fetchingFood = useRef(false);
-  const controllerRef = useRef(null);
-  const fetchFood = async () => {
-    console.log("Inside Function : ", divClick.current);
+  const [start2, setstart2] = useState(false);
 
-    if (divClick.current) {
-      if (controllerRef.current) {
-        controllerRef.current.abort();
-      }
-      setfood([]);
-      setoriginalList([]);
-      divClick.current = false;
-      console.log("Divclick is active");
-      return;
-    }
+  //Fetch Food Function
+
+  const fetchFood = async () => {
+    console.log("Inside Function");
 
     // If already fetching, exit early
     if (fetchingFood.current) {
@@ -162,42 +154,56 @@ const NutritionTracker = () => {
       return;
     }
 
+    // if (divClick.current) {
+    //   // setfood([]);
+    //   // setoriginalList([]);
+    //   divClick.current = false;
+    //   console.log("Divclick is active");
+    //   return;
+    // }
+
     // Mark as fetching
     fetchingFood.current = true;
-    controllerRef.current = new AbortController();
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "ngrok-skip-browser-warning": "true",
-        },
-        validateStatus: () => true,
-        signal: controllerRef.current.signal,
-      });
-
-      const data = res.data;
-
-      if (res.status >= 200 && res.status < 300) {
-        console.log("Data received:", page, data);
-        setfood((prev) => [...prev, ...data]);
-        setoriginalList(data);
-        // reachedBottom = false;
-      } else {
-        console.log("Problem while fetching food data");
-      }
-    } catch (err) {
-      console.error("Error in fetchFood:", err);
-    } finally {
-      // Always reset, even on error
-      divClick.current = true;
-      fetchingFood.current = false;
-    }
+    setstart2(true);
   };
 
   useEffect(() => {
-    console.log("Food :", food);
-  }, [food]);
+    if (!start2) {
+      return;
+    }
+
+    const axiosGet = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          validateStatus: () => true,
+        });
+
+        const data = res.data;
+
+        if (res.status >= 200 && res.status < 300) {
+          console.log("Data received:", page, data);
+          setfood((prev) => [...prev, ...data]);
+          setoriginalList(data);
+          // reachedBottom = false;
+        } else {
+          console.log("Problem while fetching food data");
+        }
+      } catch (err) {
+        console.error("Error in fetchFood:", err);
+      } finally {
+        // Always reset, even on error
+        // divClick.current = true;
+        fetchingFood.current = false;
+        setstart2(false);
+      }
+    };
+    axiosGet();
+  }, [start2]);
 
   const isFirstRender = useRef(true);
 
