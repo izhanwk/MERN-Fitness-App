@@ -470,7 +470,7 @@ const NutritionTracker = () => {
   const searchItems = (input) => {
     setsearchText(input);
     if (!input) return setfood(originalList);
-    const filtered = originalList.filter((item) =>
+    const filtered = food.filter((item) =>
       Object.values(item).join("").toLowerCase().includes(input.toLowerCase())
     );
     setfood(filtered);
