@@ -487,6 +487,7 @@ const NutritionTracker = () => {
     );
     if (filtered.length < 1) {
       const search = async () => {
+        const token = localStorage.getItem("token");
         const response = await axios.get(`${API_URL}/search?text=${input}`, {
           headers: {
             Authorization: `Bearer ${token}`,
