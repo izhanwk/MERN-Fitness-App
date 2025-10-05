@@ -258,6 +258,12 @@ const NutritionTracker = () => {
     fetchFood();
   }, [page]);
 
+  useEffect(() => {
+    if (!isSearching.current) {
+      setoriginalList(food);
+    }
+  }, [food]);
+
   // initial token log (optional)
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -467,10 +473,15 @@ const NutritionTracker = () => {
   const rotate = () => setrotation((r) => !r);
 
   // search list
+  const isSearching = useRef(false);
   const searchItems = (input) => {
     setsearchText(input);
-    if (!input) return setfood(originalList);
-    setoriginalList(food);
+    if (!input) {
+      isSearching.current = false;
+      return setfood(originalList);
+    }
+
+    isSearching.current = true;
     const filtered = food.filter((item) =>
       Object.values(item).join("").toLowerCase().includes(input.toLowerCase())
     );
