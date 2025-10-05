@@ -139,8 +139,9 @@ const NutritionTracker = () => {
       el.removeEventListener("scroll", calculateThumb);
     };
   }, []);
-  const divClick = useRef(false);
+  // const divClick = useRef(false);
   const fetchingFood = useRef(false);
+  const initialFetchingDone = useRef(false);
   // const [start2, setstart2] = useState(false);
 
   //Fetch Food Function
@@ -148,19 +149,23 @@ const NutritionTracker = () => {
   const fetchFood = async () => {
     console.log("Inside Function and fetching food : ", fetchingFood.current);
 
+    if (initialFetchingDone.current) {
+      return;
+    }
+
     // If already fetching, exit early
     if (fetchingFood.current) {
       console.log("Already fetching, skipping new call");
       return;
     }
 
-    if (divClick.current) {
-      // setfood([]);
-      // setoriginalList([]);
-      divClick.current = false;
-      console.log("Divclick is active");
-      return;
-    }
+    // if (divClick.current) {
+    //   // setfood([]);
+    //   // setoriginalList([]);
+    //   divClick.current = false;
+    //   console.log("Divclick is active");
+    //   return;
+    // }
 
     // Mark as fetching
     fetchingFood.current = true;
@@ -179,6 +184,7 @@ const NutritionTracker = () => {
 
         if (res.status >= 200 && res.status < 300) {
           console.log("Data received:", page, data);
+          initialFetchingDone.current = true;
           setfood((prev) => [...prev, ...data]);
           setoriginalList(data);
           // reachedBottom = false;
