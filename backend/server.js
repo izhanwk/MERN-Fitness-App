@@ -285,7 +285,8 @@ app.get("/getfood", verifyToken, async (req, res) => {
 });
 
 app.get("/getfood2", verifyToken, async (req, res) => {
-  const page = parseInt(req.query.page) || 1; // default page = 1
+  console.log("Page from fontend : ", req.query.page);
+  const page = parseInt(req.query.page) || 0; // default page = 1
   try {
     console.log("Page no : ", page);
     const totalLength = await Foods.countDocuments({});
