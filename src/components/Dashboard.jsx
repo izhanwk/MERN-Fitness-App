@@ -197,7 +197,7 @@ const NutritionTracker = () => {
         // Always reset, even on error
         // divClick.current = true;
         fetchingFood.current = false;
-        setstart2(false);
+        // setstart2(false);
       }
     };
     axiosGet();
@@ -237,7 +237,7 @@ const NutritionTracker = () => {
           if (page === 1) setoriginalList(data); // only overwrite on first page
           if (data.length > 0) {
             console.log("Greater than 0");
-            reachedBottom = false;
+            reachedBottom.current = false;
           }
         } else {
           console.log("Problem while fetching food data");
