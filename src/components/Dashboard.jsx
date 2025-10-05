@@ -210,11 +210,15 @@ const NutritionTracker = () => {
   // }, [start2]);
 
   const isFirstRender = useRef(true);
-
+  const more = useRef(true);
   useEffect(() => {
     console.log("Inside useEffect");
     if (isFirstRender.current) {
       isFirstRender.current = false; // skip first render
+      return;
+    }
+    if (!more.current) {
+      console.log("No more to fetch");
       return;
     }
 
@@ -234,8 +238,11 @@ const NutritionTracker = () => {
           console.log("scroll data ", data);
           setfood((prev) => [...prev, ...data]);
           // setfoodselection((prev) => [...prev, ...data]);
-          if (page === 1) setoriginalList(data); // only overwrite on first page
+
           if (data.length > 0) {
+            if (!data[0].showMore) {
+              more.current = false;
+            }
             console.log("Greater than 0");
             reachedBottom.current = false;
           }
