@@ -485,6 +485,18 @@ const NutritionTracker = () => {
     const filtered = food.filter((item) =>
       Object.values(item).join("").toLowerCase().includes(input.toLowerCase())
     );
+    if (filtered.length < 1) {
+      const search = async () => {
+        const response = await axios.get(`${API_URL}/search?text=${input}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+        });
+        setfood(response.data);
+      };
+      search();
+    }
     setfood(filtered);
   };
 

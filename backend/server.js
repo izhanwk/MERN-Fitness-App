@@ -284,6 +284,24 @@ app.get("/getfood", verifyToken, async (req, res) => {
   }
 });
 
+app.get("/search", verifyToken, async (req, res) => {
+  try {
+    const search = req.query.text || "";
+
+    // If search query is empty, return all foods
+    const filter = search
+      ? { name: { $regex: search, $options: "i" } } // only search by name
+      : {};
+
+    const foods = await Foods.find(filter).lean();
+
+    res.status(200).json(foods);
+  } catch (err) {
+    console.error("Error in /search:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 app.get("/getfood2", verifyToken, async (req, res) => {
   console.log("Page from fontend : ", req.query.page);
   const page = parseInt(req.query.page) || 0; // default page = 1
