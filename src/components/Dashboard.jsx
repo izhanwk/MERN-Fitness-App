@@ -187,7 +187,7 @@ const NutritionTracker = () => {
           console.log("Data received:", page, data);
           initialFetchingDone.current = true;
           setfood((prev) => [...prev, ...data]);
-          setoriginalList(data);
+          // setoriginalList(data);
           // reachedBottom = false;
         } else {
           console.log("Problem while fetching food data");
@@ -304,7 +304,7 @@ const NutritionTracker = () => {
         if (res.status >= 200 && res.status < 300) {
           setfood(data);
           // setfoodselection((prev) => [...prev, ...data]);
-          setoriginalList(data);
+          // setoriginalList(data);
         } else {
           console.log("Problem while fetching food data");
         }
@@ -470,6 +470,7 @@ const NutritionTracker = () => {
   const searchItems = (input) => {
     setsearchText(input);
     if (!input) return setfood(originalList);
+    setoriginalList(food);
     const filtered = food.filter((item) =>
       Object.values(item).join("").toLowerCase().includes(input.toLowerCase())
     );
