@@ -155,7 +155,7 @@ const NutritionTracker = () => {
 
     // If already fetching, exit early
     if (fetchingFood.current) {
-      console.log("Already fetching, skipping new call");
+      // console.log("Already fetching, skipping new call");
       return;
     }
 
