@@ -536,7 +536,7 @@ const NutritionTracker = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [searchVisiblity]);
 
   // initial load: restore stored foods
   const [isFirstLoad, setIsFirstLoad] = useState(true);
