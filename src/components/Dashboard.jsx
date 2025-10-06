@@ -817,11 +817,7 @@ const NutritionTracker = () => {
                           onChange={(e) => searchItems(e.target.value)}
                         />
                         <ul className="text-sm mt-2">
-                          {searching && (
-                            <li key={index} className="p-3 ">
-                              Loading...
-                            </li>
-                          )}
+                          {searching && <li className="p-3 ">Loading...</li>}
                           {food.map((f, index) => (
                             <li
                               key={index}
