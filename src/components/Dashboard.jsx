@@ -508,12 +508,16 @@ const NutritionTracker = () => {
   const closeEatList = () => setshowList(false);
 
   // const boxRef = useRef(null); // reference to the div
-
+  const Box = useRef(false);
   useEffect(() => {
     // Function to handle clicks outside
     const handleClickOutside = (event) => {
       // If the click target is NOT inside our div
-      if (sBox.current && !sBox.current.contains(event.target)) {
+      if (
+        sBox.current &&
+        !sBox.current.contains(event.target) &&
+        !Box.current.contains(event.target)
+      ) {
         setsearchVisiblity(false);
       }
     };
@@ -778,6 +782,7 @@ const NutritionTracker = () => {
                     <div className="flex relative w-full sm:w-auto">
                       <div
                         className="w-full sm:w-64 h-12 rounded-xl bg-white/90 backdrop-blur-sm cursor-pointer text-slate-800 text-sm font-semibold flex items-center justify-between px-4 shadow-lg border border-white/20 hover:bg-white transition-all duration-300"
+                        ref={Box}
                         onClick={() => {
                           searchFood();
                           // start();
