@@ -504,6 +504,26 @@ const NutritionTracker = () => {
   const eatList = () => setshowList(true);
   const closeEatList = () => setshowList(false);
 
+  // const boxRef = useRef(null); // reference to the div
+
+  useEffect(() => {
+    // Function to handle clicks outside
+    const handleClickOutside = (event) => {
+      // If the click target is NOT inside our div
+      if (sBox.current && !sBox.current.contains(event.target)) {
+        searchFood();
+      }
+    };
+
+    // Listen for all clicks on the document
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup when component unmounts
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // initial load: restore stored foods
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   useEffect(() => {
