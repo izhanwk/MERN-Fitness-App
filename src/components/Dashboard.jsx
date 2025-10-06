@@ -515,6 +515,9 @@ const NutritionTracker = () => {
 
   const Box = useRef(false);
   useEffect(() => {
+    if (searchVisiblity) {
+      sBox.current.scrollTop = 0;
+    }
     // Function to handle clicks outside
     const handleClickOutside = (event) => {
       // If the click target is NOT inside our div
@@ -682,9 +685,9 @@ const NutritionTracker = () => {
     [tMagnesium, magnesiumReq]
   );
 
-  const scrollup = () => {
-    sBox.current.scrollTop = 0;
-  };
+  // const scrollup = () => {
+  //   sBox.current.scrollTop = 0;
+  // };
 
   return (
     <>
@@ -800,7 +803,7 @@ const NutritionTracker = () => {
                           // start();
                           rotate();
                           fetchFood();
-                          scrollup();
+                          // scrollup();
                         }}
                       >
                         <p className="text-slate-600 truncate">{selectFood}</p>
