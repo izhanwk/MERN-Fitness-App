@@ -682,6 +682,10 @@ const NutritionTracker = () => {
     [tMagnesium, magnesiumReq]
   );
 
+  const scrollup = () => {
+    sBox.current.scrollTop = 0;
+  };
+
   return (
     <>
       {loading && (
@@ -796,6 +800,7 @@ const NutritionTracker = () => {
                           // start();
                           rotate();
                           fetchFood();
+                          scrollup();
                         }}
                       >
                         <p className="text-slate-600 truncate">{selectFood}</p>
