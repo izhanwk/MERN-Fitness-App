@@ -496,6 +496,7 @@ const NutritionTracker = () => {
   useEffect(() => {
     if (searchVisiblity) {
       setsearchText("");
+      setfood(originalList);
       sBox.current.scrollTop = 0;
     }
     // Function to handle clicks outside
