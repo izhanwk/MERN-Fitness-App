@@ -603,6 +603,9 @@ app.post("/data", verifyToken, async (req, res) => {
       user.lengthScale = lengthScale;
 
       await user.save();
+      if (user.height && user.goal && user.activity && user.mode) {
+        user.profileComplete = "Complete";
+      }
       return res.status(200).json({ message: "Data saved in DB collection" });
     } else {
       console.log("User not found");
@@ -621,6 +624,9 @@ app.post("/mode", verifyToken, async (req, res) => {
     if (user) {
       user.mode = req.body.mode;
       await user.save();
+      if (user.height && user.goal && user.activity && user.mode) {
+        user.profileComplete = "Complete";
+      }
       return res.status(200).json({ message: "Saved in DB" });
     } else {
       console.log("User not found");
@@ -637,8 +643,10 @@ app.post("/activity", verifyToken, async (req, res) => {
   if (user) {
     if (user) {
       user.activity = req.body.activity;
-      user.profileComplete = "Complete";
       user.save();
+      if (user.height && user.goal && user.activity && user.mode) {
+        user.profileComplete = "Complete";
+      }
       return res.status(200).json({ message: "Saved in DB" });
     } else {
       console.log("User not found");
@@ -656,6 +664,9 @@ app.post("/goals", verifyToken, async (req, res) => {
     if (user) {
       user.goal = req.body.goal;
       await user.save();
+      if (user.height && user.goal && user.activity && user.mode) {
+        user.profileComplete = "Complete";
+      }
       return res.status(200).json({ message: "Saved in DB" });
     } else {
       console.log("User not found");
