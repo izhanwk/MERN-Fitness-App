@@ -508,6 +508,11 @@ const NutritionTracker = () => {
   const closeEatList = () => setshowList(false);
 
   // const boxRef = useRef(null); // reference to the div
+
+  useEffect(() => {
+    console.log("Search Visibility : ", searchVisiblity);
+  }, [searchVisiblity]);
+
   const Box = useRef(false);
   useEffect(() => {
     // Function to handle clicks outside
