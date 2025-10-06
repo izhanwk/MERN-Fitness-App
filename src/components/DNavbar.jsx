@@ -67,11 +67,13 @@ function DNavbar() {
       console.log("Token refreshed successfully");
       return data.token;
     } catch (err) {
-      console.error("Error occurred:", err);
-      localStorage.removeItem("token");
-      localStorage.removeItem("sessionId");
-      showAlert("Session Expired", "error", "Authentication Failed");
-      navigate("/signin");
+      if (err.response.status === 403) {
+        console.error("Error occurred:", err);
+        localStorage.removeItem("token");
+        localStorage.removeItem("sessionId");
+        showAlert("Session Expired", "error", "Authentication Failed");
+        navigate("/signin");
+      }
       return null;
     } finally {
       // setLoading(false);
@@ -192,40 +194,40 @@ function DNavbar() {
     };
   }, []);
 
-  useEffect(() => {
-    const interValid = setInterval(() => {
-      const fetchData = async () => {
-        try {
-          const token = localStorage.getItem("token");
-          const sessionId = localStorage.getItem("sessionId");
+  // useEffect(() => {
+  //   const interValid = setInterval(() => {
+  //     const fetchData = async () => {
+  //       try {
+  //         const token = localStorage.getItem("token");
+  //         const sessionId = localStorage.getItem("sessionId");
 
-          const response = await axios.get(`${API_URL}/getdata`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              ...(sessionId && { "X-Session-Id": sessionId }),
-              "ngrok-skip-browser-warning": "true",
-            },
-          });
+  //         const response = await axios.get(`${API_URL}/getdata`, {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //             ...(sessionId && { "X-Session-Id": sessionId }),
+  //             "ngrok-skip-browser-warning": "true",
+  //           },
+  //         });
 
-          if (response.status === 200) {
-            console.log("Token is valid");
-          }
-        } catch (err) {
-          if (err.response?.status === 403) {
-            // Token expired, try refreshing
-            await refreshtoken();
-          } else {
-            console.error("Error in fetchData:", err);
-            logOut();
-          }
-        }
-      };
+  //         if (response.status === 200) {
+  //           console.log("Token is valid");
+  //         }
+  //       } catch (err) {
+  //         if (err.response?.status === 403) {
+  //           // Token expired, try refreshing
+  //           await refreshtoken();
+  //         } else {
+  //           console.error("Error in fetchData:", err);
+  //           logOut();
+  //         }
+  //       }
+  //     };
 
-      fetchData();
-    }, 60000); // Runs every 60 seconds
+  //     fetchData();
+  //   }, 60000); // Runs every 60 seconds
 
-    return () => clearInterval(interValid);
-  }, []);
+  //   return () => clearInterval(interValid);
+  // }, []);
 
   const show = () => {
     setvisible(!visible);
