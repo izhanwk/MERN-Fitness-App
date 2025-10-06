@@ -518,6 +518,7 @@ const NutritionTracker = () => {
         !sBox.current.contains(event.target) &&
         !Box.current.contains(event.target)
       ) {
+        rotate();
         setsearchVisiblity(false);
       }
     };
