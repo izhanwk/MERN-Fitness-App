@@ -18,7 +18,7 @@ import { Navigate } from "react-router-dom";
 import Edit from "./components/Edit.jsx";
 const token = localStorage.getItem("token");
 import Protectedroute2 from "./components/Proctectedroute2.jsx";
-import ScrollToTop from "./components/ScrollToTop.jsx";
+import { ScrollToTop } from "./components/ScrollToTop.jsx";
 
 const router = createBrowserRouter(
   [
