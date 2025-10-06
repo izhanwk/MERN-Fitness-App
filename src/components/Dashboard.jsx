@@ -511,7 +511,7 @@ const NutritionTracker = () => {
     const handleClickOutside = (event) => {
       // If the click target is NOT inside our div
       if (sBox.current && !sBox.current.contains(event.target)) {
-        searchFood();
+        setsearchVisiblity(false);
       }
     };
 
