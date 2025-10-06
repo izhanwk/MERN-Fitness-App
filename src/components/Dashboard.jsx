@@ -469,7 +469,10 @@ const NutritionTracker = () => {
     setsearchText("");
     setfood(originalList);
   };
-  const searchFood = () => setsearchVisiblity((v) => !v);
+  const searchFood = () => {
+    setsearchVisiblity((v) => !v);
+    sBox.current.scrollTop = 0;
+  };
   const rotate = () => setrotation((r) => !r);
 
   // search list
