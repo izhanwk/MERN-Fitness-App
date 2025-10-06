@@ -520,6 +520,7 @@ const NutritionTracker = () => {
       // If the click target is NOT inside our div
       console.log("Search Visibility : ", searchVisiblity);
       if (
+        searchVisiblity &&
         sBox.current &&
         !sBox.current.contains(event.target) &&
         !Box.current.contains(event.target)
