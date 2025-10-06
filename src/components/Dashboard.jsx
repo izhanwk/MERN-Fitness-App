@@ -509,21 +509,17 @@ const NutritionTracker = () => {
 
   // const boxRef = useRef(null); // reference to the div
 
-  useEffect(() => {
-    if (searchVisiblity) {
-      boxOpen.current = true;
-    }
-  }, [searchVisiblity]);
+  // useEffect(() => {
+  //   console.log("Search Visibility : ", searchVisiblity);
+  // }, [searchVisiblity]);
 
-  const boxOpen = useRef(false);
   const Box = useRef(false);
   useEffect(() => {
     // Function to handle clicks outside
     const handleClickOutside = (event) => {
       // If the click target is NOT inside our div
-      console.log("Box Open : ", boxOpen);
+      console.log("Search Visibility : ", searchVisiblity);
       if (
-        boxOpen &&
         sBox.current &&
         !sBox.current.contains(event.target) &&
         !Box.current.contains(event.target)
