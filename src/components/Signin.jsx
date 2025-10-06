@@ -150,7 +150,7 @@ function Signin() {
   );
 
   useEffect(() => {
-    console.log(" inside use effect");
+    // console.log(" inside use effect");
     if (!GOOGLE_CLIENT_ID || !googleButtonRef.current) {
       return;
     }
@@ -192,7 +192,7 @@ function Signin() {
       // return () => undefined;
     }
 
-    console.log("Creating button");
+    // console.log("Creating button");
     script = document.createElement("script");
     script.src = scriptSrc;
     script.async = true;

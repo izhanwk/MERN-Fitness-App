@@ -5,14 +5,14 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// Map activity labels (or use numeric factors directly)
-const ACTIVITY = {
-  sedentary: 1.2,
-  lightly_active: 1.375,
-  moderately_active: 1.55,
-  very_active: 1.725,
-  extra_active: 1.9,
-};
+// // Map activity labels (or use numeric factors directly)
+// const ACTIVITY = {
+//   sedentary: 1.2,
+//   lightly_active: 1.375,
+//   moderately_active: 1.55,
+//   very_active: 1.725,
+//   extra_active: 1.9,
+// };
 
 // helpers
 const clamp = (v, min = 0, max = 100) => Math.max(min, Math.min(max, v));
@@ -32,7 +32,6 @@ const NutritionTracker = () => {
   // ui
   const [selectFood, setselectFood] = useState("Select Food");
   const [searchText, setsearchText] = useState("");
-  const [searchStart, setsearchStart] = useState(true);
   const [searchVisiblity, setsearchVisiblity] = useState(false);
   const [showList, setshowList] = useState(false);
   const [rotation, setrotation] = useState(false);
@@ -104,7 +103,6 @@ const NutritionTracker = () => {
 
     const calculateThumb = () => {
       if (reachedBottom.current) {
-        console.log("Reached the BOTTOM");
         return;
       }
       const visible = el.clientHeight; // visible height
@@ -122,7 +120,6 @@ const NutritionTracker = () => {
       if (thumbPosition >= TOTAL) {
         // reachedBottom = true;
         setpage((prev) => prev + 1);
-        console.log("Reached Bottom : ", reachedBottom);
       }
 
       // console.log("Total :", TOTAL);
@@ -147,15 +144,13 @@ const NutritionTracker = () => {
   //Fetch Food Function
 
   const fetchFood = async () => {
-    console.log("Inside Function and fetching food : ", fetchingFood.current);
-
     if (initialFetchingDone.current) {
       return;
     }
 
     // If already fetching, exit early
     if (fetchingFood.current) {
-      console.log("Already fetching, skipping new call");
+      // console.log("Already fetching, skipping new call");
       return;
     }
 
@@ -171,7 +166,7 @@ const NutritionTracker = () => {
     fetchingFood.current = true;
     const axiosGet = async () => {
       try {
-        console.log("This function");
+        // console.log("This function");
         const token = localStorage.getItem("token");
         const res = await axios.get(`${API_URL}/getfood2?page=0`, {
           headers: {
@@ -184,7 +179,6 @@ const NutritionTracker = () => {
         const data = res.data;
 
         if (res.status >= 200 && res.status < 300) {
-          console.log("Data received:", page, data);
           initialFetchingDone.current = true;
           setfood((prev) => [...prev, ...data]);
           // setoriginalList(data);
@@ -213,13 +207,12 @@ const NutritionTracker = () => {
   const isFirstRender = useRef(true);
   const more = useRef(true);
   useEffect(() => {
-    console.log("Inside useEffect");
     if (isFirstRender.current) {
       isFirstRender.current = false; // skip first render
       return;
     }
     if (!more.current) {
-      console.log("No more to fetch");
+      // console.log("No more to fetch");
       return;
     }
 
@@ -236,7 +229,6 @@ const NutritionTracker = () => {
 
         if (res.status >= 200 && res.status < 300) {
           const data = res.data;
-          console.log("scroll data ", data);
           setfood((prev) => [...prev, ...data]);
           // setfoodselection((prev) => [...prev, ...data]);
 
@@ -244,7 +236,6 @@ const NutritionTracker = () => {
             if (!data[0].showMore) {
               more.current = false;
             }
-            console.log("Greater than 0");
             reachedBottom.current = false;
           }
         } else {
@@ -263,12 +254,6 @@ const NutritionTracker = () => {
       setoriginalList(food);
     }
   }, [food]);
-
-  // initial token log (optional)
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    console.log("token:", token);
-  }, []);
 
   // load user + food
   useEffect(() => {
@@ -463,12 +448,6 @@ const NutritionTracker = () => {
     setuserName(userData?.name || "");
   }, [userData]);
 
-  // search UI helpers
-  const start = () => {
-    setsearchStart((s) => !s);
-    setsearchText("");
-    setfood(originalList);
-  };
   const searchFood = () => {
     setsearchVisiblity((v) => !v);
     sBox.current.scrollTop = 0;
@@ -521,7 +500,6 @@ const NutritionTracker = () => {
     // Function to handle clicks outside
     const handleClickOutside = (event) => {
       // If the click target is NOT inside our div
-      console.log("Search Visibility : ", searchVisiblity);
       if (
         searchVisiblity &&
         sBox.current &&
