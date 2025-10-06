@@ -18,7 +18,6 @@ function DNavbar() {
   const refreshPromiseRef = useRef(null);
 
   const logOut = async () => {
-    console.log("Loggin out");
     setLoading(true);
     const token = localStorage.getItem("token");
     const sessionId = localStorage.getItem("sessionId");
@@ -44,7 +43,6 @@ function DNavbar() {
     try {
       // setLoading(true);
       const sessionId = localStorage.getItem("sessionId");
-      console.log("Our session ID:", sessionId);
       if (!sessionId) {
         throw new Error("No active session");
       }
@@ -63,7 +61,6 @@ function DNavbar() {
 
       const data = response.data;
       localStorage.setItem("token", data.token);
-      console.log("New token:", localStorage.getItem("token"));
       console.log("Token refreshed successfully");
       return data.token;
     } catch (err) {
@@ -154,7 +151,6 @@ function DNavbar() {
     const responseInterceptor = axios.interceptors.response.use(
       async (response) => {
         try {
-          console.log("Response status : ", response.status);
           const retryResponse = await handleAuthFailure(
             response?.config,
             response
