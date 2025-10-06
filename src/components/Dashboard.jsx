@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import DNavbar from "./DNavbar";
 import axios from "axios";
+import { Loader2 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -818,7 +819,9 @@ const NutritionTracker = () => {
                         />
                         <ul className="text-sm mt-2">
                           {searching && (
-                            <li className="p-3 text-black">Loading...</li>
+                            <li className="p-3 flex justify-center items-center">
+                              <Loader2 className="animate-spin text-blue-500" />
+                            </li>
                           )}
                           {food.map((f, index) => (
                             <li
