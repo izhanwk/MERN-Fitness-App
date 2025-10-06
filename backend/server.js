@@ -700,9 +700,6 @@ app.post("/register", async (req, res) => {
     const baseUrl =
       process.env.SERVER_BASE_URL || `${req.protocol}://${req.get("host")}`;
     const url = `${baseUrl}/verify/${token}`;
-    console.log(url);
-    console.log(process.env.EMAIL_USER);
-    console.log(process.env.EMAIL_PASS);
 
     // send verification email
     // await transporter.sendMail({
@@ -717,7 +714,7 @@ app.post("/register", async (req, res) => {
       to: email,
       subject: "Verify your email",
       html: `<h3>Click below to verify your email:</h3>
-             <a href="${url}">${url}</a>`,
+             <a href="${url}">Click here to verify</a>`,
     });
     res.status(200).send(email);
   } catch (err) {

@@ -95,6 +95,7 @@ const NutritionTracker = () => {
   const [ironPercentage, setironPercentage] = useState(0);
   const [calciumPercentage, setcalciumPercentage] = useState(0);
   const [magnesiumPercentage, setmagnesiumPercentage] = useState(0);
+  const [searching, setsearching] = useState(false);
 
   const reachedBottom = useRef(false);
   useEffect(() => {
@@ -167,6 +168,7 @@ const NutritionTracker = () => {
     const axiosGet = async () => {
       try {
         // console.log("This function");
+        setsearching(true);
         const token = localStorage.getItem("token");
         const res = await axios.get(`${API_URL}/getfood2?page=0`, {
           headers: {
@@ -189,6 +191,7 @@ const NutritionTracker = () => {
       } catch (err) {
         console.error("Error in fetchFood:", err);
       } finally {
+        setsearching(false);
         // Always reset, even on error
         // divClick.current = true;
         fetchingFood.current = false;
@@ -469,14 +472,19 @@ const NutritionTracker = () => {
     );
     if (filtered.length < 1) {
       const search = async () => {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`${API_URL}/search?text=${input}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-        });
-        setfood(response.data);
+        try {
+          setsearching(true);
+          const token = localStorage.getItem("token");
+          const response = await axios.get(`${API_URL}/search?text=${input}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          });
+          setfood(response.data);
+        } finally {
+          setsearching(false);
+        }
       };
       search();
     }
@@ -809,6 +817,11 @@ const NutritionTracker = () => {
                           onChange={(e) => searchItems(e.target.value)}
                         />
                         <ul className="text-sm mt-2">
+                          {searching && (
+                            <li key={index} className="p-3 ">
+                              Loading...
+                            </li>
+                          )}
                           {food.map((f, index) => (
                             <li
                               key={index}
