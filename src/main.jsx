@@ -18,96 +18,102 @@ import { Navigate } from "react-router-dom";
 import Edit from "./components/Edit.jsx";
 const token = localStorage.getItem("token");
 import Protectedroute2 from "./components/Proctectedroute2.jsx";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 const router = createBrowserRouter(
   [
     {
-      path: "/",
-      element: token ? <Navigate to="/dashboard" /> : <App />,
-    },
-    {
-      path: "/signin",
-      element: <Signin />,
-    },
-    {
-      path: "/changepassword",
-      element: <Changepassword />,
-    },
-    {
-      path: "/signup/userdata",
-      element: (
-        <Protectedroute>
-          <Signup />
-        </Protectedroute>
-      ),
-    },
-    {
-      path: "/signup",
-      element: <Register />,
-    },
-    {
-      path: "/goals",
-      element: (
-        <Protectedroute>
-          <Protectedroute2>
-            <Goals />
-          </Protectedroute2>
-        </Protectedroute>
-      ),
-    },
-    {
-      path: "/musclegain",
-      element: (
-        <Protectedroute>
-          <Protectedroute2>
-            <Musclegain />
-          </Protectedroute2>
-        </Protectedroute>
-      ),
-    },
-    {
-      path: "/fatloss",
-      element: (
-        <Protectedroute>
-          <Protectedroute2>
-            <Fatloss />
-          </Protectedroute2>
-        </Protectedroute>
-      ),
-    },
-    {
-      path: "/activity",
-      element: (
-        <Protectedroute>
-          <Protectedroute2>
-            <Activity />
-          </Protectedroute2>
-        </Protectedroute>
-      ),
-    },
-    {
-      path: "/dashboard",
-      element: (
-        <Protectedroute>
-          <Dashboard />
-        </Protectedroute>
-      ),
-    },
-    {
-      path: "/sessions",
-      element: (
-        <Protectedroute>
-          <Sessions />
-        </Protectedroute>
-      ),
-    },
-    {
-      path: "/edit",
-      element: (
-        <Protectedroute>
-          <Edit />
-        </Protectedroute>
-      ),
+      element: <ScrollToTop />,
+      children: [
+        {
+          path: "/",
+          element: token ? <Navigate to="/dashboard" /> : <App />,
+        },
+        {
+          path: "/signin",
+          element: <Signin />,
+        },
+        {
+          path: "/changepassword",
+          element: <Changepassword />,
+        },
+        {
+          path: "/signup/userdata",
+          element: (
+            <Protectedroute>
+              <Signup />
+            </Protectedroute>
+          ),
+        },
+        {
+          path: "/signup",
+          element: <Register />,
+        },
+        {
+          path: "/goals",
+          element: (
+            <Protectedroute>
+              <Protectedroute2>
+                <Goals />
+              </Protectedroute2>
+            </Protectedroute>
+          ),
+        },
+        {
+          path: "/musclegain",
+          element: (
+            <Protectedroute>
+              <Protectedroute2>
+                <Musclegain />
+              </Protectedroute2>
+            </Protectedroute>
+          ),
+        },
+        {
+          path: "/fatloss",
+          element: (
+            <Protectedroute>
+              <Protectedroute2>
+                <Fatloss />
+              </Protectedroute2>
+            </Protectedroute>
+          ),
+        },
+        {
+          path: "/activity",
+          element: (
+            <Protectedroute>
+              <Protectedroute2>
+                <Activity />
+              </Protectedroute2>
+            </Protectedroute>
+          ),
+        },
+        {
+          path: "/dashboard",
+          element: (
+            <Protectedroute>
+              <Dashboard />
+            </Protectedroute>
+          ),
+        },
+        {
+          path: "/sessions",
+          element: (
+            <Protectedroute>
+              <Sessions />
+            </Protectedroute>
+          ),
+        },
+        {
+          path: "/edit",
+          element: (
+            <Protectedroute>
+              <Edit />
+            </Protectedroute>
+          ),
+        },
+      ],
     },
   ],
   {
