@@ -107,8 +107,9 @@ const NutritionTracker = () => {
     const el = sBox.current;
     if (!el) return;
     console.log("In actual mainList is :", mainList);
-    if (!mainList) return;
+
     const calculateThumb = () => {
+      if (!mainList) return;
       if (reachedBottom.current) {
         return;
       }
