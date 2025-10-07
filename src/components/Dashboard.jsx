@@ -250,7 +250,7 @@ const NutritionTracker = () => {
       } catch (err) {
         console.error("Error in fetchFood:", err);
       } finally {
-        loadMore(false);
+        setloadMore(false);
       }
     };
 
