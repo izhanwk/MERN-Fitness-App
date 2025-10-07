@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import DNavbar from "./DNavbar";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import SDNavbar from "./SDNavbar";
+// import SDNavbar from "./SDNavbar";
 import axios from "axios";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
@@ -79,7 +79,7 @@ function Goals() {
       <DNavbar />
 
       <div className="flex w-screen relative z-10">
-        <SDNavbar />
+        {/* <SDNavbar /> */}
         <div className="w-screen flex flex-col items-center justify-center py-12 px-4">
           <div className="text-center mb-10">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">

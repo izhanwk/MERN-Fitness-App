@@ -465,16 +465,12 @@ const NutritionTracker = () => {
 
   // search list
   const isSearching = useRef(false);
-  const lastSearchQuery = useRef("");
   const debouncedApiSearch = useMemo(
     () =>
       debounce(async (query) => {
-        if (lastSearchQuery.current !== query) {
-          return;
-        }
         try {
-          setsearching(true);
           setfood([]);
+          setsearching(true);
           const token = localStorage.getItem("token");
           const response = await axios.get(`${API_URL}/search?text=${query}`, {
             headers: {
@@ -482,15 +478,11 @@ const NutritionTracker = () => {
               "ngrok-skip-browser-warning": "true",
             },
           });
-          if (lastSearchQuery.current === query) {
-            setfood(response.data);
-          }
+          setfood(response.data);
         } catch (error) {
           console.error("Error while searching food:", error);
         } finally {
-          if (lastSearchQuery.current === query) {
-            setsearching(false);
-          }
+          setsearching(false);
         }
       }, 400),
     []
@@ -504,11 +496,9 @@ const NutritionTracker = () => {
 
   const searchItems = (input) => {
     setsearchText(input);
-    lastSearchQuery.current = input;
     if (!input) {
       isSearching.current = false;
       debouncedApiSearch.cancel();
-      setsearching(false);
       return setfood(originalList);
     }
 
@@ -541,8 +531,6 @@ const NutritionTracker = () => {
   useEffect(() => {
     if (searchVisiblity) {
       setsearchText("");
-      lastSearchQuery.current = "";
-      setsearching(false);
       setfood(originalList);
       sBox.current.scrollTop = 0;
     }
