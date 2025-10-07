@@ -260,6 +260,7 @@ const NutritionTracker = () => {
 
   useEffect(() => {
     if (!isSearching.current) {
+      console.log("Going to set it as original : ", food);
       setoriginalList(food);
     }
   }, [food]);
