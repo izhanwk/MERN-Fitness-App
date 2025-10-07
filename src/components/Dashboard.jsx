@@ -126,7 +126,7 @@ const NutritionTracker = () => {
       if (thumbPosition >= TOTAL) {
         // reachedBottom = true;
         console.log("In actual mainList is :", mainList);
-        if (!mainList) {
+        if (!mainList.current) {
           return;
         }
         setpage((prev) => prev + 1);
