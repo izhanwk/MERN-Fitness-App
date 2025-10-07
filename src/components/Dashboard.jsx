@@ -130,6 +130,7 @@ const NutritionTracker = () => {
           return;
         }
         setpage((prev) => prev + 1);
+        console.log("Page updated");
       }
 
       // console.log("Total :", TOTAL);
