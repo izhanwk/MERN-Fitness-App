@@ -541,6 +541,7 @@ const NutritionTracker = () => {
     );
 
     if (filtered.length > 0) {
+      setempty(false);
       debouncedApiSearch.cancel();
       setfood(filtered);
       return;
