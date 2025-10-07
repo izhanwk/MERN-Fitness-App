@@ -108,8 +108,6 @@ const NutritionTracker = () => {
     if (!el) return;
 
     const calculateThumb = () => {
-      console.log("In actual mainList is :", mainList);
-      if (!mainList) return;
       if (reachedBottom.current) {
         return;
       }
@@ -127,6 +125,10 @@ const NutritionTracker = () => {
 
       if (thumbPosition >= TOTAL) {
         // reachedBottom = true;
+        console.log("In actual mainList is :", mainList);
+        if (!mainList) {
+          return;
+        }
         setpage((prev) => prev + 1);
       }
 
