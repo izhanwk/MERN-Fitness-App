@@ -271,12 +271,12 @@ const NutritionTracker = () => {
     fetchFood();
   }, [page]);
 
-  const [empty, setempty] = useState(false);
-  useEffect(() => {
-    if (food.length < 1) {
-      setempty(true);
-    }
-  }, [food]);
+  // const [empty, setempty] = useState(false);
+  // useEffect(() => {
+  //   if (food.length < 1) {
+  //     setempty(true);
+  //   }
+  // }, [food]);
 
   // load user + food
   useEffect(() => {
@@ -872,11 +872,11 @@ const NutritionTracker = () => {
                           onChange={(e) => searchItems(e.target.value)}
                         />
                         <ul className="text-sm mt-2">
-                          {empty && (
+                          {/* {empty && (
                             <li className="p-3 flex justify-center items-center text-black opacity-50">
                               No Item Found
                             </li>
-                          )}
+                          )} */}
                           {searching && (
                             <li className="p-3 flex justify-center items-center">
                               <Loader2 className="animate-spin text-blue-500" />
