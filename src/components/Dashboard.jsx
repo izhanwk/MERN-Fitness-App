@@ -469,6 +469,7 @@ const NutritionTracker = () => {
     () =>
       debounce(async (query) => {
         try {
+          setfood([]);
           setsearching(true);
           const token = localStorage.getItem("token");
           const response = await axios.get(`${API_URL}/search?text=${query}`, {
