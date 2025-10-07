@@ -217,7 +217,7 @@ const NutritionTracker = () => {
       return;
     }
     if (!more.current) {
-      // console.log("No more to fetch");
+      console.log("No more to fetch");
       return;
     }
 
