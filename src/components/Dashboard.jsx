@@ -186,6 +186,7 @@ const NutritionTracker = () => {
         if (res.status >= 200 && res.status < 300) {
           initialFetchingDone.current = true;
           setfood((prev) => [...prev, ...data]);
+          setoriginalList((prev) => [...prev, ...data]);
           // setoriginalList(data);
           // reachedBottom = false;
         } else {
@@ -237,6 +238,7 @@ const NutritionTracker = () => {
         if (res.status >= 200 && res.status < 300) {
           const data = res.data;
           setfood((prev) => [...prev, ...data]);
+          setoriginalList((prev) => [...prev, ...data]);
           // setfoodselection((prev) => [...prev, ...data]);
 
           if (data.length > 0) {
@@ -258,12 +260,12 @@ const NutritionTracker = () => {
     fetchFood();
   }, [page]);
 
-  useEffect(() => {
-    if (!isSearching.current) {
-      console.log("Going to set it as original : ", food);
-      setoriginalList(food);
-    }
-  }, [food]);
+  // useEffect(() => {
+  //   if (!isSearching.current) {
+  //     console.log("Going to set it as original : ", food);
+  //     setoriginalList(food);
+  //   }
+  // }, [food]);
 
   // load user + food
   useEffect(() => {
