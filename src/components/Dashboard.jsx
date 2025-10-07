@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import DNavbar from "./DNavbar";
 import axios from "axios";
@@ -471,62 +465,37 @@ const NutritionTracker = () => {
 
   // search list
   const isSearching = useRef(false);
-  const DEBOUNCE_DELAY = 400; // ms
+  const searchItems = (input) => {
+    setsearchText(input);
+    if (!input) {
+      isSearching.current = false;
+      return setfood(originalList);
+    }
 
-  const searchItems = useCallback(
-    debounce(
-      async (
-        input,
-        setfood,
-        originalList,
-        setsearching,
-        isSearching,
-        API_URL
-      ) => {
-        // Update search text
-        setsearchText(input);
-
-        if (!input) {
-          isSearching.current = false;
-          return setfood(originalList);
+    isSearching.current = true;
+    const filtered = food.filter((item) =>
+      Object.values(item).join("").toLowerCase().includes(input.toLowerCase())
+    );
+    if (filtered.length < 1) {
+      const search = async () => {
+        try {
+          setsearching(true);
+          const token = localStorage.getItem("token");
+          const response = await axios.get(`${API_URL}/search?text=${input}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          });
+          setfood(response.data);
+        } finally {
+          setsearching(false);
         }
-
-        isSearching.current = true;
-
-        // Client-side filter
-        const filtered = food.filter((item) =>
-          Object.values(item)
-            .join("")
-            .toLowerCase()
-            .includes(input.toLowerCase())
-        );
-
-        // If no local match, hit API
-        if (filtered.length < 1) {
-          try {
-            setsearching(true);
-            const token = localStorage.getItem("token");
-            const response = await axios.get(
-              `${API_URL}/search?text=${input}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "ngrok-skip-browser-warning": "true",
-                },
-              }
-            );
-            setfood(response.data);
-          } finally {
-            setsearching(false);
-          }
-        } else {
-          setfood(filtered);
-        }
-      },
-      DEBOUNCE_DELAY
-    ),
-    [] // ✅ empty deps because debounce wraps it
-  );
+      };
+      search();
+    }
+    setfood(filtered);
+  };
 
   const eatList = () => setshowList(true);
   const closeEatList = () => setshowList(false);
