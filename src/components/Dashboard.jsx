@@ -106,6 +106,7 @@ const NutritionTracker = () => {
   useEffect(() => {
     const el = sBox.current;
     if (!el) return;
+    console.log("In actual mainList is :", mainList);
     if (!mainList) return;
     const calculateThumb = () => {
       if (reachedBottom.current) {
@@ -145,8 +146,10 @@ const NutritionTracker = () => {
 
   useEffect(() => {
     if (searchText !== "") {
+      console.log("Mainlist turned False");
       mainList.current = false;
     } else {
+      console.log("Mainlist turned True");
       mainList.current = true;
     }
   }, [searchText]);
