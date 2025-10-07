@@ -468,12 +468,15 @@ const NutritionTracker = () => {
 
   // search list
   const isSearching = useRef(false);
+  const onlineSearch = useRef(false);
+
   const debouncedApiSearch = useMemo(
     () =>
       debounce(async (query) => {
         try {
           setfood([]);
           setsearching(true);
+          onlineSearch.current = true;
           const token = localStorage.getItem("token");
           const response = await axios.get(`${API_URL}/search?text=${query}`, {
             headers: {
@@ -481,7 +484,9 @@ const NutritionTracker = () => {
               "ngrok-skip-browser-warning": "true",
             },
           });
-          setfood(response.data);
+          if (onlineSearch.current) {
+            setfood(response.data);
+          }
         } catch (error) {
           console.error("Error while searching food:", error);
         } finally {
@@ -504,8 +509,11 @@ const NutritionTracker = () => {
 
   const searchItems = (input) => {
     setsearchText(input);
-    if (!input) {
+    if (input !== "") {
+      onlineSearch.current = false;
       console.log("No input");
+    }
+    if (!input) {
       isSearching.current = false;
       debouncedApiSearch.cancel();
       return setfood(originalList);
