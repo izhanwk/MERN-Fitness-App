@@ -465,36 +465,56 @@ const NutritionTracker = () => {
 
   // search list
   const isSearching = useRef(false);
-  const searchItems = (input) => {
-    setsearchText(input);
-    if (!input) {
-      isSearching.current = false;
-      return setfood(originalList);
-    }
-
-    isSearching.current = true;
-    const filtered = food.filter((item) =>
-      Object.values(item).join("").toLowerCase().includes(input.toLowerCase())
-    );
-    if (filtered.length < 1) {
-      const search = async () => {
+  const debouncedApiSearch = useMemo(
+    () =>
+      debounce(async (query) => {
         try {
           setsearching(true);
           const token = localStorage.getItem("token");
-          const response = await axios.get(`${API_URL}/search?text=${input}`, {
+          const response = await axios.get(`${API_URL}/search?text=${query}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
             },
           });
           setfood(response.data);
+        } catch (error) {
+          console.error("Error while searching food:", error);
         } finally {
           setsearching(false);
         }
-      };
-      search();
+      }, 400),
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedApiSearch.cancel();
+    };
+  }, [debouncedApiSearch]);
+
+  const searchItems = (input) => {
+    setsearchText(input);
+    if (!input) {
+      isSearching.current = false;
+      debouncedApiSearch.cancel();
+      return setfood(originalList);
     }
-    setfood(filtered);
+
+    isSearching.current = true;
+    const listToSearch = originalList.length > 0 ? originalList : food;
+    const loweredInput = input.toLowerCase();
+    const filtered = listToSearch.filter((item) =>
+      Object.values(item).join("").toLowerCase().includes(loweredInput)
+    );
+
+    if (filtered.length > 0) {
+      debouncedApiSearch.cancel();
+      setfood(filtered);
+      return;
+    }
+
+    debouncedApiSearch(input);
   };
 
   const eatList = () => setshowList(true);
