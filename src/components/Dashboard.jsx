@@ -494,9 +494,15 @@ const NutritionTracker = () => {
     };
   }, [debouncedApiSearch]);
 
+  useEffect(() => {
+    console.log("Updated food : ", food);
+    console.log("Updated original list : ", originalList);
+  }, [food, originalList]);
+
   const searchItems = (input) => {
     setsearchText(input);
     if (!input) {
+      console.log("No input");
       isSearching.current = false;
       debouncedApiSearch.cancel();
       return setfood(originalList);
