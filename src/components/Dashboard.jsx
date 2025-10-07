@@ -471,6 +471,7 @@ const NutritionTracker = () => {
 
   // search list
   const isSearching = useRef(false);
+  const DEBOUNCE_DELAY = 400; // ms
 
   const searchItems = useCallback(
     debounce(
