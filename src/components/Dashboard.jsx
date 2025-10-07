@@ -99,6 +99,7 @@ const NutritionTracker = () => {
   const [magnesiumPercentage, setmagnesiumPercentage] = useState(0);
   const [searching, setsearching] = useState(false);
   const [loadMore, setloadMore] = useState(false);
+  const [empty, setempty] = useState(false);
 
   const reachedBottom = useRef(false);
   const mainList = useRef(true);
@@ -196,6 +197,11 @@ const NutritionTracker = () => {
         });
 
         const data = res.data;
+        if (data.length > 0) {
+          setempty(false);
+        } else {
+          setempty(true);
+        }
 
         if (res.status >= 200 && res.status < 300) {
           initialFetchingDone.current = true;
@@ -273,19 +279,6 @@ const NutritionTracker = () => {
 
     fetchFood();
   }, [page]);
-
-  const [empty, setempty] = useState(false);
-  useEffect(() => {
-    if (food.length < 1) {
-      setempty(true);
-    } else {
-      setempty(false);
-    }
-  }, [food]);
-
-  useEffect(() => {
-    console.log("Empty : ", empty);
-  }, [empty]);
 
   // load user + food
   useEffect(() => {
@@ -504,8 +497,14 @@ const NutritionTracker = () => {
               "ngrok-skip-browser-warning": "true",
             },
           });
+          const data = response.data;
+          if (data.length > 0) {
+            setempty(false);
+          } else {
+            setempty(true);
+          }
           if (onlineSearch.current) {
-            setfood(response.data);
+            setfood(data);
           }
         } catch (error) {
           console.error("Error while searching food:", error);
