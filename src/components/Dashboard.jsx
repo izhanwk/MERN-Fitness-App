@@ -101,10 +101,12 @@ const NutritionTracker = () => {
   const [loadMore, setloadMore] = useState(false);
 
   const reachedBottom = useRef(false);
+  const mainList = useRef(true);
+
   useEffect(() => {
     const el = sBox.current;
     if (!el) return;
-
+    if (!mainList) return;
     const calculateThumb = () => {
       if (reachedBottom.current) {
         return;
@@ -140,6 +142,15 @@ const NutritionTracker = () => {
       el.removeEventListener("scroll", calculateThumb);
     };
   }, []);
+
+  useEffect(() => {
+    if (searchText !== "") {
+      mainList.current = false;
+    } else {
+      mainList.current = true;
+    }
+  }, [searchText]);
+
   // const divClick = useRef(false);
   const fetchingFood = useRef(false);
   const initialFetchingDone = useRef(false);
@@ -260,12 +271,12 @@ const NutritionTracker = () => {
     fetchFood();
   }, [page]);
 
-  // useEffect(() => {
-  //   if (!isSearching.current) {
-  //     console.log("Going to set it as original : ", food);
-  //     setoriginalList(food);
-  //   }
-  // }, [food]);
+  const [empty, setempty] = useState(false);
+  useEffect(() => {
+    if (food.length < 1) {
+      setempty(true);
+    }
+  }, [food]);
 
   // load user + food
   useEffect(() => {
@@ -861,6 +872,11 @@ const NutritionTracker = () => {
                           onChange={(e) => searchItems(e.target.value)}
                         />
                         <ul className="text-sm mt-2">
+                          {empty && (
+                            <li className="p-3 flex justify-center items-center text-black opacity-50">
+                              No Item Found
+                            </li>
+                          )}
                           {searching && (
                             <li className="p-3 flex justify-center items-center">
                               <Loader2 className="animate-spin text-blue-500" />
