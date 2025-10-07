@@ -281,6 +281,10 @@ const NutritionTracker = () => {
     }
   }, [food]);
 
+  useEffect(() => {
+    console.log("Empty : ", empty);
+  }, [empty]);
+
   // load user + food
   useEffect(() => {
     const fetchData = async () => {
