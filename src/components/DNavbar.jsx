@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react"; // for hamburger icons
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
 import axios from "axios";
+import { Dumbbell } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -258,13 +259,7 @@ function DNavbar() {
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-md">
-              <svg
-                className="w-6 h-6 text-black"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M4 10h2V8a1 1 0 1 1 2 0v2h8V8a1 1 0 1 1 2 0v2h2a1 1 0 1 1 0 2h-2v2a1 1 0 1 1-2 0v-2H8v2a1 1 0 1 1-2 0v-2H4a1 1 0 1 1 0-2z" />
-              </svg>
+              <Dumbbell className="w-6 h-6 text-black" strokeWidth={2.5} />
             </div>
             <span className="text-white font-bold text-xl">FitTracker</span>
           </div>
