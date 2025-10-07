@@ -129,7 +129,6 @@ const NutritionTracker = () => {
       if (thumbPosition >= TOTAL) {
         // reachedBottom = true;
         setpage((prev) => prev + 1);
-        console.log("Page updated");
       }
 
       // console.log("Total :", TOTAL);
@@ -275,12 +274,12 @@ const NutritionTracker = () => {
     fetchFood();
   }, [page]);
 
-  // const [empty, setempty] = useState(false);
-  // useEffect(() => {
-  //   if (food.length < 1) {
-  //     setempty(true);
-  //   }
-  // }, [food]);
+  const [empty, setempty] = useState(false);
+  useEffect(() => {
+    if (food.length < 1) {
+      setempty(true);
+    }
+  }, [food]);
 
   // load user + food
   useEffect(() => {
@@ -516,11 +515,6 @@ const NutritionTracker = () => {
       debouncedApiSearch.cancel();
     };
   }, [debouncedApiSearch]);
-
-  useEffect(() => {
-    console.log("Updated food : ", food);
-    console.log("Updated original list : ", originalList);
-  }, [food, originalList]);
 
   const searchItems = (input) => {
     setsearchText(input);
@@ -876,11 +870,11 @@ const NutritionTracker = () => {
                           onChange={(e) => searchItems(e.target.value)}
                         />
                         <ul className="text-sm mt-2">
-                          {/* {empty && (
+                          {empty && (
                             <li className="p-3 flex justify-center items-center text-black opacity-50">
                               No Item Found
                             </li>
-                          )} */}
+                          )}
                           {searching && (
                             <li className="p-3 flex justify-center items-center">
                               <Loader2 className="animate-spin text-blue-500" />
