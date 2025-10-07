@@ -97,6 +97,7 @@ const NutritionTracker = () => {
   const [calciumPercentage, setcalciumPercentage] = useState(0);
   const [magnesiumPercentage, setmagnesiumPercentage] = useState(0);
   const [searching, setsearching] = useState(false);
+  const [loadMore, setloadMore] = useState(false);
 
   const reachedBottom = useRef(false);
   useEffect(() => {
@@ -223,6 +224,7 @@ const NutritionTracker = () => {
     const fetchFood = async () => {
       try {
         const token = localStorage.getItem("token");
+        setloadMore(true);
         const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -247,6 +249,8 @@ const NutritionTracker = () => {
         }
       } catch (err) {
         console.error("Error in fetchFood:", err);
+      } finally {
+        loadMore(false);
       }
     };
 
@@ -837,6 +841,11 @@ const NutritionTracker = () => {
                               {f.name}
                             </li>
                           ))}
+                          {loadMore && (
+                            <li className="p-3 flex justify-center items-center">
+                              <Loader2 className="animate-spin text-blue-500" />
+                            </li>
+                          )}
                         </ul>
                       </div>
                     </div>
