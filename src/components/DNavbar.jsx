@@ -259,7 +259,7 @@ function DNavbar() {
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-md">
-              <Dumbbell className="w-6 h-6 text-black" strokeWidth={2.5} />
+              <Dumbbell className="w-6 h-6 text-white" strokeWidth={2.5} />
             </div>
             <span className="text-white font-bold text-xl">FitTracker</span>
           </div>
