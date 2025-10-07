@@ -111,6 +111,9 @@ const NutritionTracker = () => {
       if (reachedBottom.current) {
         return;
       }
+      if (!mainList.current) {
+        return;
+      }
       const visible = el.clientHeight; // visible height
       const total = el.scrollHeight; // total content height
       const track = el.offsetHeight; // scrollbar track height
@@ -125,10 +128,6 @@ const NutritionTracker = () => {
 
       if (thumbPosition >= TOTAL) {
         // reachedBottom = true;
-        console.log("In actual mainList is :", mainList);
-        if (!mainList.current) {
-          return;
-        }
         setpage((prev) => prev + 1);
         console.log("Page updated");
       }
@@ -150,10 +149,8 @@ const NutritionTracker = () => {
 
   useEffect(() => {
     if (searchText !== "") {
-      console.log("Mainlist turned False");
       mainList.current = false;
     } else {
-      console.log("Mainlist turned True");
       mainList.current = true;
     }
   }, [searchText]);
