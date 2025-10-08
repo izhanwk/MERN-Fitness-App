@@ -524,6 +524,12 @@ const NutritionTracker = () => {
     };
   }, [debouncedApiSearch]);
 
+  useEffect(() => {
+    if (food.length > 0) {
+      setempty(true);
+    }
+  }, [food]);
+
   const searchItems = (input) => {
     setsearchText(input);
     if (input !== "") {
