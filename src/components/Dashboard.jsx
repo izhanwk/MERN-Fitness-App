@@ -505,8 +505,8 @@ const NutritionTracker = () => {
           } else if (data.length === 0 && query === "") {
             setempty(false);
           } else {
-            console.log("2nd turned on empty");
-            setempty(true);
+            // console.log("2nd turned on empty");
+            // setempty(true);
           }
 
           if (onlineSearch.current) {
