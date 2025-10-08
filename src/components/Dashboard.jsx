@@ -523,6 +523,7 @@ const NutritionTracker = () => {
 
   const searchItems = (input) => {
     setsearchText(input);
+    setempty(false);
     if (input !== "") {
       setsearching(false);
       onlineSearch.current = false;
