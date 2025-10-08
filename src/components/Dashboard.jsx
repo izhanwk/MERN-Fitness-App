@@ -542,6 +542,9 @@ const NutritionTracker = () => {
     if (!input) {
       isSearching.current = false;
       debouncedApiSearch.cancel();
+      if (originalList.length !== 0) {
+        setempty(false);
+      }
       return setfood(originalList);
     }
 
