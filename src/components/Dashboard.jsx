@@ -200,6 +200,7 @@ const NutritionTracker = () => {
         if (data.length > 0) {
           setempty(false);
         } else {
+          console.log("1st turned on empty");
           setempty(true);
         }
 
@@ -504,6 +505,7 @@ const NutritionTracker = () => {
           } else if ((data.length = 0 && query === "")) {
             setempty(false);
           } else {
+            console.log("2nd turned on empty");
             setempty(true);
           }
           if (onlineSearch.current) {
