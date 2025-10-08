@@ -526,7 +526,7 @@ const NutritionTracker = () => {
 
   useEffect(() => {
     if (food.length > 0) {
-      setempty(true);
+      setempty(false);
     }
   }, [food]);
 
