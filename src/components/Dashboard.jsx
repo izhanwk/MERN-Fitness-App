@@ -501,6 +501,8 @@ const NutritionTracker = () => {
           const data = response.data;
           if (data.length > 0) {
             setempty(false);
+          } else if ((data.length = 0 && query === "")) {
+            setempty(false);
           } else {
             setempty(true);
           }
