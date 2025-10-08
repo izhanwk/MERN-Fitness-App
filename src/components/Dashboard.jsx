@@ -502,12 +502,13 @@ const NutritionTracker = () => {
           const data = response.data;
           if (data.length > 0) {
             setempty(false);
-          } else if ((data.length = 0 && query === "")) {
+          } else if (data.length === 0 && query === "") {
             setempty(false);
           } else {
             console.log("2nd turned on empty");
             setempty(true);
           }
+
           if (onlineSearch.current) {
             setfood(data);
           }
