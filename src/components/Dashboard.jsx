@@ -488,6 +488,7 @@ const NutritionTracker = () => {
       debounce(async (query) => {
         try {
           setfood([]);
+          setempty(false);
           setsearching(true);
           onlineSearch.current = true;
           const token = localStorage.getItem("token");
@@ -523,7 +524,6 @@ const NutritionTracker = () => {
 
   const searchItems = (input) => {
     setsearchText(input);
-    setempty(false);
     if (input !== "") {
       setsearching(false);
       onlineSearch.current = false;
