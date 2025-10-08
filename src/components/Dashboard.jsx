@@ -507,6 +507,7 @@ const NutritionTracker = () => {
           } else {
             // console.log("2nd turned on empty");
             // setempty(true);
+            setfood([]);
           }
 
           if (onlineSearch.current) {
@@ -530,6 +531,8 @@ const NutritionTracker = () => {
   useEffect(() => {
     if (food.length > 0) {
       setempty(false);
+    } else {
+      setempty(true);
     }
   }, [food]);
 
