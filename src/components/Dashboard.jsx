@@ -484,9 +484,15 @@ const NutritionTracker = () => {
   const isSearching = useRef(false);
   const onlineSearch = useRef(false);
 
+  const latestQueryRef = useRef("");
+
   const debouncedApiSearch = useMemo(
     () =>
       debounce(async (query) => {
+        if (query !== latestQueryRef.current || query.trim() === "") {
+          return;
+        }
+
         try {
           setfood([]);
           setempty(false);
@@ -500,6 +506,11 @@ const NutritionTracker = () => {
             },
           });
           const data = response.data;
+
+          if (query !== latestQueryRef.current) {
+            return;
+          }
+
           if (data.length > 0) {
             setempty(false);
           } else if (data.length === 0 && query === "") {
@@ -516,7 +527,9 @@ const NutritionTracker = () => {
         } catch (error) {
           console.error("Error while searching food:", error);
         } finally {
-          setsearching(false);
+          if (query === latestQueryRef.current) {
+            setsearching(false);
+          }
         }
       }, 400),
     []
@@ -535,6 +548,7 @@ const NutritionTracker = () => {
   }, [food]);
 
   const searchItems = (input) => {
+    latestQueryRef.current = input;
     setsearchText(input);
     if (input === "") {
       setsearching(false);
@@ -582,6 +596,7 @@ const NutritionTracker = () => {
   const Box = useRef(false);
   useEffect(() => {
     if (searchVisiblity) {
+      latestQueryRef.current = "";
       setsearchText("");
       setfood(originalList);
       sBox.current.scrollTop = 0;
