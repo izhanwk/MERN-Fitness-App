@@ -506,7 +506,7 @@ const NutritionTracker = () => {
             setempty(false);
           } else {
             // console.log("2nd turned on empty");
-            // setempty(true);
+            setempty(true);
             setfood([]);
           }
 
@@ -538,13 +538,16 @@ const NutritionTracker = () => {
     setsearchText(input);
     if (input !== "") {
       setsearching(false);
+      if (originalList.length > 0) {
+        setempty(false);
+      }
       onlineSearch.current = false;
       console.log("No input");
     }
     if (!input) {
       isSearching.current = false;
       debouncedApiSearch.cancel();
-      if (originalList.length !== 0) {
+      if (originalList.length > 0) {
         setempty(false);
       }
       return setfood(originalList);
