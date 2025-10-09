@@ -487,28 +487,34 @@ const NutritionTracker = () => {
   const debouncedApiSearch = useMemo(
     () =>
       debounce(async (query) => {
-        setsearching(true);
-        onlineSearch.current = true;
-
         try {
+          setfood([]);
+          setempty(false);
+          setsearching(true);
+          onlineSearch.current = true;
           const token = localStorage.getItem("token");
-          const { data } = await axios.get(`${API_URL}/search?text=${query}`, {
+          const response = await axios.get(`${API_URL}/search?text=${query}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
             },
           });
-
-          if (Array.isArray(data) && data.length > 0) {
+          const data = response.data;
+          if (data.length > 0) {
             setempty(false);
-            setFood(data);
+          } else if (data.length === 0 && query === "") {
+            setempty(false);
           } else {
+            // console.log("2nd turned on empty");
             setempty(true);
-            setFood([]);
+            setfood([]);
+          }
+
+          if (onlineSearch.current) {
+            setfood(data);
           }
         } catch (error) {
           console.error("Error while searching food:", error);
-          setempty(true);
         } finally {
           setsearching(false);
         }
@@ -530,37 +536,37 @@ const NutritionTracker = () => {
 
   const searchItems = (input) => {
     setsearchText(input);
-
-    // 1️⃣ If no input: reset everything
-    if (!input.trim()) {
-      debouncedApiSearch.cancel();
-      isSearching.current = false;
-      onlineSearch.current = false;
+    if (input === "") {
       setsearching(false);
-      setFood(originalList.current);
-      setempty(originalList.current.length === 0);
-      return;
+      if (originalList.length > 0) {
+        setempty(false);
+      }
+      onlineSearch.current = false;
+      console.log("No input");
+    }
+    if (!input) {
+      isSearching.current = false;
+      debouncedApiSearch.cancel();
+      if (originalList.length > 0) {
+        setempty(false);
+      }
+      return setfood(originalList);
     }
 
-    // 2️⃣ Local filter
     isSearching.current = true;
-    const listToSearch =
-      originalList.current.length > 0 ? originalList.current : food;
+    const listToSearch = originalList.length > 0 ? originalList : food;
     const loweredInput = input.toLowerCase();
-
     const filtered = listToSearch.filter((item) =>
       Object.values(item).join("").toLowerCase().includes(loweredInput)
     );
 
     if (filtered.length > 0) {
-      debouncedApiSearch.cancel();
       setempty(false);
-      setsearching(false);
-      setFood(filtered);
+      debouncedApiSearch.cancel();
+      setfood(filtered);
       return;
     }
 
-    // 3️⃣ If not found locally, search online
     debouncedApiSearch(input);
   };
 
