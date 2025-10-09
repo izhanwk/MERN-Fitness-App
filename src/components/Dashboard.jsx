@@ -549,9 +549,9 @@ const NutritionTracker = () => {
 
   const searchItems = (input) => {
     latestQueryRef.current = input;
+    setsearching(false);
     setsearchText(input);
     if (input === "") {
-      setsearching(false);
       if (originalList.length > 0) {
         setempty(false);
       }
