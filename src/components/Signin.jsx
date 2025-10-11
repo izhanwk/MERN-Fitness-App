@@ -405,11 +405,18 @@ function Signin() {
                     </span>
                     <span className="h-px flex-1 bg-white/20"></span>
                   </div>
-                  <div className="flex justify-center">
-                    <div
-                      ref={googleButtonRef}
-                      className="w-full flex justify-center"
-                    ></div>
+                  <div className="flex justify-center" ref={googleButtonRef}>
+                    <button
+                      id="customGoogleBtn"
+                      class="flex items-center justify-center gap-3 w-full sm:w-auto bg-white border border-gray-300 text-gray-600 font-medium rounded-md px-5 py-2 hover:bg-gray-50 transition duration-200"
+                    >
+                      <img
+                        src="https://developers.google.com/identity/images/g-logo.png"
+                        alt="Google logo"
+                        class="w-5 h-5"
+                      />
+                      <span>Sign in with Google</span>
+                    </button>
                   </div>
                   {!GOOGLE_CLIENT_ID && (
                     <p className="text-xs text-center text-purple-200">
