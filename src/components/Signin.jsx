@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Navbar from "./Navbar";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -20,7 +20,7 @@ function Signin() {
     formState: { errors },
   } = useForm();
   const [loading, setLoading] = useState(false);
-  const [isGoogleReady, setIsGoogleReady] = useState(false);
+  const googleButtonRef = useRef(null);
 
   const persistSession = useCallback((session) => {
     if (!session) return;
@@ -151,51 +151,48 @@ function Signin() {
 
   useEffect(() => {
     // console.log(" inside use effect");
-    let isCancelled = false;
-
-    setIsGoogleReady(false);
-
-    if (!GOOGLE_CLIENT_ID) {
+    if (!GOOGLE_CLIENT_ID || !googleButtonRef.current) {
       return;
     }
 
     const scriptSrc = "https://accounts.google.com/gsi/client";
 
-    const initializeGoogleClient = () => {
-      if (isCancelled) return;
-      if (window.google?.accounts?.id) {
+    const renderGoogleButton = () => {
+      if (window.google && googleButtonRef.current) {
+        googleButtonRef.current.innerHTML = "";
         window.google.accounts.id.initialize({
           client_id: GOOGLE_CLIENT_ID,
           callback: handleGoogleCredentialResponse,
-          ux_mode: "popup",
-          auto_select: false,
-          context: "signin",
         });
-        setIsGoogleReady(true);
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: "outline",
+          size: "large",
+          width: "100%",
+        });
       }
     };
 
     let script = document.querySelector(`script[src="${scriptSrc}"]`);
     const handleLoad = () => {
-      if (isCancelled) return;
       if (script) {
         script.dataset.loaded = "true";
       }
-      initializeGoogleClient();
+      renderGoogleButton();
     };
 
     if (script) {
       if (script.dataset.loaded) {
-        initializeGoogleClient();
+        renderGoogleButton();
       } else {
         script.addEventListener("load", handleLoad);
+        return () => {
+          script?.removeEventListener("load", handleLoad);
+        };
       }
-      return () => {
-        isCancelled = true;
-        script?.removeEventListener("load", handleLoad);
-      };
+      // return () => undefined;
     }
 
+    // console.log("Creating button");
     script = document.createElement("script");
     script.src = scriptSrc;
     script.async = true;
@@ -204,53 +201,9 @@ function Signin() {
     document.body.appendChild(script);
 
     return () => {
-      isCancelled = true;
       script.removeEventListener("load", handleLoad);
-      window.google?.accounts?.id?.cancel?.();
     };
   }, [handleGoogleCredentialResponse]);
-
-  const handleGoogleSignInClick = useCallback(() => {
-    if (loading || !isGoogleReady) {
-      return;
-    }
-
-    if (!GOOGLE_CLIENT_ID) {
-      showAlert(
-        "Google sign-in is temporarily unavailable.",
-        "error",
-        "Google Sign-In"
-      );
-      return;
-    }
-
-    const googleId = window.google?.accounts?.id;
-    if (!googleId) {
-      showAlert(
-        "Google services are still getting ready. Please try again in a moment.",
-        "info",
-        "Google Sign-In"
-      );
-      return;
-    }
-
-    googleId.prompt((notification) => {
-      if (notification.isNotDisplayed?.()) {
-        const reason = notification.getNotDisplayedReason?.();
-        console.warn("Google sign-in prompt not displayed:", reason);
-        showAlert(
-          "Google sign-in popup was blocked. Please allow pop-ups and try again.",
-          "error",
-          "Google Sign-In"
-        );
-      } else if (notification.isSkippedMoment?.()) {
-        const reason = notification.getSkippedReason?.();
-        console.warn("Google sign-in prompt skipped:", reason);
-      } else if (notification.isDismissedMoment?.()) {
-        console.warn("Google sign-in prompt dismissed by the user.");
-      }
-    });
-  }, [isGoogleReady, loading, showAlert]);
 
   return (
     <>
@@ -452,45 +405,17 @@ function Signin() {
                     </span>
                     <span className="h-px flex-1 bg-white/20"></span>
                   </div>
-                  <div className="flex justify-center">
+                  <div className="flex justify-center" ref={googleButtonRef}>
                     <button
-                      type="button"
-                      onClick={handleGoogleSignInClick}
-                      disabled={loading || !isGoogleReady || !GOOGLE_CLIENT_ID}
-                      className={`group relative flex w-full sm:w-auto items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-lg shadow-blue-500/20 border border-white/30 bg-gradient-to-r from-white via-blue-50 to-white text-slate-700 hover:from-blue-50 hover:via-white hover:to-blue-100 hover:text-slate-800 ${
-                        loading || !isGoogleReady || !GOOGLE_CLIENT_ID
-                          ? "opacity-60 cursor-not-allowed"
-                          : "hover:scale-[1.02]"
-                      }`}
+                      id="customGoogleBtn"
+                      class="flex items-center justify-center gap-3 w-full sm:w-auto bg-white border border-gray-300 text-gray-600 font-medium rounded-md px-5 py-2 hover:bg-gray-50 transition duration-200"
                     >
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-inner">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 48 48"
-                          className="h-5 w-5"
-                        >
-                          <path
-                            fill="#EA4335"
-                            d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.26 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.2C12.57 13.72 17.84 9.5 24 9.5z"
-                          />
-                          <path
-                            fill="#4285F4"
-                            d="M46.1 24.55c0-1.59-.14-3.11-.41-4.55H24v8.62h12.45c-.54 2.77-2.16 5.11-4.6 6.69l7.3 5.66c4.27-3.95 6.95-9.78 6.95-16.42z"
-                          />
-                          <path
-                            fill="#FBBC05"
-                            d="M10.54 28.02a14.5 14.5 0 010-8.04l-7.98-6.2A23.961 23.961 0 000 24c0 3.86.9 7.5 2.56 10.22l7.98-6.2z"
-                          />
-                          <path
-                            fill="#34A853"
-                            d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.3-5.66c-2.03 1.37-4.64 2.18-8.6 2.18-6.16 0-11.43-4.22-13.46-10.01l-7.98 6.2C6.51 42.62 14.62 48 24 48z"
-                          />
-                        </svg>
-                      </span>
-                      <span className="relative z-10 text-sm md:text-base tracking-wide">
-                        Continue with Google
-                      </span>
-                      <span className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-r from-blue-200/30 via-transparent to-purple-200/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                      <img
+                        src="https://developers.google.com/identity/images/g-logo.png"
+                        alt="Google logo"
+                        class="w-5 h-5"
+                      />
+                      <span>Sign in with Google</span>
                     </button>
                   </div>
                   {!GOOGLE_CLIENT_ID && (
