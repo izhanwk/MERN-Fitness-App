@@ -207,6 +207,10 @@ function Signin() {
     };
   }, [handleGoogleCredentialResponse]);
 
+  useEffect(() => {
+    console.log("GOogle loaded : ", googleLoaded);
+  }, [googleLoaded]);
+
   return (
     <>
       {loading && <Loader />}
@@ -407,15 +411,15 @@ function Signin() {
                     </span>
                     <span className="h-px flex-1 bg-white/20"></span>
                   </div>
-                  <div
-                    className={`flex justify-center ${
-                      googleLoaded ? "opacity-100" : "opacity-50"
-                    } `}
-                    ref={googleButtonRef}
-                  >
+                  <div className="flex justify-center" ref={googleButtonRef}>
                     <button
+                      disabled={!googleLoaded}
                       id="customGoogleBtn"
-                      class="flex items-center justify-center gap-3 w-full sm:w-auto bg-white border border-gray-300 text-gray-600 font-medium rounded-md px-5 py-2 hover:bg-gray-50 transition duration-200"
+                      class={`flex items-center justify-center gap-3 w-full sm:w-auto bg-white border border-gray-300 text-gray-600 font-medium rounded-md px-5 py-2 hover:bg-gray-50 transition duration-200   ${
+                        googleLoaded
+                          ? "opacity-100 pointer-events-auto"
+                          : "opacity-50 pointer-events-none"
+                      }`}
                     >
                       <img
                         src="https://developers.google.com/identity/images/g-logo.png"
