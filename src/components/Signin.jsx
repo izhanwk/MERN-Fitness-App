@@ -20,6 +20,7 @@ function Signin() {
     formState: { errors },
   } = useForm();
   const [loading, setLoading] = useState(false);
+  const [googleLoaded, setgoogleLoaded] = useState(false);
   const googleButtonRef = useRef(null);
 
   const persistSession = useCallback((session) => {
@@ -164,6 +165,7 @@ function Signin() {
           client_id: GOOGLE_CLIENT_ID,
           callback: handleGoogleCredentialResponse,
         });
+        setgoogleLoaded(true);
         window.google.accounts.id.renderButton(googleButtonRef.current, {
           theme: "outline",
           size: "large",
@@ -406,7 +408,9 @@ function Signin() {
                     <span className="h-px flex-1 bg-white/20"></span>
                   </div>
                   <div
-                    className="flex justify-center opacity-50"
+                    className={`flex justify-center ${
+                      googleLoaded ? "opacity-100" : "opacity-50"
+                    } `}
                     ref={googleButtonRef}
                   >
                     <button
