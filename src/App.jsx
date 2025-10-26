@@ -104,45 +104,6 @@ function App() {
               </div>
             </div>
 
-            {/* Stats section */}
-            <div className="mt-12 sm:mt-16 lg:mt-20 w-full max-w-2xl">
-              <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                <div className="text-center">
-                  <div
-                    className="font-bold text-white mb-1 sm:mb-2
-                    text-xl sm:text-2xl lg:text-3xl xl:text-4xl"
-                  >
-                    10K+
-                  </div>
-                  <div className="text-white/60 text-xs sm:text-sm lg:text-base">
-                    Active Users
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div
-                    className="font-bold text-white mb-1 sm:mb-2
-                    text-xl sm:text-2xl lg:text-3xl xl:text-4xl"
-                  >
-                    500+
-                  </div>
-                  <div className="text-white/60 text-xs sm:text-sm lg:text-base">
-                    Food Items
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div
-                    className="font-bold text-white mb-1 sm:mb-2
-                    text-xl sm:text-2xl lg:text-3xl xl:text-4xl"
-                  >
-                    95%
-                  </div>
-                  <div className="text-white/60 text-xs sm:text-sm lg:text-base">
-                    Success Rate
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Bottom spacing */}
             <div className="h-12 sm:h-16 lg:h-20"></div>
           </div>
