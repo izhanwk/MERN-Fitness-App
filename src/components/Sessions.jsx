@@ -5,6 +5,7 @@ import { LogOut } from "lucide-react";
 import axios from "axios";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
+import { getApiMessage, unwrapApiData } from "../lib/apiResponse";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -40,7 +41,7 @@ function Sessions() {
         if (response.status < 200 || response.status >= 300)
           throw new Error("Failed to fetch sessions");
 
-        const data = response.data;
+        const data = unwrapApiData(response.data) || [];
         console.log("Fetched sessions:", data);
         console.log(data);
         setSessions(data);
@@ -78,8 +79,11 @@ function Sessions() {
       if (response.status >= 200 && response.status < 300) {
         setSessions((prev) => prev.filter((s) => s._id !== id));
       } else {
-        const data = response.data;
-        showAlert(data.message || "Error deleting session", "error", "Delete Failed");
+        showAlert(
+          getApiMessage(response.data, "Error deleting session"),
+          "error",
+          "Delete Failed"
+        );
       }
     } catch (error) {
       console.error("Error deleting session:", error);

@@ -1,7 +1,6 @@
 import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import SDNavbar from "./SDNavbar";
 import axios from "axios";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";

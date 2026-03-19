@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
+import { getApiMessage, unwrapApiData } from "../lib/apiResponse";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -47,21 +48,21 @@ function Signin() {
         validateStatus: () => true,
       });
 
-      if (response.status === 302) {
-        const sessionData = response.data?.data;
-        persistSession(sessionData);
-        showAlert(
-          "Incomplete profile, redirecting...",
-          "info",
-          "Profile Setup Required"
-        );
-        const emailForSetup = sessionData?.email || data.email;
-        navigate("/signup/userdata", { state: { email: emailForSetup } });
-        return;
-      }
-
       if (response.status >= 200 && response.status < 300) {
-        persistSession(response.data?.data);
+        const sessionData = unwrapApiData(response.data);
+        if (sessionData?.requiresProfileSetup) {
+          persistSession(sessionData);
+          showAlert(
+            "Incomplete profile, redirecting...",
+            "info",
+            "Profile Setup Required"
+          );
+          const emailForSetup = sessionData?.email || data.email;
+          navigate("/signup/userdata", { state: { email: emailForSetup } });
+          return;
+        }
+
+        persistSession(sessionData);
         navigate("/dashboard");
         return;
       }
@@ -69,11 +70,11 @@ function Signin() {
       const errorData = response.data;
       setError("email", {
         type: "server",
-        message: errorData?.message || "You provided wrong data",
+        message: getApiMessage(errorData, "You provided wrong data"),
       });
       setError("password", {
         type: "server",
-        message: errorData?.message || "You provided wrong data",
+        message: getApiMessage(errorData, "You provided wrong data"),
       });
     } catch (err) {
       showAlert(
@@ -113,28 +114,29 @@ function Signin() {
           }
         );
 
-        if (googleResponse.status === 302) {
-          const sessionData = googleResponse.data?.data;
-          persistSession(sessionData);
-          showAlert(
-            "Incomplete profile, redirecting...",
-            "info",
-            "Profile Setup Required"
-          );
-          const emailForSetup = sessionData?.email;
-          navigate("/signup/userdata", { state: { email: emailForSetup } });
-          return;
-        }
-
         if (googleResponse.status >= 200 && googleResponse.status < 300) {
-          persistSession(googleResponse.data?.data);
+          const sessionData = unwrapApiData(googleResponse.data);
+          if (sessionData?.requiresProfileSetup) {
+            persistSession(sessionData);
+            showAlert(
+              "Incomplete profile, redirecting...",
+              "info",
+              "Profile Setup Required"
+            );
+            const emailForSetup = sessionData?.email;
+            navigate("/signup/userdata", { state: { email: emailForSetup } });
+            return;
+          }
+
+          persistSession(sessionData);
           navigate("/dashboard");
           return;
         }
 
-        const message =
-          googleResponse.data?.message ||
-          "Unable to sign in with Google. Please try another method.";
+        const message = getApiMessage(
+          googleResponse.data,
+          "Unable to sign in with Google. Please try another method."
+        );
         showAlert(message, "error", "Google Sign-In Failed");
       } catch (error) {
         console.error("Google sign-in error:", error);
@@ -415,7 +417,7 @@ function Signin() {
                     <button
                       disabled={!googleLoaded}
                       id="customGoogleBtn"
-                      class={`flex items-center justify-center gap-3 w-full sm:w-auto bg-white border border-gray-300 text-gray-600 font-medium rounded-md px-5 py-2 hover:bg-gray-50 transition duration-200   ${
+                      className={`flex items-center justify-center gap-3 w-full sm:w-auto bg-white border border-gray-300 text-gray-600 font-medium rounded-md px-5 py-2 hover:bg-gray-50 transition duration-200   ${
                         googleLoaded
                           ? "opacity-100 pointer-events-auto"
                           : "opacity-50 pointer-events-none"
@@ -424,7 +426,7 @@ function Signin() {
                       <img
                         src="https://developers.google.com/identity/images/g-logo.png"
                         alt="Google logo"
-                        class="w-5 h-5"
+                        className="w-5 h-5"
                       />
                       <span>Sign in with Google</span>
                     </button>

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
+import { getApiMessage } from "../lib/apiResponse";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -35,7 +36,7 @@ function Changepassword() {
       if (res.status >= 200 && res.status < 300) {
         setOtpSent(true);
       } else {
-        showAlert("Failed to send OTP", "error", "OTP Failed");
+        showAlert(getApiMessage(res.data, "Failed to send OTP"), "error", "OTP Failed");
       }
     } catch (err) {
       console.error(err);
@@ -67,8 +68,11 @@ function Changepassword() {
         showAlert("Password updated successfully!", "success", "Password Changed");
         navigate("/signin");
       } else {
-        const data = res.data;
-        showAlert(data.message || "Error updating password", "error", "Update Failed");
+        showAlert(
+          getApiMessage(res.data, "Error updating password"),
+          "error",
+          "Update Failed"
+        );
       }
     } catch (err) {
       console.error(err);

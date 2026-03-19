@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import DNavbar from "./DNavbar";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import debounce from "lodash.debounce";
+import { unwrapApiData } from "../lib/apiResponse";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -55,7 +56,6 @@ const NutritionTracker = () => {
   const [activity, setactivity] = useState(1.2); // factor number or label
 
   // requirements
-  const [BMR, setBMR] = useState(0); // pure BMR (kcal)
   const [Crequirement, setCrequirement] = useState(0); // target kcal/day (TDEE +/- goal)
   const [proteinReq, setproteinReq] = useState(0); // grams
   const [fatsreq, setfatsreq] = useState(0); // grams
@@ -196,7 +196,7 @@ const NutritionTracker = () => {
           validateStatus: () => true,
         });
 
-        const data = res.data;
+        const data = unwrapApiData(res.data) || [];
         if (data.length > 0) {
           setempty(false);
         } else {
@@ -257,7 +257,7 @@ const NutritionTracker = () => {
         });
 
         if (res.status >= 200 && res.status < 300) {
-          const data = res.data;
+          const data = unwrapApiData(res.data) || [];
           setfood((prev) => [...prev, ...data]);
           setoriginalList((prev) => [...prev, ...data]);
           // setfoodselection((prev) => [...prev, ...data]);
@@ -293,7 +293,7 @@ const NutritionTracker = () => {
           },
           validateStatus: () => true,
         });
-        const data = res.data;
+        const data = unwrapApiData(res.data) || {};
         // if (res.status < 200 || res.status >= 300) {
         //   alert("Token expired");
         //   navigate("/signin");
@@ -307,32 +307,8 @@ const NutritionTracker = () => {
       }
     };
 
-    const fetchFood = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${API_URL}/getfood`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-          validateStatus: () => true,
-        });
-        const data = res.data;
-        if (res.status >= 200 && res.status < 300) {
-          setfood(data);
-          // setfoodselection((prev) => [...prev, ...data]);
-          // setoriginalList(data);
-        } else {
-          console.log("Problem while fetching food data");
-        }
-      } catch (err) {
-        console.error("Error in fetchFood:", err);
-      }
-    };
-
     (async () => {
       await fetchData();
-      // await fetchFood();
       setLoading(false);
     })();
   }, [navigate]);
@@ -452,7 +428,6 @@ const NutritionTracker = () => {
     else if (mode === "Moderate fatloss") target -= 500;
     else if (mode === "Fast fatloss") target -= 800;
 
-    setBMR(Math.round(bmrVal)); // pure BMR
     setCrequirement(Math.round(target)); // daily target kcal
   }, [gender, weight, height, userAge, activity, mode]);
 
@@ -505,7 +480,7 @@ const NutritionTracker = () => {
               "ngrok-skip-browser-warning": "true",
             },
           });
-          const data = response.data;
+          const data = unwrapApiData(response.data) || [];
 
           if (query !== latestQueryRef.current) {
             return;
@@ -584,7 +559,6 @@ const NutritionTracker = () => {
     debouncedApiSearch(input);
   };
 
-  const eatList = () => setshowList(true);
   const closeEatList = () => setshowList(false);
 
   // const boxRef = useRef(null); // reference to the div
@@ -638,7 +612,7 @@ const NutritionTracker = () => {
           validateStatus: () => true,
         });
         if (res.status >= 200 && res.status < 300) {
-          const data = res.data;
+          const data = unwrapApiData(res.data) || [];
           setinitialFood(data || []);
           setIsFirstLoad(false);
         }

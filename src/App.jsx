@@ -1,10 +1,7 @@
-import { useState } from "react";
 import Navbar from "./components/Navbar";
 import { useNavigate } from "react-router-dom";
-import SNavbar from "./components/SNavbar";
 
 function App() {
-  const [count, setCount] = useState(0);
   const navigate = useNavigate();
 
   return (

@@ -5,6 +5,7 @@ import Loader from "./Loader";
 import { useAlert } from "./Alert";
 import axios from "axios";
 import { Dumbbell } from "lucide-react";
+import { getApiMessage, unwrapApiData } from "../lib/apiResponse";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -60,16 +61,20 @@ function DNavbar() {
         }
       );
 
-      const data = response.data;
+      const data = unwrapApiData(response.data);
       localStorage.setItem("token", data.token);
       console.log("Token refreshed successfully");
       return data.token;
     } catch (err) {
-      if (err.response.status === 403) {
+      if (err.response?.status === 403) {
         console.error("Error occurred:", err);
         localStorage.removeItem("token");
         localStorage.removeItem("sessionId");
-        showAlert("Session Expired", "error", "Authentication Failed");
+        showAlert(
+          getApiMessage(err.response?.data, "Session Expired"),
+          "error",
+          "Authentication Failed"
+        );
         navigate("/signin");
       }
       return null;

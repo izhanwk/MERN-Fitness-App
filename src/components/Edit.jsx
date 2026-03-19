@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DNavbar from "./DNavbar";
 import axios from "axios";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "./Alert";
+import { getApiMessage, unwrapApiData } from "../lib/apiResponse";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -44,7 +45,7 @@ function Edit() {
         });
         if (response.status < 200 || response.status >= 300)
           throw new Error("Fetch failed");
-        const resData = response.data;
+        const resData = unwrapApiData(response.data);
 
         const dateISO = resData?.date
           ? new Date(resData.date).toISOString().slice(0, 10)
@@ -121,11 +122,11 @@ function Edit() {
       });
 
       if (response.status < 200 || response.status >= 300) {
-        const errText = response.data?.message || "Save failed";
+        const errText = getApiMessage(response.data, "Save failed");
         throw new Error(errText);
       }
 
-      const updated = response.data;
+      const updated = unwrapApiData(response.data);
       // reflect server truth in the form
       const next = {
         ...form,

@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
+import { getApiMessage, unwrapApiData } from "../lib/apiResponse";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -41,8 +42,9 @@ function Register() {
         validateStatus: () => true,
       });
       if (response.status >= 200 && response.status < 300) {
+        const payload = unwrapApiData(response.data);
         showAlert(
-          `Registration Successful! Please check ${response.data} for verification.`,
+          `Registration successful. Please check ${payload?.email || data.email} for verification.`,
           "success",
           "Account Created",
           8000
@@ -55,10 +57,10 @@ function Register() {
         redirectTimeoutRef.current = setTimeout(() => {
           navigate("/signin");
         }, 8000);
-      } else if (response.status === 503) {
+      } else if (response.status === 409 || response.status === 503) {
         setError("email", {
           type: "server",
-          message: "This email already exists",
+          message: getApiMessage(response.data, "This email already exists"),
         });
       }
     } catch (error) {

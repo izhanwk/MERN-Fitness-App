@@ -1,7 +1,5 @@
-import React from "react";
 import DNavbar from "./DNavbar";
 import Data from "./Data";
-import SDNavbar from "./SDNavbar";
 
 function Signup() {
   return (
