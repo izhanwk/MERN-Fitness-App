@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import Data from "../../Model/Registerdata.js";
 import Sessions from "../../Model/Sessions.js";
-import { sendGmail } from "../gmailSender.js";
+import { sendEmail } from "../emailSender.js";
 import { OAuth2Client } from "google-auth-library";
 import { buildAuthResponsePayload } from "../utils/authPayload.js";
 import { createSession } from "../services/sessionService.js";
@@ -279,7 +279,7 @@ export const register = async (req, res) => {
       process.env.SERVER_BASE_URL || `${req.protocol}://${req.get("host")}`;
     const url = `${baseUrl}/verify/${token}`;
 
-    await sendGmail({
+    await sendEmail({
       to: email,
       subject: "Verify your email",
       html: `<h3>Click below to verify your email:</h3>
@@ -323,3 +323,4 @@ export const verifyEmail = async (req, res) => {
     });
   }
 };
+
