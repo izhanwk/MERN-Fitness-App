@@ -1,13 +1,11 @@
 import "dotenv/config";
-import express, { response } from "express";
+import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import Data from "../Model/Registerdata.js";
 import Foods from "../Model/Foods.js";
-import nodemailer from "nodemailer";
 import Sessions from "../Model/Sessions.js";
 import Otp from "../Model/Otp.js";
 import useragent from "useragent";
@@ -28,18 +26,10 @@ app.set("view engine", "ejs");
 // set views folder
 app.set("views", path.join(__dirname, "views"));
 const port = process.env.PORT || 5000;
-let primaryEmail = "";
 let secretkey = process.env.SECRET_KEY;
 let refreshkey = process.env.REFRESH;
 const safeUserFields =
   "email name date gender weight weightScale height lengthScale goal mode activity profileComplete verified authProvider avatar googleId array";
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER, // your email
-    pass: process.env.EMAIL_PASS, // your app password
-  },
-});
 
 const googleClient = process.env.GOOGLE_CLIENT_ID
   ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
@@ -75,10 +65,12 @@ app.use(
 const getClientIp = (req) =>
   req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.ip;
 
+if (!process.env.MONGODB_URI) {
+  throw new Error("MONGODB_URI is not defined in environment variables");
+}
+
 mongoose
-  .connect(
-    "mongodb+srv://izhanwaseem6:0d1P5WuAsnyKy4no@cluster0.j2hzs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-  )
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("Connected to Database");
   })
