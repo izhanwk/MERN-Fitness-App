@@ -30,12 +30,13 @@ function Changepassword() {
             "ngrok-skip-browser-warning": "true",
           },
           validateStatus: () => true,
-        }
+        },
       );
       if (res.status >= 200 && res.status < 300) {
         setOtpSent(true);
       } else {
-        showAlert("Failed to send OTP", "error", "OTP Failed");
+        const message = res.data?.message || "Failed to send OTP";
+        showAlert(message, "error", "OTP Failed");
       }
     } catch (err) {
       console.error(err);
@@ -61,14 +62,22 @@ function Changepassword() {
             "ngrok-skip-browser-warning": "true",
           },
           validateStatus: () => true,
-        }
+        },
       );
       if (res.status >= 200 && res.status < 300) {
-        showAlert("Password updated successfully!", "success", "Password Changed");
+        showAlert(
+          "Password updated successfully!",
+          "success",
+          "Password Changed",
+        );
         navigate("/signin");
       } else {
         const data = res.data;
-        showAlert(data.message || "Error updating password", "error", "Update Failed");
+        showAlert(
+          data.message || "Error updating password",
+          "error",
+          "Update Failed",
+        );
       }
     } catch (err) {
       console.error(err);
