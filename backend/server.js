@@ -31,6 +31,8 @@ const port = process.env.PORT || 5000;
 let primaryEmail = "";
 let secretkey = process.env.SECRET_KEY;
 let refreshkey = process.env.REFRESH;
+const safeUserFields =
+  "email name date gender weight weightScale height lengthScale goal mode activity profileComplete verified authProvider avatar googleId array";
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -67,7 +69,7 @@ app.use(
       "ngrok-skip-browser-warning",
     ],
     credentials: true, // only if you use cookies or auth headers
-  })
+  }),
 );
 
 const getClientIp = (req) =>
@@ -75,7 +77,7 @@ const getClientIp = (req) =>
 
 mongoose
   .connect(
-    "mongodb+srv://izhanwaseem6:0d1P5WuAsnyKy4no@cluster0.j2hzs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    "mongodb+srv://izhanwaseem6:0d1P5WuAsnyKy4no@cluster0.j2hzs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
   )
   .then(() => {
     console.log("Connected to Database");
@@ -130,7 +132,7 @@ const verifyToken = async (req, res, next) => {
 
     await Sessions.updateMany(
       { userId: decodedToken.userId, _id: { $ne: sessionId } },
-      { $set: { currentDevice: false } }
+      { $set: { currentDevice: false } },
     );
 
     next();
@@ -180,7 +182,7 @@ app.post("/refresh-token", async (req, res) => {
         email: user.email,
       },
       secretkey,
-      { expiresIn: "5m" }
+      { expiresIn: "5m" },
     );
 
     session.lastActive = new Date();
@@ -210,7 +212,7 @@ app.get("/getdata", verifyToken, async (req, res) => {
   try {
     console.log("Hite");
     const email = req.email;
-    const user = await Data.findOne({ email: email });
+    const user = await Data.findOne({ email: email }).select(safeUserFields);
     if (user) {
       return res.status(200).json(user);
     } else {
@@ -334,6 +336,11 @@ app.post("/signin", async (req, res) => {
             .status(401)
             .json({ message: "The information you entered is not correct" });
         } else {
+          if (!user.password) {
+            return res
+              .status(401)
+              .json({ message: "The information you entered is not correct" });
+          }
           bcrypt.compare(password, user.password, async (err, isMatch) => {
             if (err) {
               return res.status(500).send({
@@ -349,7 +356,7 @@ app.post("/signin", async (req, res) => {
                     email: user.email,
                   },
                   secretkey,
-                  { expiresIn: "5m" }
+                  { expiresIn: "5m" },
                 );
                 let refreshToken = jwt.sign(
                   {
@@ -357,7 +364,7 @@ app.post("/signin", async (req, res) => {
                     email: user.email,
                   },
                   refreshkey,
-                  { expiresIn: "7d" }
+                  { expiresIn: "7d" },
                 );
 
                 // Don't overwrite user.refreshtoken - store per session instead
@@ -397,6 +404,7 @@ app.post("/signin", async (req, res) => {
                   const sessionId = newSession._id.toString();
                   return res.status(302).json({
                     success: true,
+                    needsOnboarding: true,
                     data: {
                       userId: user.id,
                       email: user.email,
@@ -437,6 +445,7 @@ app.post("/signin", async (req, res) => {
                 const sessionId = newSession._id.toString();
                 return res.status(200).json({
                   success: true,
+                  needsOnboarding: false,
                   data: {
                     userId: user.id,
                     email: user.email,
@@ -532,7 +541,7 @@ app.post("/signin/google", async (req, res) => {
         email: user.email,
       },
       secretkey,
-      { expiresIn: "5m" }
+      { expiresIn: "5m" },
     );
 
     const refreshToken = jwt.sign(
@@ -541,7 +550,7 @@ app.post("/signin/google", async (req, res) => {
         email: user.email,
       },
       refreshkey,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     const agent = useragent.parse(req.headers["user-agent"]);
@@ -562,6 +571,7 @@ app.post("/signin/google", async (req, res) => {
 
     const responsePayload = {
       success: true,
+      needsOnboarding: !user.height || !user.weight || !user.activity,
       data: {
         userId: user.id,
         email: user.email,
@@ -601,11 +611,10 @@ app.post("/data", verifyToken, async (req, res) => {
       user.weightScale = weightScale;
       user.height = height;
       user.lengthScale = lengthScale;
-
-      await user.save();
       if (user.height && user.goal && user.activity && user.mode) {
         user.profileComplete = "Complete";
       }
+      await user.save();
       return res.status(200).json({ message: "Data saved in DB collection" });
     } else {
       console.log("User not found");
@@ -623,10 +632,10 @@ app.post("/mode", verifyToken, async (req, res) => {
     const user = await Data.findOne({ email: email });
     if (user) {
       user.mode = req.body.mode;
-      await user.save();
       if (user.height && user.goal && user.activity && user.mode) {
         user.profileComplete = "Complete";
       }
+      await user.save();
       return res.status(200).json({ message: "Saved in DB" });
     } else {
       console.log("User not found");
@@ -638,22 +647,23 @@ app.post("/mode", verifyToken, async (req, res) => {
 });
 
 app.post("/activity", verifyToken, async (req, res) => {
-  const email = req.user.email;
-  const user = await Data.findOne({ email: email });
-  if (user) {
+  try {
+    const email = req.user.email;
+    const user = await Data.findOne({ email: email });
     if (user) {
       user.activity = req.body.activity;
-      user.save();
       if (user.height && user.goal && user.activity && user.mode) {
         user.profileComplete = "Complete";
       }
+      await user.save();
       return res.status(200).json({ message: "Saved in DB" });
     } else {
       console.log("User not found");
-      return res.status(400).json({ message: "Could not save in DB" });
+      return res.status(404).json({ message: "User not found" });
     }
-  } else {
-    return res.status(402).json({ message: "Error occured: ", err });
+  } catch (err) {
+    console.error("Error updating activity:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -663,10 +673,10 @@ app.post("/goals", verifyToken, async (req, res) => {
     const user = await Data.findOne({ email: email });
     if (user) {
       user.goal = req.body.goal;
-      await user.save();
       if (user.height && user.goal && user.activity && user.mode) {
         user.profileComplete = "Complete";
       }
+      await user.save();
       return res.status(200).json({ message: "Saved in DB" });
     } else {
       console.log("User not found");
@@ -694,7 +704,7 @@ app.post("/register", async (req, res) => {
     const token = jwt.sign(
       { email, password: hashpassword },
       process.env.JWT_VERIFY,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     const baseUrl =
@@ -887,10 +897,8 @@ app.post("/change-password", async (req, res) => {
 
 app.get("/editdata", verifyToken, async (req, res) => {
   const email = req.email;
-  const user = await Data.findOne({ email: email });
+  const user = await Data.findOne({ email: email }).select(safeUserFields);
   if (user) {
-    delete user.password;
-    delete user.refreshtoken;
     return res.status(200).json(user);
   }
 });
@@ -929,7 +937,7 @@ app.put("/editdata", verifyToken, async (req, res) => {
     const user = await Data.findOneAndUpdate(
       { email: req.email },
       { $set: updates },
-      { new: true }
+      { new: true },
     );
 
     if (!user) return res.status(404).json({ message: "User not found" });
