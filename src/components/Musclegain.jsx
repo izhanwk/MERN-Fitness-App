@@ -5,6 +5,7 @@ import SDNavbar from "./SDNavbar";
 import axios from "axios";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
+import Footer from "./Footer";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -93,7 +94,7 @@ function Musclegain() {
                   <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mb-4">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-8 w-8 text-black"
+                      className="h-8 w-8 text-[#2f1b46]"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -124,7 +125,7 @@ function Musclegain() {
                   <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-teal-500 rounded-full flex items-center justify-center mb-4">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-8 w-8 text-black"
+                      className="h-8 w-8 text-[#2f1b46]"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -153,6 +154,7 @@ function Musclegain() {
             </p>
           </div>
         </div>
+        <Footer />
       </div>
     </div>
   );

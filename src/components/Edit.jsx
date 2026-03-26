@@ -4,6 +4,7 @@ import axios from "axios";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "./Alert";
+import Footer from "./Footer";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -446,7 +447,7 @@ function Edit() {
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 grid place-items-center">
-                            <span className="text-black text-xs font-semibold">
+                            <span className="text-[#2f1b46] text-xs font-semibold">
                               {opt.badge}
                             </span>
                           </div>
@@ -492,8 +493,8 @@ function Edit() {
                   disabled={!isDirty || saving}
                   className={`px-5 py-2.5 rounded-xl font-semibold transition ${
                     !isDirty || saving
-                      ? "bg-yellow-400/40 text-black/60 cursor-not-allowed"
-                      : "bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:opacity-95"
+                      ? "bg-yellow-400/40 text-[#2f1b46]/70 cursor-not-allowed"
+                      : "bg-gradient-to-r from-yellow-400 to-orange-500 text-[#2f1b46] hover:opacity-95"
                   }`}
                 >
                   {saving ? "Saving…" : "Save Changes"}
@@ -507,6 +508,7 @@ function Edit() {
           </div>
         </section>
       </main>
+      <Footer />
 
       {(loading || saving) && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 backdrop-blur-sm">

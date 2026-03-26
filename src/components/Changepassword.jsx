@@ -2,8 +2,10 @@ import { useState } from "react";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Lock } from "lucide-react";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
+import Footer from "./Footer";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -87,59 +89,108 @@ function Changepassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
       {loading && <Loader />}
       <Alert />
       <Navbar />
-      <div className="flex w-screen items-center justify-center pt-10">
-        <form
-          onSubmit={otpSent ? changePassword : sendOtp}
-          className="flex flex-col space-y-4 bg-white/10 p-6 rounded-xl backdrop-blur-md"
-        >
-          <input
-            type="email"
-            placeholder="Email"
-            className="px-4 py-2 rounded"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          {otpSent && (
-            <>
-              <input
-                type="text"
-                placeholder="OTP"
-                className="px-4 py-2 rounded"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                placeholder="New password"
-                className="px-4 py-2 rounded"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                placeholder="Confirm password"
-                className="px-4 py-2 rounded"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                required
-              />
-            </>
-          )}
-          <button
-            type="submit"
-            className="bg-yellow-400 text-black font-bold px-4 py-2 rounded"
+      <div className="flex flex-1 items-center justify-center px-4 py-10">
+        <div className="w-full max-w-md rounded-3xl border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
+          <div className="mb-6 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 shadow-lg">
+              <Lock className="h-7 w-7 text-[#2f1b46]" strokeWidth={2.2} />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">
+              {otpSent ? "Set New Password" : "Forgot Password"}
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-purple-200">
+              {otpSent
+                ? "Enter your OTP and choose a new password."
+                : "Enter your email to receive an OTP."}
+            </p>
+          </div>
+
+          <form
+            onSubmit={otpSent ? changePassword : sendOtp}
+            className="space-y-4"
           >
-            {otpSent ? "Change Password" : "Send OTP"}
-          </button>
-        </form>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-purple-100">
+                Email
+              </label>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="h-12 w-full rounded-2xl border border-white/20 bg-white/95 px-4 text-slate-900 outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            {otpSent && (
+              <>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-purple-100">
+                    OTP
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter 6-digit OTP"
+                    className="h-12 w-full rounded-2xl border border-white/20 bg-white/95 px-4 text-slate-900 outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-purple-100">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Enter a new password"
+                    className="h-12 w-full rounded-2xl border border-white/20 bg-white/95 px-4 text-slate-900 outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-purple-100">
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Confirm your new password"
+                    className="h-12 w-full rounded-2xl border border-white/20 bg-white/95 px-4 text-slate-900 outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    required
+                  />
+                </div>
+              </>
+            )}
+
+            <button
+              type="submit"
+              className="mt-2 w-full rounded-2xl bg-yellow-400 px-4 py-3 text-base font-bold text-[#2f1b46] transition hover:bg-yellow-300 shadow-lg"
+            >
+              {otpSent ? "Change Password" : "Send OTP"}
+            </button>
+
+            <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-purple-100/85">
+              {otpSent ? (
+                <p>Use the latest OTP sent to your email.</p>
+              ) : (
+                <p>OTP requests are rate-limited for security.</p>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 }

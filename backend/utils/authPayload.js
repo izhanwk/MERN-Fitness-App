@@ -1,4 +1,9 @@
-export const buildAuthResponsePayload = ({ user, token, refreshToken, sessionId }) => ({
+export const buildAuthResponsePayload = ({
+  user,
+  token,
+  refreshToken,
+  sessionId,
+}) => ({
   success: true,
   needsOnboarding: !user.height || !user.weight || !user.activity,
   data: {

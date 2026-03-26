@@ -16,6 +16,11 @@ function Protectedroute2({ children }) {
         const token = localStorage.getItem("token");
         const sessionId = localStorage.getItem("sessionId");
 
+        if (!token) {
+          navigate("/signin", { replace: true });
+          return;
+        }
+
         const response = await axios.get(`${API_URL}/checkData`, {
           headers: {
             ...(token && { Authorization: `Bearer ${token}` }),
@@ -29,14 +34,16 @@ function Protectedroute2({ children }) {
 
         if (response.status === 200) {
           navigate("/dashboard", { replace: true });
-        } else {
+        } else if (response.status === 210) {
           setShouldRenderChildren(true);
+        } else {
+          navigate("/signin", { replace: true });
         }
       } catch (err) {
         if (!isActive) return;
 
         console.error(err);
-        setShouldRenderChildren(true);
+        navigate("/signin", { replace: true });
       }
     })();
 
