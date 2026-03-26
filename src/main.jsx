@@ -41,7 +41,9 @@ const router = createBrowserRouter(
           path: "/signup/userdata",
           element: (
             <Protectedroute>
-              <Signup />
+              <Protectedroute2>
+                <Signup />
+              </Protectedroute2>
             </Protectedroute>
           ),
         },
@@ -125,11 +127,11 @@ const router = createBrowserRouter(
       v7_partialHydration: true,
       v7_skipActionErrorRevalidation: true,
     },
-  }
+  },
 );
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>
+  </StrictMode>,
 );

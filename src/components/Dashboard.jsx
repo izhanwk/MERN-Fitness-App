@@ -4,6 +4,7 @@ import DNavbar from "./DNavbar";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import debounce from "lodash.debounce";
+import Footer from "./Footer";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -35,6 +36,7 @@ const NutritionTracker = () => {
   const [selectFood, setselectFood] = useState("Select Food");
   const [searchText, setsearchText] = useState("");
   const [searchVisiblity, setsearchVisiblity] = useState(false);
+  const [foodSearchInitialized, setFoodSearchInitialized] = useState(false);
   const [showList, setshowList] = useState(false);
   const [rotation, setrotation] = useState(false);
   const [indexFood, setindexFood] = useState(0);
@@ -100,6 +102,9 @@ const NutritionTracker = () => {
   const [searching, setsearching] = useState(false);
   const [loadMore, setloadMore] = useState(false);
   const [empty, setempty] = useState(false);
+  const skipNextStoreSync = useRef(false);
+  const [userBootstrapped, setUserBootstrapped] = useState(false);
+  const [storeBootstrapped, setStoreBootstrapped] = useState(false);
 
   const reachedBottom = useRef(false);
   const mainList = useRef(true);
@@ -109,6 +114,9 @@ const NutritionTracker = () => {
     if (!el) return;
 
     const calculateThumb = () => {
+      if (!foodSearchInitialized || !searchVisiblity) {
+        return;
+      }
       if (reachedBottom.current) {
         return;
       }
@@ -145,7 +153,7 @@ const NutritionTracker = () => {
     return () => {
       el.removeEventListener("scroll", calculateThumb);
     };
-  }, []);
+  }, [foodSearchInitialized, searchVisiblity]);
 
   useEffect(() => {
     if (searchText !== "") {
@@ -237,6 +245,9 @@ const NutritionTracker = () => {
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false; // skip first render
+      return;
+    }
+    if (!foodSearchInitialized) {
       return;
     }
     if (!more.current) {
@@ -333,7 +344,7 @@ const NutritionTracker = () => {
     (async () => {
       await fetchData();
       // await fetchFood();
-      setLoading(false);
+      setUserBootstrapped(true);
     })();
   }, [navigate]);
 
@@ -532,7 +543,7 @@ const NutritionTracker = () => {
           }
         }
       }, 400),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -571,7 +582,7 @@ const NutritionTracker = () => {
     const listToSearch = originalList.length > 0 ? originalList : food;
     const loweredInput = input.toLowerCase();
     const filtered = listToSearch.filter((item) =>
-      Object.values(item).join("").toLowerCase().includes(loweredInput)
+      Object.values(item).join("").toLowerCase().includes(loweredInput),
     );
 
     if (filtered.length > 0) {
@@ -639,22 +650,36 @@ const NutritionTracker = () => {
         });
         if (res.status >= 200 && res.status < 300) {
           const data = res.data;
+          skipNextStoreSync.current = true;
           setinitialFood(data || []);
           setIsFirstLoad(false);
+          setStoreBootstrapped(true);
         }
       } catch (e) {
         console.error("GET /store error", e);
+        setIsFirstLoad(false);
+        setStoreBootstrapped(true);
       }
     })();
   }, []);
 
+  useEffect(() => {
+    if (userBootstrapped && storeBootstrapped) {
+      setLoading(false);
+    }
+  }, [userBootstrapped, storeBootstrapped]);
+
   // persist foods when changed (skip first load)
   useEffect(() => {
     if (isFirstLoad) return;
+    if (skipNextStoreSync.current) {
+      skipNextStoreSync.current = false;
+      setnewfood(initialFood);
+      return;
+    }
+
     (async () => {
       try {
-        setLoading(true);
-
         await axios.post(
           `${API_URL}/store`,
           { array: initialFood },
@@ -665,14 +690,11 @@ const NutritionTracker = () => {
               "ngrok-skip-browser-warning": "true",
             },
             validateStatus: () => true,
-          }
+          },
         );
         setnewfood(initialFood);
-        setLoading(false);
       } catch (e) {
         console.error("POST /store error", e);
-
-        setLoading(false);
       }
     })();
   }, [initialFood, isFirstLoad]);
@@ -741,16 +763,16 @@ const NutritionTracker = () => {
   // percentages (guard divide-by-zero)
   useEffect(
     () => setcalPercentage(safePct(tcalories, Crequirement)),
-    [tcalories, Crequirement]
+    [tcalories, Crequirement],
   );
   useEffect(
     () => setproPercentage(safePct(tproteins, proteinReq)),
-    [tproteins, proteinReq]
+    [tproteins, proteinReq],
   );
   useEffect(() => setfatsPercentage(safePct(tfats, fatsreq)), [tfats, fatsreq]);
   useEffect(
     () => setcarbsPercentage(safePct(tcarbs, carbsreq)),
-    [tcarbs, carbsreq]
+    [tcarbs, carbsreq],
   );
   useEffect(() => setvApercentage(safePct(tVA, Areq)), [tVA, Areq]);
   useEffect(() => setvBpercentage(safePct(tVB, Breq)), [tVB, Breq]);
@@ -760,11 +782,11 @@ const NutritionTracker = () => {
   useEffect(() => setironPercentage(safePct(tIron, ireq)), [tIron, ireq]);
   useEffect(
     () => setcalciumPercentage(safePct(tCalcium, calciumReq)),
-    [tCalcium, calciumReq]
+    [tCalcium, calciumReq],
   );
   useEffect(
     () => setmagnesiumPercentage(safePct(tMagnesium, magnesiumReq)),
-    [tMagnesium, magnesiumReq]
+    [tMagnesium, magnesiumReq],
   );
 
   // const scrollup = () => {
@@ -881,11 +903,12 @@ const NutritionTracker = () => {
                         className="w-full sm:w-64 h-12 rounded-xl bg-white/90 backdrop-blur-sm cursor-pointer text-slate-800 text-sm font-semibold flex items-center justify-between px-4 shadow-lg border border-white/20 hover:bg-white transition-all duration-300"
                         ref={Box}
                         onClick={() => {
+                          if (!foodSearchInitialized) {
+                            setFoodSearchInitialized(true);
+                          }
                           searchFood();
-                          // start();
                           rotate();
                           fetchFood();
-                          // scrollup();
                         }}
                       >
                         <p className="text-slate-600 truncate">{selectFood}</p>
@@ -1177,6 +1200,7 @@ const NutritionTracker = () => {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     </>
   );

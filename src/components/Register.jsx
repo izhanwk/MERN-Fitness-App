@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
+import Footer from "./Footer";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -289,7 +290,7 @@ function Register() {
               <div className="pt-4 w-full">
                 <button
                   type="submit"
-                  className="group relative w-full h-14 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold text-lg rounded-xl shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 hover:scale-[1.02] hover:from-yellow-300 hover:to-orange-400 flex items-center justify-center"
+                  className="group relative w-full h-14 bg-gradient-to-r from-yellow-400 to-orange-500 text-[#2f1b46] font-bold text-lg rounded-xl shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 hover:scale-[1.02] hover:from-yellow-300 hover:to-orange-400 flex items-center justify-center"
                 >
                   <span className="relative z-10 flex items-center">
                     <svg
@@ -325,6 +326,7 @@ function Register() {
             </form>
           </div>
         </div>
+        <Footer />
       </div>
     </div>
   );

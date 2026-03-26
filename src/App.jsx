@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "./components/Navbar";
 import { useNavigate } from "react-router-dom";
 import SNavbar from "./components/SNavbar";
+import Footer from "./components/Footer";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -80,7 +81,7 @@ function App() {
                 }}
                 className="group relative font-bold rounded-full shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 hover:scale-105 hover:from-yellow-300 hover:to-orange-400
                   px-6 py-3 text-base sm:px-7 sm:py-3.5 sm:text-lg lg:px-8 lg:py-4 lg:text-xl
-                  bg-gradient-to-r from-yellow-400 to-orange-500 text-black"
+                  bg-gradient-to-r from-yellow-400 to-orange-500 text-[#2f1b46]"
               >
                 <span className="relative z-10">Start Your Journey</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-orange-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
@@ -108,6 +109,7 @@ function App() {
             <div className="h-12 sm:h-16 lg:h-20"></div>
           </div>
         </div>
+        <Footer />
       </div>
     </>
   );

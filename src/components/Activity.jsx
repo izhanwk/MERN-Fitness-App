@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
+import Footer from "./Footer";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -211,7 +212,7 @@ function Activity() {
                     >
                       <div className="flex items-start gap-4">
                         <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 grid place-items-center">
-                          <span className="text-black">{opt.icon}</span>
+                          <span className="text-[#2f1b46]">{opt.icon}</span>
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
@@ -253,6 +254,7 @@ function Activity() {
             </div>
           </div>
         </main>
+        <Footer />
       </div>
 
       {/* Blocking loader */}

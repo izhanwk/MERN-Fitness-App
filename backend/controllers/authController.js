@@ -7,8 +7,16 @@ import { sendEmail } from "../emailSender.js";
 import { OAuth2Client } from "google-auth-library";
 import { buildAuthResponsePayload } from "../utils/authPayload.js";
 import { createSession } from "../services/sessionService.js";
+import {
+  isStrongEnoughPassword,
+  isValidEmail,
+  normalizeEmail,
+} from "../utils/validators.js";
+import {
+  createAccessToken,
+  createRefreshToken,
+} from "../utils/authTokens.js";
 
-const secretkey = process.env.SECRET_KEY;
 const refreshkey = process.env.REFRESH;
 const googleClient = process.env.GOOGLE_CLIENT_ID
   ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
@@ -48,14 +56,7 @@ export const refreshToken = async (req, res) => {
       return res.status(403).json({ message: "Invalid refresh token" });
     }
 
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-      },
-      secretkey,
-      { expiresIn: "5m" },
-    );
+    const token = createAccessToken(user);
 
     session.lastActive = new Date();
     await session.save();
@@ -81,83 +82,58 @@ export const refreshToken = async (req, res) => {
 };
 
 export const signIn = async (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  try {
+    const email = normalizeEmail(req.body.email);
+    const password = req.body.password;
 
-  Data.findOne({ email: email })
-    .then((user) => {
-      try {
-        if (!user) {
-          return res
-            .status(401)
-            .json({ message: "The information you entered is not correct" });
-        } else {
-          if (!user.password) {
-            return res
-              .status(401)
-              .json({ message: "The information you entered is not correct" });
-          }
-          bcrypt.compare(password, user.password, async (err, isMatch) => {
-            if (err) {
-              return res.status(500).send({
-                message: "An error occurred during password comparison ERROR: ",
-                err,
-              });
-            }
-            if (isMatch) {
-              try {
-                const token = jwt.sign(
-                  {
-                    userId: user.id,
-                    email: user.email,
-                  },
-                  secretkey,
-                  { expiresIn: "5m" },
-                );
-                const refreshToken = jwt.sign(
-                  {
-                    userId: user.id,
-                    email: user.email,
-                  },
-                  refreshkey,
-                  { expiresIn: "7d" },
-                );
+    if (!isValidEmail(email) || !isStrongEnoughPassword(password)) {
+      return res
+        .status(401)
+        .json({ message: "The information you entered is not correct" });
+    }
 
-                console.log("Session not exist");
-                const newSession = await createSession({ user, req, refreshToken });
-                const sessionId = newSession._id.toString();
-                const payload = buildAuthResponsePayload({
-                  user,
-                  token,
-                  refreshToken,
-                  sessionId,
-                });
+    const user = await Data.findOne({ email });
 
-                if (payload.needsOnboarding) {
-                  return res.status(302).json(payload);
-                }
+    if (!user || !user.password) {
+      return res
+        .status(401)
+        .json({ message: "The information you entered is not correct" });
+    }
 
-                return res.status(200).json(payload);
-              } catch (JWSerr) {
-                return res.status(500).json({
-                  message: "Error occured while generation JWS Token ERROR: ",
-                  JWSerr,
-                });
-              }
-            } else {
-              return res
-                .status(401)
-                .send({ message: "The password you entered is incorrect" });
-            }
-          });
-        }
-      } catch {
-        return res.status(600).json({ message: "A Problem occured" });
-      }
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: "An error occurred", err });
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res
+        .status(401)
+        .send({ message: "The password you entered is incorrect" });
+    }
+
+    const token = createAccessToken(user);
+    const refreshToken = createRefreshToken(user);
+
+    console.log("Session not exist");
+    const newSession = await createSession({
+      user,
+      req,
+      refreshToken,
     });
+    const sessionId = newSession._id.toString();
+    const payload = buildAuthResponsePayload({
+      user,
+      token,
+      refreshToken,
+      sessionId,
+    });
+
+    if (payload.needsOnboarding) {
+      return res.status(302).json(payload);
+    }
+
+    return res.status(200).json(payload);
+  } catch (err) {
+    console.error("Sign-in error:", err);
+    return res.status(500).json({ message: "An error occurred", err });
+  }
 };
 
 export const googleSignIn = async (req, res) => {
@@ -191,14 +167,22 @@ export const googleSignIn = async (req, res) => {
         .json({ message: "Unable to verify Google account" });
     }
 
-    let user = await Data.findOne({ email });
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!isValidEmail(normalizedEmail)) {
+      return res
+        .status(400)
+        .json({ message: "Unable to verify Google account" });
+    }
+
+    let user = await Data.findOne({ email: normalizedEmail });
 
     if (!user) {
       user = new Data({
-        email,
+        email: normalizedEmail,
         password: null,
         verified: true,
-        name: name || email,
+        name: name || normalizedEmail,
         googleId,
         authProvider: "google",
         avatar: picture,
@@ -219,23 +203,8 @@ export const googleSignIn = async (req, res) => {
 
     await user.save();
 
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-      },
-      secretkey,
-      { expiresIn: "5m" },
-    );
-
-    const refreshToken = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-      },
-      refreshkey,
-      { expiresIn: "7d" },
-    );
+    const token = createAccessToken(user);
+    const refreshToken = createRefreshToken(user);
 
     const newSession = await createSession({ user, req, refreshToken });
     const sessionId = newSession._id.toString();
@@ -260,7 +229,12 @@ export const googleSignIn = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = normalizeEmail(req.body.email);
+    const password = req.body.password;
+
+    if (!isValidEmail(email) || !isStrongEnoughPassword(password)) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
 
     const exist = await Data.findOne({ email });
     if (exist) {
@@ -323,4 +297,3 @@ export const verifyEmail = async (req, res) => {
     });
   }
 };
-

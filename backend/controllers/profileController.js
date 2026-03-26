@@ -1,6 +1,7 @@
 import Data from "../../Model/Registerdata.js";
 import { applyProfileComplete } from "../utils/profileComplete.js";
 import { safeUserFields } from "../utils/safeUserFields.js";
+import { isNonEmptyString, parseFiniteNumber } from "../utils/validators.js";
 
 export const getData = async (req, res) => {
   try {
@@ -29,13 +30,17 @@ export const saveData = async (req, res) => {
     const user = await Data.findOne({ email: email });
 
     if (user) {
-      user.name = name;
-      user.date = date;
-      user.gender = gender;
-      user.weight = weight;
-      user.weightScale = weightScale;
-      user.height = height;
-      user.lengthScale = lengthScale;
+      user.name = isNonEmptyString(name) ? name.trim() : user.name;
+      user.date = date ? new Date(date) : user.date;
+      user.gender = isNonEmptyString(gender) ? gender.trim() : user.gender;
+      user.weight = parseFiniteNumber(weight) ?? user.weight;
+      user.weightScale = isNonEmptyString(weightScale)
+        ? weightScale.trim()
+        : user.weightScale;
+      user.height = parseFiniteNumber(height) ?? user.height;
+      user.lengthScale = isNonEmptyString(lengthScale)
+        ? lengthScale.trim()
+        : user.lengthScale;
       applyProfileComplete(user);
       await user.save();
       return res.status(200).json({ message: "Data saved in DB collection" });
@@ -108,6 +113,10 @@ export const checkData = async (req, res) => {
   const email = req.email;
   try {
     const user = await Data.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     if (user.profileComplete === "Complete") {
       return res.status(200).json({ message: "Completed" });
     } else {
@@ -124,6 +133,8 @@ export const getEditData = async (req, res) => {
   if (user) {
     return res.status(200).json(user);
   }
+
+  return res.status(404).json({ message: "User not found" });
 };
 
 export const updateEditData = async (req, res) => {
@@ -147,9 +158,23 @@ export const updateEditData = async (req, res) => {
     }
 
     if (updates.date) updates.date = new Date(updates.date);
-    if (updates.weight != null) updates.weight = Number(updates.weight);
-    if (updates.height != null) updates.height = Number(updates.height);
-    if (updates.activity != null) updates.activity = Number(updates.activity);
+    if (updates.weight != null) {
+      updates.weight = parseFiniteNumber(updates.weight);
+    }
+    if (updates.height != null) {
+      updates.height = parseFiniteNumber(updates.height);
+    }
+    if (updates.activity != null) {
+      updates.activity = parseFiniteNumber(updates.activity);
+    }
+
+    if (
+      (updates.weight !== undefined && updates.weight === null) ||
+      (updates.height !== undefined && updates.height === null) ||
+      (updates.activity !== undefined && updates.activity === null)
+    ) {
+      return res.status(400).json({ message: "Invalid numeric input" });
+    }
 
     const user = await Data.findOneAndUpdate(
       { email: req.email },
