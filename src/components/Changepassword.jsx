@@ -89,7 +89,7 @@ function Changepassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex flex-col">
       {loading && <Loader />}
       <Alert />
       <Navbar />
@@ -113,19 +113,21 @@ function Changepassword() {
             onSubmit={otpSent ? changePassword : sendOtp}
             className="space-y-4"
           >
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-purple-100">
-                Email
-              </label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="h-12 w-full rounded-2xl border border-white/20 bg-white/95 px-4 text-slate-900 outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+            {!otpSent && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-purple-100">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="h-12 w-full rounded-2xl border border-white/20 bg-white/95 px-4 text-slate-900 outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            )}
 
             {otpSent && (
               <>

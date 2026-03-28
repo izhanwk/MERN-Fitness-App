@@ -46,7 +46,7 @@ function Register() {
           `Registration Successful! Please check ${response.data} for verification.`,
           "success",
           "Account Created",
-          8000
+          8000,
         );
 
         if (redirectTimeoutRef.current) {
@@ -67,7 +67,7 @@ function Register() {
       showAlert(
         "Oops! There occurred a problem",
         "error",
-        "Registration Failed"
+        "Registration Failed",
       );
     } finally {
       setLoading(false);
@@ -75,7 +75,7 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-0 m-0 font-dm-sans relative overflow-hidden">
       {loading && <Loader />}
       <Alert />
       <Navbar />
@@ -86,9 +86,9 @@ function Register() {
         <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-yellow-400/10 rounded-full blur-2xl animate-pulse delay-500"></div>
       </div>
 
-      <div className="flex w-screen relative z-10">
-        <div className="w-screen flex flex-col items-center justify-center py-12">
-          <div className="text-center mb-10">
+      <div className="relative z-10 flex min-h-[calc(100vh-120px)] w-full flex-col items-center justify-center px-4 py-5 md:py-8">
+        <div className="w-full flex flex-col items-center justify-center">
+          <div className="text-center mb-6 md:mb-8">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">
               Create Your Account
             </h1>
@@ -107,7 +107,7 @@ function Register() {
 
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col items-center justify-center text-sm h-full p-8 space-y-8"
+              className="flex flex-col items-center justify-center text-sm h-full p-6 md:p-8 space-y-6 md:space-y-8"
             >
               <div className="relative w-full">
                 <div className="flex items-center mb-2">
@@ -326,8 +326,9 @@ function Register() {
             </form>
           </div>
         </div>
-        <Footer />
       </div>
+
+      <Footer />
     </div>
   );
 }

@@ -54,7 +54,7 @@ function Protectedroute2({ children }) {
 
   if (!shouldRenderChildren) {
     return (
-      <div className="min-h-screen flex justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
+      <div className="min-h-screen flex justify-center bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
         <div className="w-16 h-16 border-4 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin"></div>
       </div>
     );
