@@ -48,7 +48,7 @@ function Data() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+    <div className="flex w-full items-center justify-center bg-transparent px-4 py-6 md:py-8">
       {loading && <Loader />}
       <Alert />
       <div className="w-full max-w-md bg-gradient-to-br from-purple-900/70 to-indigo-900/70 backdrop-blur-md rounded-3xl shadow-2xl border border-white/10 overflow-hidden">

@@ -254,8 +254,9 @@ function Activity() {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
+
+      <Footer />
 
       {/* Blocking loader */}
       {loading && (

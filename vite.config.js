@@ -8,4 +8,9 @@ export default defineConfig({
     host: "0.0.0.0", // Makes the server accessible externally
     port: 5173, // Ensure the port is correct
   },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: "./src/test/setup.js",
+  },
 });

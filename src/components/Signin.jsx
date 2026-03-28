@@ -54,7 +54,7 @@ function Signin() {
         showAlert(
           "Incomplete profile, redirecting...",
           "info",
-          "Profile Setup Required"
+          "Profile Setup Required",
         );
         const emailForSetup = sessionData?.email || data.email;
         navigate("/signup/userdata", { state: { email: emailForSetup } });
@@ -80,7 +80,7 @@ function Signin() {
       showAlert(
         "An error occurred. Please try again.",
         "error",
-        "Connection Error"
+        "Connection Error",
       );
       console.error(err);
     } finally {
@@ -95,7 +95,7 @@ function Signin() {
         showAlert(
           "Google authentication failed. Please try again.",
           "error",
-          "Google Sign-In"
+          "Google Sign-In",
         );
         return;
       }
@@ -111,7 +111,7 @@ function Signin() {
               "ngrok-skip-browser-warning": "true",
             },
             validateStatus: () => true,
-          }
+          },
         );
 
         if (googleResponse.status === 302) {
@@ -120,7 +120,7 @@ function Signin() {
           showAlert(
             "Incomplete profile, redirecting...",
             "info",
-            "Profile Setup Required"
+            "Profile Setup Required",
           );
           const emailForSetup = sessionData?.email;
           navigate("/signup/userdata", { state: { email: emailForSetup } });
@@ -142,13 +142,13 @@ function Signin() {
         showAlert(
           "We couldn’t reach Google sign-in. Please try again.",
           "error",
-          "Google Sign-In Failed"
+          "Google Sign-In Failed",
         );
       } finally {
         setLoading(false);
       }
     },
-    [navigate, persistSession, showAlert]
+    [navigate, persistSession, showAlert],
   );
 
   useEffect(() => {
@@ -208,15 +208,11 @@ function Signin() {
     };
   }, [handleGoogleCredentialResponse]);
 
-  useEffect(() => {
-    console.log("GOogle loaded : ", googleLoaded);
-  }, [googleLoaded]);
-
   return (
     <>
       {loading && <Loader />}
       <Alert />
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0 font-dm-sans relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-0 m-0 font-dm-sans relative overflow-hidden">
         <Navbar />
 
         {/* Animated background elements */}
@@ -416,7 +412,7 @@ function Signin() {
                     <button
                       disabled={!googleLoaded}
                       id="customGoogleBtn"
-                      class={`flex items-center justify-center gap-3 w-full sm:w-auto bg-white border border-gray-300 text-gray-600 font-medium rounded-md px-5 py-2 hover:bg-gray-50 transition duration-200   ${
+                      className={`flex items-center justify-center gap-3 w-full sm:w-auto bg-white border border-gray-300 text-gray-600 font-medium rounded-md px-5 py-2 hover:bg-gray-50 transition duration-200 ${
                         googleLoaded
                           ? "opacity-100 pointer-events-auto"
                           : "opacity-50 pointer-events-none"
@@ -425,7 +421,7 @@ function Signin() {
                       <img
                         src="https://developers.google.com/identity/images/g-logo.png"
                         alt="Google logo"
-                        class="w-5 h-5"
+                        className="w-5 h-5"
                       />
                       <span>Sign in with Google</span>
                     </button>

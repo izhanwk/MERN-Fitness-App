@@ -167,6 +167,37 @@ npm run start:server
 npm run dev
 ```
 
+## Testing
+
+This repo uses Vitest with Testing Library for frontend component tests.
+
+Run the full test suite:
+
+```bash
+npm run test:run
+```
+
+Run the auth component tests directly:
+
+```bash
+npm run test:run -- src/components/__tests__/Signin.test.jsx src/components/__tests__/Register.test.jsx
+```
+
+Current frontend coverage includes:
+
+- dashboard rendering and food dropdown interaction
+- dashboard persisted meal-log rendering
+- dashboard edit-profile navigation
+- sign-in form rendering and successful auth redirect
+- incomplete-profile redirect handling after sign-in
+- invalid-credentials handling on sign-in
+- sign-in network-failure alert handling`r`n- change-password OTP rate-limit alert handling`r`n- registration form rendering and successful signup redirect
+- client-side registration validation for mismatched passwords
+- existing-email handling during registration
+- registration failure alert handling
+
+GitHub Actions runs `npm run test:run` on every push and pull request through [`.github/workflows/test.yml`](/C:/Users/izhan/Desktop/Node%20JS/React/new%20fitness%20app/.github/workflows/test.yml).
+
 ## Production Notes
 
 - `MONGODB_URI` must be provided in the deployment environment
@@ -195,7 +226,7 @@ npm run dev
 ## Current Gaps / Next Improvements
 
 - Add automated backend integration tests
-- Add frontend flow tests
+- Expand frontend flow tests beyond auth into dashboard and session-management paths
 - Normalize remaining legacy status-code behavior where frontend allows it
 - Add centralized API error formatting
 - Add `.env.example`
@@ -215,3 +246,4 @@ This project demonstrates practical full-stack engineering beyond basic CRUD:
 ## Author
 
 Built by Izhan as a production-style portfolio project focused on full-stack product development, auth/session flows, and applied backend architecture.
+

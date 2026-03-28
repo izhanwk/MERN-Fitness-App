@@ -1,7 +1,6 @@
 import DNavbar from "./DNavbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import SDNavbar from "./SDNavbar";
 import axios from "axios";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
@@ -53,7 +52,7 @@ function Musclegain() {
   }, [musclegainMode]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-0 m-0 font-dm-sans relative overflow-hidden">
       <Alert />
       {/* Animated background */}
       <div className="absolute inset-0 overflow-hidden">
@@ -65,9 +64,8 @@ function Musclegain() {
       {loading && <Loader />}
       <DNavbar />
 
-      <div className="flex w-screen relative z-10">
-        {/* <SDNavbar /> */}
-        <div className="w-screen flex flex-col items-center justify-center py-12 px-4">
+      <div className="relative z-10 flex min-h-[calc(100vh-120px)] w-full flex-col items-center justify-center px-4 py-8 md:py-12">
+        <div className="w-full flex flex-col items-center justify-center">
           <div className="text-center mb-10">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">
               Choose Your Muscle Gain Mode
@@ -154,8 +152,9 @@ function Musclegain() {
             </p>
           </div>
         </div>
-        <Footer />
       </div>
+
+      <Footer />
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import DNavbar from "./DNavbar";
-import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 // import SDNavbar from "./SDNavbar";
 import axios from "axios";
@@ -12,62 +11,69 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function Goals() {
   const { showAlert, Alert } = useAlert();
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
-
-  const selectedGoal = watch("goal");
-
   const navigate = useNavigate();
   const [goal, setgoal] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (selectedGoal) {
-      setgoal(selectedGoal);
-    }
-  }, [selectedGoal]);
-  console.log(`goal: ${goal}`);
-
   const buttonClick = () => {
-    if (goal == "musclegain") {
+    if (goal === "musclegain") {
       navigate("/musclegain");
     } else {
       navigate("/fatloss");
     }
   };
 
-  const onSubmit = async (data) => {
+  const sendData = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/goals`, data, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "ngrok-skip-browser-warning": "true",
+      const response = await axios.post(
+        `${API_URL}/goals`,
+        { goal },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          validateStatus: () => true,
         },
-        validateStatus: () => true,
-      });
+      );
       if (response.status >= 200 && response.status < 300) {
-        showAlert("Your goal has been submitted successfully!", "success", "Goal Set");
+        showAlert(
+          "Your goal has been submitted successfully!",
+          "success",
+          "Goal Set",
+        );
         buttonClick();
       }
       if (response.status < 200 || response.status >= 300) {
-        showAlert("An error occurred from server. Please login again.", "error", "Server Error");
+        showAlert(
+          "An error occurred from server. Please login again.",
+          "error",
+          "Server Error",
+        );
       }
     } catch (err) {
       console.error(err);
-      showAlert("Problem while connecting with server", "error", "Connection Error");
+      showAlert(
+        "Problem while connecting with server",
+        "error",
+        "Connection Error",
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (goal) {
+      sendData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goal]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-0 m-0 font-dm-sans relative overflow-hidden">
       <Alert />
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -79,9 +85,8 @@ function Goals() {
       {loading && <Loader />}
       <DNavbar />
 
-      <div className="flex w-screen relative z-10">
-        {/* <SDNavbar /> */}
-        <div className="w-screen flex flex-col items-center justify-center py-12 px-4">
+      <div className="relative z-10 flex min-h-[calc(100vh-120px)] w-full flex-col items-center justify-center px-4 py-8 md:py-12">
+        <div className="w-full flex flex-col items-center justify-center">
           <div className="text-center mb-10">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">
               Choose Your Fitness Goal
@@ -98,33 +103,13 @@ function Goals() {
               </h2>
             </div>
 
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col items-center justify-center p-8 space-y-8"
-            >
+            <div className="flex flex-col items-center justify-center p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                {/* Muscle Gain Option */}
-                <label
-                  htmlFor="musclegain"
-                  className={`relative cursor-pointer transition-all duration-300 transform hover:scale-105 ${
-                    selectedGoal === "musclegain" ? "scale-105" : ""
-                  }`}
+                <div
+                  onClick={() => setgoal("musclegain")}
+                  className="relative cursor-pointer transition-all duration-300 transform hover:scale-105"
                 >
-                  <input
-                    type="radio"
-                    name="goal"
-                    id="musclegain"
-                    value="musclegain"
-                    className="appearance-none"
-                    {...register("goal", { required: "Please select a goal" })}
-                  />
-                  <div
-                    className={`w-full h-40 rounded-2xl border-2 flex flex-col items-center justify-center p-4 transition-all duration-300 ${
-                      selectedGoal === "musclegain"
-                        ? "border-yellow-400 bg-yellow-400/10 shadow-lg shadow-yellow-400/20"
-                        : "border-white/20 bg-white/5 hover:border-yellow-400/50 hover:bg-yellow-400/5"
-                    }`}
-                  >
+                  <div className="w-full h-40 rounded-2xl border-2 flex flex-col items-center justify-center p-4 transition-all duration-300 border-white/20 bg-white/5 hover:border-yellow-400/50 hover:bg-yellow-400/5 hover:shadow-lg hover:shadow-yellow-400/20">
                     <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mb-4">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -148,30 +133,13 @@ function Goals() {
                       Build strength and increase muscle mass
                     </p>
                   </div>
-                </label>
+                </div>
 
-                {/* Fat Loss Option */}
-                <label
-                  htmlFor="fatloss"
-                  className={`relative cursor-pointer transition-all duration-300 transform hover:scale-105 ${
-                    selectedGoal === "fatloss" ? "scale-105" : ""
-                  }`}
+                <div
+                  onClick={() => setgoal("fatloss")}
+                  className="relative cursor-pointer transition-all duration-300 transform hover:scale-105"
                 >
-                  <input
-                    type="radio"
-                    name="goal"
-                    id="fatloss"
-                    value="fatloss"
-                    className="appearance-none"
-                    {...register("goal", { required: "Please select a goal" })}
-                  />
-                  <div
-                    className={`w-full h-40 rounded-2xl border-2 flex flex-col items-center justify-center p-4 transition-all duration-300 ${
-                      selectedGoal === "fatloss"
-                        ? "border-yellow-400 bg-yellow-400/10 shadow-lg shadow-yellow-400/20"
-                        : "border-white/20 bg-white/5 hover:border-yellow-400/50 hover:bg-yellow-400/5"
-                    }`}
-                  >
+                  <div className="w-full h-40 rounded-2xl border-2 flex flex-col items-center justify-center p-4 transition-all duration-300 border-white/20 bg-white/5 hover:border-yellow-400/50 hover:bg-yellow-400/5 hover:shadow-lg hover:shadow-yellow-400/20">
                     <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-teal-500 rounded-full flex items-center justify-center mb-4">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -195,57 +163,14 @@ function Goals() {
                       Lose weight and improve body composition
                     </p>
                   </div>
-                </label>
-              </div>
-
-              {errors.goal && (
-                <div className="text-red-400 text-sm font-medium flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {errors.goal.message}
                 </div>
-              )}
-
-              <button
-                type="submit"
-                className="group relative w-full max-w-xs h-14 bg-gradient-to-r from-yellow-400 to-orange-500 text-[#2f1b46] font-bold text-lg rounded-xl shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 hover:scale-[1.02] hover:from-yellow-300 hover:to-orange-400 flex items-center justify-center"
-              >
-                <span className="relative z-10 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                  Continue
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-orange-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
-              </button>
-            </form>
+              </div>
+            </div>
           </div>
         </div>
-        <Footer />
       </div>
+
+      <Footer />
     </div>
   );
 }
