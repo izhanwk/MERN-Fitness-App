@@ -75,31 +75,27 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-0 m-0 font-dm-sans relative overflow-hidden">
+    <div className="app-shell font-dm-sans">
       {loading && <Loader />}
       <Alert />
       <Navbar />
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-yellow-400/10 rounded-full blur-2xl animate-pulse delay-500"></div>
-      </div>
+      <div className="ambient-orbs" />
+      <div className="ambient-orb-center" />
 
       <div className="relative z-10 flex min-h-[calc(100vh-120px)] w-full flex-col items-center justify-center px-4 py-5 md:py-8">
         <div className="w-full flex flex-col items-center justify-center">
           <div className="text-center mb-6 md:mb-8">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">
+            <h1 className="theme-heading mb-4 text-5xl font-bold">
               Create Your Account
             </h1>
-            <p className="text-purple-200 text-lg max-w-md mx-auto">
+            <p className="mx-auto max-w-md text-lg text-white/65">
               Join FitTracker to start your fitness journey and achieve your
               nutrition goals
             </p>
           </div>
 
-          <div className="w-full flex flex-col justify-start max-w-md bg-gradient-to-br from-purple-900/40 to-blue-900/40 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden transform transition-all duration-500 hover:shadow-purple-500/10">
-            <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600">
+          <div className="glass-panel flex w-full max-w-md flex-col justify-start overflow-hidden">
+            <div className="panel-header p-2">
               <h2 className="text-white text-lg font-bold text-center py-2">
                 Register New Account
               </h2>
@@ -113,7 +109,7 @@ function Register() {
                 <div className="flex items-center mb-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-purple-300 mr-2"
+                    className="mr-2 h-5 w-5 text-white/45"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -125,18 +121,18 @@ function Register() {
                       d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                     />
                   </svg>
-                  <label className="text-purple-200 text-sm font-medium">
+                  <label className="text-sm font-medium text-white/70">
                     Email Address
                   </label>
                 </div>
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className={`w-full h-14 px-5 outline-none rounded-xl bg-white/95 backdrop-blur-sm text-slate-800 font-medium transition-all duration-300 shadow-lg border-2 ${
+                  className={`theme-input h-14 border-2 px-5 ${
                     errors.email
                       ? "border-red-500 focus:border-red-500"
-                      : "border-white/30 focus:border-yellow-400 focus:bg-white"
-                  }`}
+                      : "border-white/20 focus:border-purple-400"
+                    }`}
                   {...register("email", {
                     required: {
                       value: true,
@@ -173,7 +169,7 @@ function Register() {
                 <div className="flex items-center mb-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-purple-300 mr-2"
+                    className="mr-2 h-5 w-5 text-white/45"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -185,18 +181,18 @@ function Register() {
                       d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                     />
                   </svg>
-                  <label className="text-purple-200 text-sm font-medium">
+                  <label className="text-sm font-medium text-white/70">
                     Password
                   </label>
                 </div>
                 <input
                   type="password"
                   placeholder="Create a password"
-                  className={`w-full h-14 px-5 outline-none rounded-xl bg-white/95 backdrop-blur-sm text-slate-800 font-medium transition-all duration-300 shadow-lg border-2 ${
+                  className={`theme-input h-14 border-2 px-5 ${
                     errors.password
                       ? "border-red-500 focus:border-red-500"
-                      : "border-white/30 focus:border-yellow-400 focus:bg-white"
-                  }`}
+                      : "border-white/20 focus:border-purple-400"
+                    }`}
                   {...register("password", {
                     required: {
                       value: true,
@@ -233,7 +229,7 @@ function Register() {
                 <div className="flex items-center mb-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-purple-300 mr-2"
+                    className="mr-2 h-5 w-5 text-white/45"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -245,18 +241,18 @@ function Register() {
                       d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                     />
                   </svg>
-                  <label className="text-purple-200 text-sm font-medium">
+                  <label className="text-sm font-medium text-white/70">
                     Confirm Password
                   </label>
                 </div>
                 <input
                   type="password"
                   placeholder="Re-enter your password"
-                  className={`w-full h-14 px-5 outline-none rounded-xl bg-white/95 backdrop-blur-sm text-slate-800 font-medium transition-all duration-300 shadow-lg border-2 ${
+                  className={`theme-input h-14 border-2 px-5 ${
                     errors.repassword
                       ? "border-red-500 focus:border-red-500"
-                      : "border-white/30 focus:border-yellow-400 focus:bg-white"
-                  }`}
+                      : "border-white/20 focus:border-purple-400"
+                    }`}
                   {...register("repassword", {
                     required: {
                       value: true,
@@ -290,7 +286,7 @@ function Register() {
               <div className="pt-4 w-full">
                 <button
                   type="submit"
-                  className="group relative w-full h-14 bg-gradient-to-r from-yellow-400 to-orange-500 text-[#2f1b46] font-bold text-lg rounded-xl shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 hover:scale-[1.02] hover:from-yellow-300 hover:to-orange-400 flex items-center justify-center"
+                  className="group relative flex h-14 w-full items-center justify-center rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 text-lg font-bold text-white shadow-2xl shadow-purple-950/30 transition-all duration-300 hover:scale-[1.02] hover:from-purple-400 hover:to-sky-400"
                 >
                   <span className="relative z-10 flex items-center">
                     <svg
@@ -309,15 +305,15 @@ function Register() {
                     </svg>
                     Create Account
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-orange-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-400 to-sky-400 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100"></div>
                 </button>
               </div>
 
               <div className="text-center pt-4">
-                <p className="text-purple-200 text-sm">
+                <p className="text-sm text-white/65">
                   Already have an account?{" "}
                   <Link to={"/signin"}>
-                    <span className="text-yellow-400 hover:text-yellow-300 transition-colors duration-300 font-semibold underline cursor-pointer">
+                    <span className="cursor-pointer font-semibold text-sky-300 underline transition-colors duration-300 hover:text-sky-200">
                       Sign in here
                     </span>
                   </Link>

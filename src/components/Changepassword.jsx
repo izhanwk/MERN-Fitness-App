@@ -89,20 +89,22 @@ function Changepassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex flex-col">
+    <div className="app-shell flex flex-col">
       {loading && <Loader />}
       <Alert />
       <Navbar />
+      <div className="ambient-orbs" />
+      <div className="ambient-orb-center" />
       <div className="flex flex-1 items-center justify-center px-4 py-10">
-        <div className="w-full max-w-md rounded-3xl border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
+        <div className="glass-panel w-full max-w-md p-6">
           <div className="mb-6 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 shadow-lg">
-              <Lock className="h-7 w-7 text-[#2f1b46]" strokeWidth={2.2} />
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-r from-purple-500 to-blue-500 shadow-lg shadow-purple-950/30">
+              <Lock className="h-7 w-7 text-white" strokeWidth={2.2} />
             </div>
             <h1 className="text-2xl font-bold text-white tracking-tight">
               {otpSent ? "Set New Password" : "Forgot Password"}
             </h1>
-            <p className="mt-2 text-sm leading-6 text-purple-200">
+            <p className="mt-2 text-sm leading-6 text-white/60">
               {otpSent
                 ? "Enter your OTP and choose a new password."
                 : "Enter your email to receive an OTP."}
@@ -121,7 +123,7 @@ function Changepassword() {
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="h-12 w-full rounded-2xl border border-white/20 bg-white/95 px-4 text-slate-900 outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                  className="theme-input"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -138,7 +140,7 @@ function Changepassword() {
                   <input
                     type="text"
                     placeholder="Enter 6-digit OTP"
-                    className="h-12 w-full rounded-2xl border border-white/20 bg-white/95 px-4 text-slate-900 outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                    className="theme-input"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     required
@@ -152,7 +154,7 @@ function Changepassword() {
                   <input
                     type="password"
                     placeholder="Enter a new password"
-                    className="h-12 w-full rounded-2xl border border-white/20 bg-white/95 px-4 text-slate-900 outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                    className="theme-input"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -166,7 +168,7 @@ function Changepassword() {
                   <input
                     type="password"
                     placeholder="Confirm your new password"
-                    className="h-12 w-full rounded-2xl border border-white/20 bg-white/95 px-4 text-slate-900 outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                    className="theme-input"
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
                     required
@@ -177,12 +179,12 @@ function Changepassword() {
 
             <button
               type="submit"
-              className="mt-2 w-full rounded-2xl bg-yellow-400 px-4 py-3 text-base font-bold text-[#2f1b46] transition hover:bg-yellow-300 shadow-lg"
+              className="mt-2 w-full rounded-2xl bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-3 text-base font-bold text-white shadow-lg shadow-purple-950/30 transition hover:from-purple-400 hover:to-sky-400"
             >
               {otpSent ? "Change Password" : "Send OTP"}
             </button>
 
-            <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-purple-100/85">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/65">
               {otpSent ? (
                 <p>Use the latest OTP sent to your email.</p>
               ) : (

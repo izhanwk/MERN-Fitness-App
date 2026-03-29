@@ -1,17 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react"; // for hamburger icons
+import { Menu, X, Dumbbell } from "lucide-react";
 import Loader from "./Loader";
 import { useAlert } from "./Alert";
 import axios from "axios";
-import { Dumbbell } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function DNavbar() {
   const navigate = useNavigate();
   const { showAlert, Alert } = useAlert();
-  const [visible2, setvisible2] = useState(false);
   const [visible, setvisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -49,7 +47,6 @@ function DNavbar() {
 
   const refreshtoken = async () => {
     try {
-      // setLoading(true);
       const sessionId = localStorage.getItem("sessionId");
       if (!sessionId) {
         throw new Error("No active session");
@@ -64,29 +61,24 @@ function DNavbar() {
             ...(sessionId && { "X-Session-Id": sessionId }),
             "ngrok-skip-browser-warning": "true",
           },
-        }
+        },
       );
 
       const data = response.data;
       localStorage.setItem("token", data.token);
-      console.log("Token refreshed successfully");
       return data.token;
     } catch (err) {
-      if (err.response.status === 403) {
-        console.error("Error occurred:", err);
+      if (err.response?.status === 403) {
         localStorage.removeItem("token");
         localStorage.removeItem("sessionId");
         showAlert("Session Expired", "error", "Authentication Failed");
         navigate("/signin");
       }
       return null;
-    } finally {
-      // setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Global axios request interceptor: attach access token and session id
     const requestInterceptor = axios.interceptors.request.use((config) => {
       const sessionId = localStorage.getItem("sessionId");
 
@@ -111,7 +103,6 @@ function DNavbar() {
       ) {
         originalRequest._retry = true;
 
-        // ensure only a single refresh runs; others await the same promise
         let starter = false;
         if (!isRefreshing.current) {
           isRefreshing.current = true;
@@ -161,7 +152,7 @@ function DNavbar() {
         try {
           const retryResponse = await handleAuthFailure(
             response?.config,
-            response
+            response,
           );
           if (retryResponse) {
             return retryResponse;
@@ -179,7 +170,7 @@ function DNavbar() {
         try {
           const retryResponse = await handleAuthFailure(
             originalRequest,
-            response
+            response,
           );
           if (retryResponse) {
             return retryResponse;
@@ -189,7 +180,7 @@ function DNavbar() {
         }
 
         return Promise.reject(error);
-      }
+      },
     );
 
     return () => {
@@ -198,104 +189,65 @@ function DNavbar() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   const interValid = setInterval(() => {
-  //     const fetchData = async () => {
-  //       try {
-  //         const token = localStorage.getItem("token");
-  //         const sessionId = localStorage.getItem("sessionId");
-
-  //         const response = await axios.get(`${API_URL}/getdata`, {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //             ...(sessionId && { "X-Session-Id": sessionId }),
-  //             "ngrok-skip-browser-warning": "true",
-  //           },
-  //         });
-
-  //         if (response.status === 200) {
-  //           console.log("Token is valid");
-  //         }
-  //       } catch (err) {
-  //         if (err.response?.status === 403) {
-  //           // Token expired, try refreshing
-  //           await refreshtoken();
-  //         } else {
-  //           console.error("Error in fetchData:", err);
-  //           logOut();
-  //         }
-  //       }
-  //     };
-
-  //     fetchData();
-  //   }, 60000); // Runs every 60 seconds
-
-  //   return () => clearInterval(interValid);
-  // }, []);
-
-  const show = () => {
-    setvisible(!visible);
-  };
-
-  const session_Function = async () => {
-    navigate("/sessions");
-  };
-
   return (
     <div className="relative">
       {loading && <Loader />}
       <Alert />
-      {/* Navbar */}
-      <nav className="w-full h-20 bg-black/20 backdrop-blur-md border-b border-white/10 flex items-center relative z-20">
+      <nav className="theme-nav relative z-20 flex h-20 items-center">
         <div className="flex items-center justify-between w-full px-6 md:px-8">
-          {/* Logo */}
           <div
             className="flex cursor-pointer items-center space-x-2"
             onClick={() => navigate("/dashboard")}
           >
-            <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-md">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 shadow-lg shadow-purple-950/40">
               <Dumbbell className="w-6 h-6 text-white" strokeWidth={2.5} />
             </div>
             <span className="text-white font-bold text-xl">FitTracker</span>
           </div>
 
-          {/* Desktop Menu */}
-          <ul className="hidden md:flex text-white font-dm-sans space-x-8 items-center">
-            <li
-              className="hover:cursor-pointer hover:text-yellow-400 transition-colors duration-300 px-4 py-2 rounded-lg hover:bg-white/10"
-              onClick={() => scrollToFooterSection("footer-contact")}
-            >
-              Contact
+          <ul className="hidden md:flex text-white font-dm-sans space-x-6 items-center">
+            <li>
+              <button
+                className="cursor-pointer rounded-xl px-4 py-2 text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                onClick={() => scrollToFooterSection("footer-contact")}
+              >
+                Contact
+              </button>
             </li>
-            <li
-              className="hover:cursor-pointer hover:text-yellow-400 transition-colors duration-300 px-4 py-2 rounded-lg hover:bg-white/10"
-              onClick={() => scrollToFooterSection("footer-about")}
-            >
-              About us
+            <li>
+              <button
+                className="cursor-pointer rounded-xl px-4 py-2 text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                onClick={() => scrollToFooterSection("footer-about")}
+              >
+                About us
+              </button>
             </li>
-            <li
-              className="hover:cursor-pointer hover:text-yellow-400 transition-colors duration-300 px-4 py-2 rounded-lg hover:bg-white/10"
-              onClick={() => scrollToFooterSection("footer-guide")}
-            >
-              Guide
+            <li>
+              <button
+                className="cursor-pointer rounded-xl px-4 py-2 text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                onClick={() => scrollToFooterSection("footer-guide")}
+              >
+                Guide
+              </button>
             </li>
-            <span
-              className="hover:cursor-pointer hover:text-yellow-400 transition-colors duration-300 px-4 py-2 rounded-lg hover:bg-white/10"
-              onClick={() => {
-                session_Function();
-              }}
-            >
-              Sessions
-            </span>
-            <li
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 px-6 py-2 rounded-full cursor-pointer transition-all duration-300 shadow-lg hover:shadow-red-500/25"
-              onClick={show}
-            >
-              Logout
+            <li>
+              <button
+                className="cursor-pointer rounded-xl px-4 py-2 text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                onClick={() => navigate("/sessions")}
+              >
+                Sessions
+              </button>
+            </li>
+            <li>
+              <button
+                className="cursor-pointer rounded-full border border-red-400/25 bg-red-500/15 px-6 py-2 text-red-200 transition-all duration-200 hover:bg-red-500/25"
+                onClick={() => setvisible(true)}
+              >
+                Logout
+              </button>
             </li>
           </ul>
 
-          {/* Mobile Menu Button */}
           <button
             className="md:hidden text-white"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -305,75 +257,79 @@ function DNavbar() {
         </div>
       </nav>
 
-      {/* Mobile Dropdown */}
       {menuOpen && (
-        <div className="md:hidden absolute top-20 left-0 w-full bg-black/80 backdrop-blur-lg z-40 flex flex-col space-y-4 px-6 py-4 text-white">
-          <span
-            className="cursor-pointer hover:text-yellow-400 transition-colors"
+        <div className="absolute left-0 top-20 z-40 flex w-full flex-col space-y-3 border-b border-white/10 bg-slate-950/90 px-6 py-4 text-white backdrop-blur-lg md:hidden">
+          <button
+            className="cursor-pointer rounded-xl px-3 py-2 text-left text-white/70 transition-colors hover:bg-white/8 hover:text-white"
             onClick={() => {
               scrollToFooterSection("footer-contact");
               setMenuOpen(false);
             }}
           >
             Contact
-          </span>
-          <span
-            className="cursor-pointer hover:text-yellow-400 transition-colors"
+          </button>
+          <button
+            className="cursor-pointer rounded-xl px-3 py-2 text-left text-white/70 transition-colors hover:bg-white/8 hover:text-white"
             onClick={() => {
               scrollToFooterSection("footer-about");
               setMenuOpen(false);
             }}
           >
             About us
-          </span>
-          <span
-            className="cursor-pointer hover:text-yellow-400 transition-colors"
+          </button>
+          <button
+            className="cursor-pointer rounded-xl px-3 py-2 text-left text-white/70 transition-colors hover:bg-white/8 hover:text-white"
             onClick={() => {
               scrollToFooterSection("footer-guide");
               setMenuOpen(false);
             }}
           >
             Guide
-          </span>
-          <span
-            className="cursor-pointer hover:text-yellow-400 transition-colors"
+          </button>
+          <button
+            className="cursor-pointer rounded-xl px-3 py-2 text-left text-white/70 transition-colors hover:bg-white/8 hover:text-white"
             onClick={() => {
-              session_Function();
+              navigate("/sessions");
+              setMenuOpen(false);
             }}
           >
             Sessions
-          </span>
-          <span
-            className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-2 rounded-full text-center cursor-pointer transition-all duration-300 shadow-lg hover:shadow-red-500/25"
+          </button>
+          <button
+            className="cursor-pointer rounded-full border border-red-400/25 bg-red-500/15 px-6 py-2 text-center text-red-200 transition-all duration-200 hover:bg-red-500/25"
             onClick={() => {
-              show();
+              setvisible(true);
               setMenuOpen(false);
             }}
           >
             Logout
-          </span>
+          </button>
         </div>
       )}
 
-      {/* Logout Confirmation */}
       {visible && (
         <>
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-40"></div>
-          <div className="w-96 max-w-[90%] h-auto bg-white/95 rounded-2xl shadow-2xl fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 p-6 border border-white/20">
-            <p className="text-slate-800 font-dm-sans text-lg font-semibold mb-4">
+          <div
+            className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-md"
+            onClick={() => setvisible(false)}
+          />
+          <div className="fixed left-1/2 top-1/2 z-50 h-auto w-96 max-w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/10 bg-slate-900/95 p-6 shadow-2xl shadow-black/70">
+            <p className="mb-4 font-dm-sans text-lg font-semibold text-white">
               Are you sure you want to logout?
             </p>
-            <div
-              className="bg-gradient-to-r from-red-500 to-red-600 text-center rounded-lg py-2 mt-3 cursor-pointer hover:from-red-400 hover:to-red-500 text-white font-medium transition-all duration-300"
-              onClick={logOut}
-            >
-              Yes
-            </div>
-            <div
-              className="bg-gradient-to-r from-gray-500 to-gray-600 text-center rounded-lg py-2 mt-3 cursor-pointer hover:from-gray-400 hover:to-gray-500 text-white font-medium transition-all duration-300"
-              onClick={show}
-            >
-              No
+            <div className="mt-6 flex gap-3">
+              <button
+                className="flex-1 rounded-2xl border border-white/10 bg-white/6 py-3 text-center font-medium text-white/80 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                onClick={() => setvisible(false)}
+              >
+                No
+              </button>
+              <button
+                className="flex-1 rounded-2xl border border-red-400/25 bg-red-500/15 py-3 text-center font-medium text-red-200 transition-all duration-200 hover:bg-red-500/25"
+                onClick={logOut}
+              >
+                Yes
+              </button>
             </div>
           </div>
         </>

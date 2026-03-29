@@ -213,20 +213,17 @@ function Edit() {
   }, [goaltype]);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 font-dm-sans overflow-hidden">
+    <div className="app-shell font-dm-sans">
       <Alert />
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 -right-24 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-32 -left-24 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/3 left-1/3 w-40 h-40 bg-yellow-400/10 rounded-full blur-2xl animate-pulse delay-500" />
-      </div>
+      <div className="ambient-orbs" />
+      <div className="ambient-orb-center" />
 
       <DNavbar />
 
       <main className="relative z-10 mx-auto w-full max-w-4xl px-4 md:px-6">
         <section className="min-h-[calc(100vh-120px)] flex items-center justify-center py-10">
-          <div className="w-full rounded-3xl border border-white/15 bg-white/5 backdrop-blur-xl shadow-2xl overflow-hidden">
-            <div className="rounded-t-3xl p-5 md:p-6 bg-gradient-to-r from-purple-600/80 to-blue-600/80 border-b border-white/20 text-center">
+          <div className="glass-panel w-full overflow-hidden">
+            <div className="panel-header rounded-t-3xl p-5 text-center md:p-6">
               <h1 className="text-white text-2xl md:text-3xl font-bold tracking-tight">
                 Edit Profile
               </h1>
@@ -263,7 +260,7 @@ function Edit() {
                     required
                     value={form.name}
                     onChange={handleChange}
-                    className="rounded-xl bg-white/10 border border-white/15 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-400/70"
+                    className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-400/70"
                   />
                 </div>
 
@@ -277,7 +274,7 @@ function Edit() {
                     required
                     value={form.email}
                     onChange={handleChange}
-                    className="rounded-xl bg-white/10 border border-white/15 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-400/70"
+                    className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-400/70"
                   />
                 </div>
 
@@ -289,7 +286,7 @@ function Edit() {
                     name="gender"
                     value={form.gender}
                     onChange={handleChange}
-                    className="rounded-xl bg-white/10 border border-white/15 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-400/70"
+                    className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-400/70"
                   >
                     <option value="" className="bg-slate-900">
                       Select…
@@ -316,7 +313,7 @@ function Edit() {
                     value={form.date}
                     onChange={handleChange}
                     max={new Date().toISOString().slice(0, 10)}
-                    className="rounded-xl bg-white/10 border border-white/15 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-400/70"
+                    className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-400/70"
                   />
                 </div>
 
@@ -328,7 +325,7 @@ function Edit() {
                     name="goal"
                     value={form.goal}
                     onChange={handleChange}
-                    className="rounded-xl bg-white/10 border border-white/15 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-400/70"
+                    className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-400/70"
                   >
                     <option value="musclegain" className="bg-slate-900">
                       Muscle Gain
@@ -347,7 +344,7 @@ function Edit() {
                     name="mode"
                     value={form.mode}
                     onChange={handleChange}
-                    className="rounded-xl bg-white/10 border border-white/15 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-400/70"
+                    className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-400/70"
                   >
                     {goaltype.map((type) => (
                       <option key={type} value={type} className="bg-slate-900">
@@ -369,13 +366,13 @@ function Edit() {
                       value={form.height}
                       onChange={handleChange}
                       placeholder="e.g., 6 or 180"
-                      className="flex-1 rounded-xl bg-white/10 border border-white/15 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-400/70"
+                      className="flex-1 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-400/70"
                     />
                     <select
                       name="lengthScale"
                       value={form.lengthScale}
                       onChange={handleChange}
-                      className="w-28 rounded-xl bg-white/10 border border-white/15 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-400/70"
+                      className="w-28 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-400/70"
                     >
                       <option value="ft" className="bg-slate-900">
                         ft
@@ -399,13 +396,13 @@ function Edit() {
                       value={form.weight}
                       onChange={handleChange}
                       placeholder="e.g., 76"
-                      className="flex-1 rounded-xl bg-white/10 border border-white/15 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-400/70"
+                      className="flex-1 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-400/70"
                     />
                     <select
                       name="weightScale"
                       value={form.weightScale}
                       onChange={handleChange}
-                      className="w-28 rounded-xl bg-white/10 border border-white/15 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-400/70"
+                      className="w-28 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-400/70"
                     >
                       <option value="Kgs" className="bg-slate-900">
                         Kgs
@@ -439,15 +436,15 @@ function Edit() {
                         }
                         className={[
                           "group w-full text-left rounded-2xl border bg-white/[0.06] transition-all px-4 py-4",
-                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400/70",
+                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/70",
                           selected
-                            ? "border-yellow-400/60 shadow-lg shadow-yellow-400/10"
-                            : "border-white/15 hover:border-yellow-400/40 hover:shadow-md hover:shadow-yellow-400/10",
+                            ? "border-purple-400/60 shadow-lg shadow-purple-950/20"
+                            : "border-white/15 hover:border-blue-400/35 hover:shadow-md hover:shadow-purple-950/20",
                         ].join(" ")}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 grid place-items-center">
-                            <span className="text-[#2f1b46] text-xs font-semibold">
+                            <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-r from-purple-500 to-blue-500">
+                            <span className="text-xs font-semibold text-white">
                               {opt.badge}
                             </span>
                           </div>
@@ -462,7 +459,7 @@ function Edit() {
                           {selected && (
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="ml-auto h-5 w-5 text-yellow-300"
+                              className="ml-auto h-5 w-5 text-sky-300"
                               viewBox="0 0 20 20"
                               fill="currentColor"
                             >
@@ -484,7 +481,7 @@ function Edit() {
                 <button
                   type="button"
                   onClick={() => navigate(-1)}
-                  className="px-4 py-2 rounded-xl border border-white/20 text-white/90 bg-white/5 hover:bg-white/10 transition"
+                    className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-white/90 transition hover:bg-white/10"
                 >
                   Cancel
                 </button>
@@ -493,8 +490,8 @@ function Edit() {
                   disabled={!isDirty || saving}
                   className={`px-5 py-2.5 rounded-xl font-semibold transition ${
                     !isDirty || saving
-                      ? "bg-yellow-400/40 text-[#2f1b46]/70 cursor-not-allowed"
-                      : "bg-gradient-to-r from-yellow-400 to-orange-500 text-[#2f1b46] hover:opacity-95"
+                      ? "cursor-not-allowed bg-purple-400/30 text-white/50"
+                      : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:opacity-95"
                   }`}
                 >
                   {saving ? "Saving…" : "Save Changes"}
