@@ -51,8 +51,8 @@ function Data() {
     <div className="flex w-full items-center justify-center bg-transparent px-4 py-6 md:py-8">
       {loading && <Loader />}
       <Alert />
-      <div className="w-full max-w-md bg-gradient-to-br from-purple-900/70 to-indigo-900/70 backdrop-blur-md rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
-        <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600">
+      <div className="glass-panel w-full max-w-md overflow-hidden">
+        <div className="panel-header p-2">
           <h2 className="text-white text-lg font-bold text-center py-2">
             Complete Your Profile
           </h2>
@@ -61,14 +61,14 @@ function Data() {
         <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-6">
           {/* Name Field */}
           <div className="relative">
-            <label className="block text-sm font-medium text-purple-200 mb-1">
+            <label className="mb-1 block text-sm font-medium text-white/70">
               Full Name
             </label>
             <input
               type="text"
               placeholder="Enter your name"
-              className={`w-full px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 ${
-                errors.name ? "border-red-500" : "border-white/20"
+              className={`theme-input rounded-lg border-2 py-3 text-white placeholder:text-white/35 ${
+                errors.name ? "border-red-500 bg-red-500/5 text-white" : "border-white/15 bg-white/8 text-white focus:border-purple-400"
               }`}
               {...register("name", {
                 required: { value: true, message: "Name is required" },
@@ -97,13 +97,13 @@ function Data() {
 
           {/* Date of Birth Field */}
           <div className="relative">
-            <label className="block text-sm font-medium text-purple-200 mb-1">
+            <label className="mb-1 block text-sm font-medium text-white/70">
               Date of Birth
             </label>
             <input
               type="date"
-              className={`w-full px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 ${
-                errors.date ? "border-red-500" : "border-white/20"
+              className={`theme-input rounded-lg border-2 py-3 ${
+                errors.date ? "border-red-500 bg-red-500/5 text-white" : "border-white/15 bg-white/8 text-white focus:border-purple-400"
               }`}
               {...register("date", {
                 required: { value: true, message: "Date of birth is required" },
@@ -132,19 +132,19 @@ function Data() {
 
           {/* Gender Field */}
           <div>
-            <label className="block text-sm font-medium text-purple-200 mb-1">
+            <label className="mb-1 block text-sm font-medium text-white/70">
               Gender
             </label>
             <select
-              className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              className="theme-select rounded-lg border-2 border-white/15 bg-white/8 py-3 text-white focus:border-purple-400"
               {...register("gender")}
             >
-              <option value="male" className="text-indigo-900/70 font-semibold">
+              <option value="male" className="bg-slate-900 font-semibold text-white">
                 Male
               </option>
               <option
                 value="female"
-                className="text-indigo-900/70 font-semibold"
+                className="bg-slate-900 font-semibold text-white"
               >
                 Female
               </option>
@@ -154,15 +154,15 @@ function Data() {
           {/* Weight Field */}
           <div className="grid grid-cols-2 gap-4">
             <div className="relative">
-              <label className="block text-sm font-medium text-purple-200 mb-1">
+              <label className="mb-1 block text-sm font-medium text-white/70">
                 Weight
               </label>
               <input
                 type="number"
                 step="0.1"
                 placeholder="Enter weight"
-                className={`w-full max-md:text-xs px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 ${
-                  errors.weight ? "border-red-500" : "border-white/20"
+                className={`theme-input max-md:text-xs rounded-lg border-2 py-3 text-white placeholder:text-white/35 ${
+                  errors.weight ? "border-red-500 bg-red-500/5 text-white" : "border-white/15 bg-white/8 text-white focus:border-purple-400"
                 }`}
                 {...register("weight", {
                   required: { value: true, message: "Weight is required" },
@@ -190,17 +190,17 @@ function Data() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-purple-200 mb-1">
+              <label className="mb-1 block text-sm font-medium text-white/70">
                 Unit
               </label>
               <select
-                className="w-full px-4 py-3 max-md:text-xs bg-white/10 backdrop-blur-sm rounded-lg border-2 border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+                className="theme-select max-md:text-xs rounded-lg border-2 border-white/15 bg-white/8 py-3 text-white focus:border-purple-400"
                 {...register("weightScale")}
               >
-                <option className="text-indigo-900/70 font-semibold">
+                <option className="bg-slate-900 font-semibold text-white">
                   LBs
                 </option>
-                <option className="text-indigo-900/70 font-semibold">
+                <option className="bg-slate-900 font-semibold text-white">
                   Kgs
                 </option>
               </select>
@@ -210,15 +210,15 @@ function Data() {
           {/* Height Field */}
           <div className="grid grid-cols-2 gap-4">
             <div className="relative">
-              <label className="block text-sm font-medium text-purple-200 mb-1">
+              <label className="mb-1 block text-sm font-medium text-white/70">
                 Height
               </label>
               <input
                 type="number"
                 step="any"
                 placeholder="Enter height"
-                className={`w-full max-md:text-xs px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 ${
-                  errors.height ? "border-red-500" : "border-white/20"
+                className={`theme-input max-md:text-xs rounded-lg border-2 py-3 text-white placeholder:text-white/35 ${
+                  errors.height ? "border-red-500 bg-red-500/5 text-white" : "border-white/15 bg-white/8 text-white focus:border-purple-400"
                 }`}
                 {...register("height", {
                   required: { value: true, message: "Height is required" },
@@ -246,23 +246,22 @@ function Data() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-purple-200 mb-1">
+              <label className="mb-1 block text-sm font-medium text-white/70">
                 Unit
               </label>
               <select
-                className="w-full px-4 py-3 max-md:text-xs bg-white/10 backdrop-blur-sm rounded-lg border-2 border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+                className="theme-select max-md:text-xs rounded-lg border-2 border-white/15 bg-white/8 py-3 text-white focus:border-purple-400"
                 {...register("lengthScale")}
               >
-                <option className="text-indigo-900/70 font-semibold">ft</option>
-                <option className="text-indigo-900/70 font-semibold">cm</option>
+                <option className="bg-slate-900 font-semibold text-white">ft</option>
+                <option className="bg-slate-900 font-semibold text-white">cm</option>
               </select>
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-purple-500/25 flex items-center justify-center"
+            className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-3 font-semibold text-white shadow-lg shadow-purple-950/25 transition-all duration-300 hover:scale-105 hover:from-purple-400 hover:to-sky-400 active:scale-95"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

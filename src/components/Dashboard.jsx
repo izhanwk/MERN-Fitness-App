@@ -812,7 +812,7 @@ const NutritionTracker = () => {
         </div>
       )}
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white font-sans relative">
+      <div className="min-h-screen bg-black/40 text-white font-sans relative">
         {/* ambient blobs */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
           <div className="absolute -top-48 -right-48 w-96 h-96 bg-purple-600/12 rounded-full blur-[100px]" />
@@ -829,7 +829,7 @@ const NutritionTracker = () => {
                 Welcome back
               </p>
               <h1 className="text-lg sm:text-xl font-bold flex flex-wrap items-center gap-2">
-                <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-fuchsia-400 via-violet-300 to-sky-300 bg-clip-text text-transparent">
                   {userName || "Athlete"}
                 </span>
                 <span className="text-white/20 font-light">·</span>

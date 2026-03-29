@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Loader from "./Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -54,8 +55,10 @@ function Protectedroute2({ children }) {
 
   if (!shouldRenderChildren) {
     return (
-      <div className="min-h-screen flex justify-center bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-0 m-0  items-center font-dm-sans relative overflow-hidden">
-        <div className="w-16 h-16 border-4 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin"></div>
+      <div className="app-shell flex items-center justify-center font-dm-sans">
+        <div className="ambient-orbs" />
+        <div className="ambient-orb-center" />
+        <Loader />
       </div>
     );
   }
