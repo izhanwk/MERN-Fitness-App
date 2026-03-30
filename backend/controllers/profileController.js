@@ -5,7 +5,6 @@ import { isNonEmptyString, parseFiniteNumber } from "../utils/validators.js";
 
 export const getData = async (req, res) => {
   try {
-    console.log("Hite");
     const email = req.email;
     const user = await Data.findOne({ email: email }).select(safeUserFields);
     if (user) {
@@ -21,7 +20,6 @@ export const getData = async (req, res) => {
 };
 
 export const saveData = async (req, res) => {
-  console.log("Data hit");
   const email = req.user.email;
   const { name, date, gender, weight, weightScale, height, lengthScale } =
     req.body;
@@ -45,7 +43,6 @@ export const saveData = async (req, res) => {
       await user.save();
       return res.status(200).json({ message: "Data saved in DB collection" });
     } else {
-      console.log("User not found");
       return res.status(400).json({ message: "User not found" });
     }
   } catch (err) {
@@ -64,7 +61,6 @@ export const saveMode = async (req, res) => {
       await user.save();
       return res.status(200).json({ message: "Saved in DB" });
     } else {
-      console.log("User not found");
       return res.status(400).json({ message: "Could not save in DB" });
     }
   } catch (err) {
@@ -82,7 +78,6 @@ export const saveActivity = async (req, res) => {
       await user.save();
       return res.status(200).json({ message: "Saved in DB" });
     } else {
-      console.log("User not found");
       return res.status(404).json({ message: "User not found" });
     }
   } catch (err) {
@@ -101,7 +96,6 @@ export const saveGoal = async (req, res) => {
       await user.save();
       return res.status(200).json({ message: "Saved in DB" });
     } else {
-      console.log("User not found");
       return res.status(400).json({ message: "Could not save in DB" });
     }
   } catch (err) {

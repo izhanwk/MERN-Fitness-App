@@ -111,7 +111,6 @@ export const signIn = async (req, res) => {
     const token = createAccessToken(user);
     const refreshToken = createRefreshToken(user);
 
-    console.log("Session not exist");
     const newSession = await createSession({
       user,
       req,

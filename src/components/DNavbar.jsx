@@ -193,22 +193,24 @@ function DNavbar() {
     <div className="relative">
       {loading && <Loader />}
       <Alert />
-      <nav className="theme-nav relative z-20 flex h-20 items-center">
-        <div className="flex items-center justify-between w-full px-6 md:px-8">
+      <nav className="theme-nav relative z-20 flex h-16 items-center sm:h-20">
+        <div className="flex w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <div
-            className="flex cursor-pointer items-center space-x-2"
+            className="flex min-w-0 cursor-pointer items-center gap-2 sm:gap-3"
             onClick={() => navigate("/dashboard")}
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 shadow-lg shadow-purple-950/40">
-              <Dumbbell className="w-6 h-6 text-white" strokeWidth={2.5} />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 shadow-lg shadow-purple-950/40 sm:h-10 sm:w-10">
+              <Dumbbell className="h-5 w-5 text-white sm:h-6 sm:w-6" strokeWidth={2.5} />
             </div>
-            <span className="text-white font-bold text-xl">FitTracker</span>
+            <span className="truncate text-lg font-bold text-white sm:text-xl">
+              FitTracker
+            </span>
           </div>
 
-          <ul className="hidden md:flex text-white font-dm-sans space-x-6 items-center">
+          <ul className="hidden items-center space-x-2 font-dm-sans text-white lg:flex xl:space-x-4">
             <li>
               <button
-                className="cursor-pointer rounded-xl px-4 py-2 text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                className="cursor-pointer rounded-xl px-3 py-2 text-sm text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white xl:px-4"
                 onClick={() => scrollToFooterSection("footer-contact")}
               >
                 Contact
@@ -216,7 +218,7 @@ function DNavbar() {
             </li>
             <li>
               <button
-                className="cursor-pointer rounded-xl px-4 py-2 text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                className="cursor-pointer rounded-xl px-3 py-2 text-sm text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white xl:px-4"
                 onClick={() => scrollToFooterSection("footer-about")}
               >
                 About us
@@ -224,7 +226,7 @@ function DNavbar() {
             </li>
             <li>
               <button
-                className="cursor-pointer rounded-xl px-4 py-2 text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                className="cursor-pointer rounded-xl px-3 py-2 text-sm text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white xl:px-4"
                 onClick={() => scrollToFooterSection("footer-guide")}
               >
                 Guide
@@ -232,7 +234,7 @@ function DNavbar() {
             </li>
             <li>
               <button
-                className="cursor-pointer rounded-xl px-4 py-2 text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                className="cursor-pointer rounded-xl px-3 py-2 text-sm text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white xl:px-4"
                 onClick={() => navigate("/sessions")}
               >
                 Sessions
@@ -240,7 +242,7 @@ function DNavbar() {
             </li>
             <li>
               <button
-                className="cursor-pointer rounded-full border border-red-400/25 bg-red-500/15 px-6 py-2 text-red-200 transition-all duration-200 hover:bg-red-500/25"
+                className="cursor-pointer rounded-full border border-red-400/25 bg-red-500/15 px-5 py-2 text-sm text-red-200 transition-all duration-200 hover:bg-red-500/25 xl:px-6"
                 onClick={() => setvisible(true)}
               >
                 Logout
@@ -249,7 +251,7 @@ function DNavbar() {
           </ul>
 
           <button
-            className="md:hidden text-white"
+            className="rounded-xl p-2 text-white transition-colors hover:bg-white/8 lg:hidden"
             onClick={() => setMenuOpen(!menuOpen)}
           >
             {menuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -258,7 +260,7 @@ function DNavbar() {
       </nav>
 
       {menuOpen && (
-        <div className="absolute left-0 top-20 z-40 flex w-full flex-col space-y-3 border-b border-white/10 bg-slate-950/90 px-6 py-4 text-white backdrop-blur-lg md:hidden">
+        <div className="absolute left-0 top-16 z-40 flex w-full flex-col space-y-3 border-b border-white/10 bg-slate-950/90 px-4 py-4 text-white backdrop-blur-lg sm:top-20 sm:px-6 lg:hidden">
           <button
             className="cursor-pointer rounded-xl px-3 py-2 text-left text-white/70 transition-colors hover:bg-white/8 hover:text-white"
             onClick={() => {
@@ -313,11 +315,11 @@ function DNavbar() {
             className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-md"
             onClick={() => setvisible(false)}
           />
-          <div className="fixed left-1/2 top-1/2 z-50 h-auto w-96 max-w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/10 bg-slate-900/95 p-6 shadow-2xl shadow-black/70">
+          <div className="fixed left-1/2 top-1/2 z-50 h-auto w-96 max-w-[92%] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/10 bg-slate-900/95 p-5 shadow-2xl shadow-black/70 sm:max-w-[90%] sm:p-6">
             <p className="mb-4 font-dm-sans text-lg font-semibold text-white">
               Are you sure you want to logout?
             </p>
-            <div className="mt-6 flex gap-3">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <button
                 className="flex-1 rounded-2xl border border-white/10 bg-white/6 py-3 text-center font-medium text-white/80 transition-all duration-200 hover:bg-white/10 hover:text-white"
                 onClick={() => setvisible(false)}

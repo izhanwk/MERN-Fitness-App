@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import Sessions from "../../Model/Sessions.js";
-import { getClientIp } from "../utils/getClientIp.js";
 
 const secretkey = process.env.SECRET_KEY;
 
@@ -28,9 +27,6 @@ export const verifyToken = async (req, res, next) => {
     req.email = decodedToken.email;
     req.userId = decodedToken.userId;
     req.sessionId = sessionId;
-
-    const ip = getClientIp(req);
-    console.log("IP of device : ", ip);
 
     const session = await Sessions.findOne({
       _id: sessionId,
