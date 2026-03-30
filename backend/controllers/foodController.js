@@ -94,7 +94,7 @@ export const getFoodPage = async (req, res) => {
       showMore: totalLength > skip + products.length,
     }));
     return res.status(200).json(response);
-  } catch (err) {
+  } catch {
     return res.status(200).json({ message: "An error occured" });
   }
 };

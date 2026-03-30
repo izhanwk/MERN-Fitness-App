@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DNavbar from "./DNavbar";
 import axios from "axios";
 import Loader from "./Loader";
@@ -149,18 +149,10 @@ function Edit() {
       setForm(next);
       setInitialForm(next);
 
-      showAlert(
-        "Profile updated successfully!",
-        "success",
-        "Update Successful"
-      );
+      showAlert("Profile updated successfully!", "success", "Update Successful");
     } catch (e) {
       console.error(e);
-      showAlert(
-        "There was a problem saving your changes.",
-        "error",
-        "Save Failed"
-      );
+      showAlert("There was a problem saving your changes.", "error", "Save Failed");
     } finally {
       setSaving(false);
     }
@@ -200,17 +192,12 @@ function Edit() {
   ];
 
   useEffect(() => {
-    console.log(form.goal);
-    if (form.goal == "musclegain") {
+    if (form.goal === "musclegain") {
       setgoaltype(["Moderate Musclegain", "Fast Musclegain"]);
-    } else if (form.goal == "fatloss") {
+    } else if (form.goal === "fatloss") {
       setgoaltype(["Moderate fatloss", "Fast fatloss"]);
     }
   }, [form.goal]);
-
-  useEffect(() => {
-    console.log(goaltype);
-  }, [goaltype]);
 
   return (
     <div className="app-shell font-dm-sans">
@@ -443,7 +430,7 @@ function Edit() {
                         ].join(" ")}
                       >
                         <div className="flex items-center gap-3">
-                            <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-r from-purple-500 to-blue-500">
+                          <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-r from-purple-500 to-blue-500">
                             <span className="text-xs font-semibold text-white">
                               {opt.badge}
                             </span>
@@ -481,7 +468,7 @@ function Edit() {
                 <button
                   type="button"
                   onClick={() => navigate(-1)}
-                    className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-white/90 transition hover:bg-white/10"
+                  className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-white/90 transition hover:bg-white/10"
                 >
                   Cancel
                 </button>
