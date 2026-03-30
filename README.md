@@ -1,6 +1,6 @@
 # FitTrack App
 
-FitTrack is a full-stack fitness and nutrition tracking app built with React, Express, and MongoDB. It helps users set up their profile, track calorie and nutrition intake, search food data, and manage active sessions across devices.
+FitTrack is a full-stack fitness and nutrition tracking app built with React, Express, and MongoDB. It helps users set up their profile, track calorie and nutrition intake, search food data, select foods portion-wise, and manage active sessions across devices.
 
 This project is structured as a real deployed application, not just a frontend demo. It includes authentication, Google sign-in, email-based account flows, session management, onboarding logic, and password reset with OTP protection.
 
@@ -10,7 +10,7 @@ This project is structured as a real deployed application, not just a frontend d
 - Google sign-in support
 - Session tracking across devices with remote session revocation
 - Onboarding flow for profile completion
-- Food search and paginated food browsing
+- Food search, portion-aware selection, and paginated food browsing
 - Persisted user tracking state
 - OTP-based password reset with expiry and request limiting
 - Resend-based transactional email delivery
@@ -34,13 +34,18 @@ src/
   main.jsx
 
 backend/
+  app.js
   controllers/
   middleware/
   routes/
   services/
+  test/
   utils/
   views/
   server.js
+
+e2e/
+  signin-dashboard.spec.js
 
 Model/
   Registerdata.js
@@ -72,6 +77,7 @@ Model/
 
 - Browse food data with pagination
 - Search foods by name
+- Select foods by serving/portion size before adding them to the meal log
 - Save and restore the user's working nutrition array/state
 - Display dashboard data for macros and micros
 
@@ -91,7 +97,7 @@ The backend was refactored from a single large file into focused modules:
 - `services/`: reusable service logic such as session creation
 - `utils/`: helpers for validation, token generation, safe user projections, and profile-completion logic
 
-This keeps `backend/server.js` focused on application bootstrapping, database connection, middleware setup, and route mounting.
+This keeps `backend/app.js` focused on Express app creation and route mounting, while `backend/server.js` handles database connection and server startup.
 
 ## Main API Areas
 
@@ -103,25 +109,37 @@ This keeps `backend/server.js` focused on application bootstrapping, database co
 
 ## Screenshots
 
-### Home
+### Home Page
 
-![Home](screenshots/mainpage.png)
-
-### Sign In
-
-![Sign In](screenshots/loginsystem.png)
+![Home Page](screenshots/mainHomePage.png)
 
 ### Dashboard
 
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](screenshots/Beautiful%20Dashboard.png)
 
-### Nutrition Detail
+### Food Search and Portion Selection
 
-![Nutrition Detail](screenshots/macrosandmicros.png)
+![Food Portion Selection](screenshots/foodPortion%20Selection.png)
+
+### Food Catalog
+
+![List of Food](screenshots/List%20of%20Food.png)
+
+### Edit Selected Food
+
+![Edit Selected Food](screenshots/editeselectedfood.png)
 
 ### Session Management
 
-![Session Management](screenshots/home1.png)
+![Session Management](screenshots/Session%20Management.png)
+
+### Footer
+
+![Footer](screenshots/Footer.png)
+
+### Product Infographics
+
+![Product Infographics](screenshots/Userfrienlyinfographucs.png)
 
 ## Local Setup
 
@@ -169,12 +187,30 @@ npm run dev
 
 ## Testing
 
-This repo uses Vitest with Testing Library for frontend component tests.
+This repo uses Vitest for both frontend and backend testing.
 
 Run the full test suite:
 
 ```bash
 npm run test:run
+```
+
+Run the backend integration test suite:
+
+```bash
+npm.cmd run test:backend
+```
+
+Run the Playwright end-to-end suite:
+
+```bash
+npm.cmd run test:e2e
+```
+
+Run a single backend integration file:
+
+```bash
+npm.cmd run test:backend -- auth.test.js
 ```
 
 Run the auth component tests directly:
@@ -183,7 +219,7 @@ Run the auth component tests directly:
 npm run test:run -- src/components/__tests__/Signin.test.jsx src/components/__tests__/Register.test.jsx
 ```
 
-Current frontend coverage includes:
+Frontend coverage includes:
 
 - dashboard rendering and food dropdown interaction
 - dashboard persisted meal-log rendering
@@ -191,12 +227,30 @@ Current frontend coverage includes:
 - sign-in form rendering and successful auth redirect
 - incomplete-profile redirect handling after sign-in
 - invalid-credentials handling on sign-in
-- sign-in network-failure alert handling`r`n- change-password OTP rate-limit alert handling`r`n- registration form rendering and successful signup redirect
+- sign-in network-failure alert handling
+- change-password OTP rate-limit alert handling
+- registration form rendering and successful signup redirect
 - client-side registration validation for mismatched passwords
 - existing-email handling during registration
 - registration failure alert handling
 
-GitHub Actions runs `npm run test:run` on every push and pull request through [`.github/workflows/test.yml`](/C:/Users/izhan/Desktop/Node%20JS/React/new%20fitness%20app/.github/workflows/test.yml).
+Backend integration coverage includes:
+
+- auth route tests for invalid sign-in, valid sign-in, token refresh, and invalid session refresh rejection
+- session route tests for missing auth rejection, session listing, remote session revocation, and active-session protection
+- password-reset route tests for unknown-user rejection, OTP creation, successful password change, invalid OTP rejection, and OTP rate limiting
+
+Backend integration tests use `supertest` against [`backend/app.js`](/C:/Users/izhan/Desktop/Node%20JS/React/new%20fitness%20app/backend/app.js). The shared setup in [`backend/test/setup.js`](/C:/Users/izhan/Desktop/Node%20JS/React/new%20fitness%20app/backend/test/setup.js) connects to `TEST_MONGODB_URI` when provided, otherwise it uses `MONGODB_URI` with an isolated `fittrack_test_*` database name. External email delivery is mocked in route tests so no real Resend calls are made.
+
+Playwright end-to-end coverage includes:
+
+- sign in with a seeded user
+- add a seeded food item from the dashboard
+- open the meal log and confirm the tracked food appears
+
+The Playwright setup uses [`playwright.config.js`](/C:/Users/izhan/Desktop/Node%20JS/React/new%20fitness%20app/playwright.config.js) to boot isolated frontend and backend servers on dedicated e2e ports and uses an isolated MongoDB database name for the flow.
+
+GitHub Actions currently runs `npm run test:run` on every push and pull request through [`.github/workflows/test.yml`](/C:/Users/izhan/Desktop/Node%20JS/React/new%20fitness%20app/.github/workflows/test.yml).
 
 ## Production Notes
 
@@ -223,15 +277,6 @@ GitHub Actions runs `npm run test:run` on every push and pull request through [`
 - Added safer input validation utilities
 - Reduced accidental exposure of sensitive user fields
 
-## Current Gaps / Next Improvements
-
-- Add automated backend integration tests
-- Expand frontend flow tests beyond auth into dashboard and session-management paths
-- Normalize remaining legacy status-code behavior where frontend allows it
-- Add centralized API error formatting
-- Add `.env.example`
-- Remove remaining unused dependencies from `package.json`
-
 ## Why This Project Matters
 
 This project demonstrates practical full-stack engineering beyond basic CRUD:
@@ -246,4 +291,3 @@ This project demonstrates practical full-stack engineering beyond basic CRUD:
 ## Author
 
 Built by Izhan as a production-style portfolio project focused on full-stack product development, auth/session flows, and applied backend architecture.
-

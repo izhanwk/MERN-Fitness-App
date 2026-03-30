@@ -11,7 +11,9 @@ export const getSessions = async (req, res) => {
       .lean();
 
     const sanitizedSessions = sessions.map((session) => {
-      const { token, __v, ...rest } = session;
+      const rest = { ...session };
+      delete rest.token;
+      delete rest.__v;
       const id = session._id.toString();
       return {
         ...rest,

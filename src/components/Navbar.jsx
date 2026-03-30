@@ -1,11 +1,25 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // for hamburger icons
 import { Dumbbell } from "lucide-react";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const publicRoutes = ["/", "/signin", "/signup", "/changepassword"];
+
+    if (token && publicRoutes.includes(location.pathname)) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [location.pathname, navigate, token]);
+
+  const navigateHome = () => {
+    navigate(token ? "/dashboard" : "/");
+  };
 
   const scrollToFooterSection = (sectionId) => {
     const section = document.getElementById(sectionId);
@@ -20,7 +34,7 @@ const Navbar = () => {
         <div className="flex w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <div
             className="flex min-w-0 cursor-pointer items-center gap-2 sm:gap-3"
-            onClick={() => navigate("/")}
+            onClick={navigateHome}
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 shadow-lg shadow-purple-950/40 sm:h-10 sm:w-10">
               <Dumbbell
@@ -36,7 +50,7 @@ const Navbar = () => {
           <ul className="hidden items-center space-x-2 font-dm-sans text-white lg:flex xl:space-x-4">
             <li
               className="cursor-pointer rounded-xl px-3 py-2 text-sm text-white/65 transition-all duration-200 hover:bg-white/10 hover:text-white xl:px-4"
-              onClick={() => navigate("/")}
+              onClick={navigateHome}
             >
               Home
             </li>
@@ -75,7 +89,7 @@ const Navbar = () => {
           <span
             className="cursor-pointer rounded-xl px-3 py-2 text-white/70 transition-colors hover:bg-white/8 hover:text-white"
             onClick={() => {
-              navigate("/");
+              navigateHome();
               setMenuOpen(false);
             }}
           >

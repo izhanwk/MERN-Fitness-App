@@ -116,7 +116,7 @@ export const checkData = async (req, res) => {
     } else {
       return res.status(210).json({ message: "Not completed" });
     }
-  } catch (err) {
+  } catch {
     return res.status(500).json({ message: "Not Completed" });
   }
 };
