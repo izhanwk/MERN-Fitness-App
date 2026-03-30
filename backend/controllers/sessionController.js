@@ -43,7 +43,6 @@ export const logout = async (req, res) => {
 export const logoutSession = async (req, res) => {
   try {
     const id = req.query.id;
-    console.log("Deleting session:", id);
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid session identifier" });
     }

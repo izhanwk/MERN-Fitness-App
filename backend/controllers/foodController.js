@@ -9,7 +9,6 @@ export const getStore = async (req, res) => {
     if (user) {
       return res.status(200).json(user.array);
     } else {
-      console.log("User not found");
       return res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
@@ -22,7 +21,6 @@ export const saveStore = async (req, res) => {
   try {
     const email = req.email;
     const array = req.body.array;
-    console.log(array);
     const user = await Data.findOne({ email });
 
     if (user) {
@@ -30,7 +28,6 @@ export const saveStore = async (req, res) => {
       await user.save();
       return res.status(200).json(array);
     } else {
-      console.log("User not found");
       return res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
@@ -53,7 +50,6 @@ export const searchFood = async (req, res) => {
     const search = req.query.text || "";
     const filter = search ? { name: { $regex: search, $options: "i" } } : {};
     const foods = await Foods.find(filter).lean();
-
     res.status(200).json(foods);
   } catch (err) {
     console.error("Error in /search:", err);
@@ -61,13 +57,35 @@ export const searchFood = async (req, res) => {
   }
 };
 
+export const getPortions = async (req, res) => {
+  try {
+    const name = (req.query.name || "").trim();
+
+    if (!name) {
+      return res.status(400).json({ message: "Food name is required" });
+    }
+
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const food = await Foods.findOne({
+      name: { $regex: `^${escapedName}$`, $options: "i" },
+    }).lean();
+
+    if (!food) {
+      return res.status(404).json({ message: "Food not found" });
+    }
+
+    const portions = (food.portions || []).map((portion) => portion.label);
+    return res.status(200).json(portions);
+  } catch (err) {
+    console.error("Error in /getportion:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const getFoodPage = async (req, res) => {
-  console.log("Page from fontend : ", req.query.page);
   const page = parseInt(req.query.page) || 0;
   try {
-    console.log("Page no : ", page);
     const totalLength = await Foods.countDocuments({});
-    console.log("Length of document : ", totalLength);
     const limit = 15;
     const skip = limit * page;
     const products = await Foods.find({}).skip(skip).limit(limit);
@@ -75,7 +93,6 @@ export const getFoodPage = async (req, res) => {
       ...product.toObject(),
       showMore: totalLength > skip + products.length,
     }));
-    console.log("Response length : ", response.length);
     return res.status(200).json(response);
   } catch (err) {
     return res.status(200).json({ message: "An error occured" });

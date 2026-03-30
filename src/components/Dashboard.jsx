@@ -141,8 +141,11 @@ const NutritionTracker = () => {
   const [foodSearchInitialized, setFoodSearchInitialized] = useState(false);
   const [showList, setshowList] = useState(false);
   const [rotation, setrotation] = useState(false);
-  const [indexFood, setindexFood] = useState(0);
+  const [portionVisibility, setPortionVisibility] = useState(false);
+  const [portionRotation, setPortionRotation] = useState(false);
+  const [selectedFood, setSelectedFood] = useState(null);
   const [quantity, setquantity] = useState("");
+  const [portion, setPortion] = useState("");
   const [loading, setLoading] = useState(true);
 
   const [userData, setuserData] = useState({});
@@ -203,6 +206,9 @@ const NutritionTracker = () => {
   const [storeBootstrapped, setStoreBootstrapped] = useState(false);
   const reachedBottom = useRef(false);
   const mainList = useRef(true);
+  const portionBox = useRef(null);
+
+  const [portionOpts, setportionOpts] = useState([]);
 
   useEffect(() => {
     const el = sBox.current;
@@ -220,7 +226,10 @@ const NutritionTracker = () => {
         track = el.offsetHeight;
       const thumb = (visible / total) * track;
       const thumbPos = (el.scrollTop / (total - visible)) * (track - thumb);
-      if (thumbPos >= track - thumb) setpage((p) => p + 1);
+      if (thumbPos >= track - thumb) {
+        reachedBottom.current = true;
+        setpage((p) => p + 1);
+      }
     };
     calc();
     el.addEventListener("scroll", calc);
@@ -253,6 +262,7 @@ const NutritionTracker = () => {
         initialFetchingDone.current = true;
         setfood((p) => [...p, ...data]);
         setoriginalList((p) => [...p, ...data]);
+        more.current = data.length > 0 && data[0].showMore;
       }
     } catch (err) {
       console.error(err);
@@ -284,9 +294,11 @@ const NutritionTracker = () => {
         });
         if (res.status >= 200 && res.status < 300) {
           const data = res.data;
+          const hasMore = data.length > 0 && data[0].showMore;
+
           setfood((p) => [...p, ...data]);
           setoriginalList((p) => [...p, ...data]);
-          if (data.length > 0 && !data[0].showMore) more.current = false;
+          more.current = hasMore;
           reachedBottom.current = false;
         }
       } catch (err) {
@@ -431,6 +443,30 @@ const NutritionTracker = () => {
     if (sBox.current) sBox.current.scrollTop = 0;
   };
   const rotate = () => setrotation((r) => !r);
+  const togglePortionDropdown = () => setPortionVisibility((v) => !v);
+  const rotatePortion = () => setPortionRotation((r) => !r);
+  const portionFunction = async (foodName) => {
+    if (!foodName) {
+      setportionOpts([]);
+      return;
+    }
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${API_URL}/getportion?name=${encodeURIComponent(foodName)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+        },
+      );
+      setportionOpts(Array.isArray(response.data) ? response.data : []);
+    } catch (err) {
+      console.error(err);
+      setportionOpts([]);
+    }
+  };
 
   const isSearching = useRef(false);
   const onlineSearch = useRef(false);
@@ -481,19 +517,6 @@ const NutritionTracker = () => {
       return setfood(originalList);
     }
     isSearching.current = true;
-    const filtered = (originalList.length > 0 ? originalList : food).filter(
-      (item) =>
-        Object.values(item)
-          .join("")
-          .toLowerCase()
-          .includes(input.toLowerCase()),
-    );
-    if (filtered.length > 0) {
-      setempty(false);
-      debouncedApiSearch.cancel();
-      setfood(filtered);
-      return;
-    }
     debouncedApiSearch(input);
   };
 
@@ -519,6 +542,21 @@ const NutritionTracker = () => {
     document.addEventListener("mousedown", outside);
     return () => document.removeEventListener("mousedown", outside);
   }, [searchVisiblity]);
+
+  useEffect(() => {
+    const outside = (e) => {
+      if (
+        portionVisibility &&
+        portionBox.current &&
+        !portionBox.current.contains(e.target)
+      ) {
+        rotatePortion();
+        setPortionVisibility(false);
+      }
+    };
+    document.addEventListener("mousedown", outside);
+    return () => document.removeEventListener("mousedown", outside);
+  }, [portionVisibility]);
 
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   useEffect(() => {
@@ -571,6 +609,7 @@ const NutritionTracker = () => {
             validateStatus: () => true,
           },
         );
+
         setnewfood(initialFood);
       } catch (e) {
         console.error(e);
@@ -580,10 +619,20 @@ const NutritionTracker = () => {
     })();
   }, [initialFood, isFirstLoad]);
 
-  const setFood = (index) => {
-    const sel = food[index];
+  const setFood = () => {
+    const sel = selectedFood;
     if (!sel || !quantity || Number(quantity) <= 0) return;
-    setinitialFood((p) => [...p, { ...sel, quantity: Number(quantity) }]);
+    const selectedPortion = sel.portions?.find(
+      (item) => item.label === portion,
+    );
+    const portionData = selectedPortion || sel.portions?.[0];
+
+    if (!portionData) return;
+
+    setinitialFood((p) => [
+      ...p,
+      { ...portionData, name: sel.name, quantity: Number(quantity) },
+    ]);
     setquantity("");
   };
 
@@ -631,6 +680,7 @@ const NutritionTracker = () => {
 
   const removefood = (idx) =>
     setinitialFood((p) => p.filter((_, i) => i !== idx));
+  const clearAllFood = () => setinitialFood([]);
 
   useEffect(
     () => setcalPercentage(safePct(tcalories, Crequirement)),
@@ -873,12 +923,22 @@ const NutritionTracker = () => {
                       tracked today
                     </p>
                   </div>
-                  <button
-                    onClick={() => setshowList(false)}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-white/40 transition-colors hover:bg-white/8 hover:text-white"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {newfood.length > 0 && (
+                      <button
+                        onClick={clearAllFood}
+                        className="rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-1.5 text-[11px] font-semibold text-red-300 transition-all hover:bg-red-500/20 hover:text-red-200"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setshowList(false)}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-white/40 transition-colors hover:bg-white/8 hover:text-white"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
                 <div className="max-h-[55vh] overflow-y-auto px-4 py-4 space-y-2">
                   {newfood.length > 0 ? (
@@ -999,8 +1059,10 @@ const NutritionTracker = () => {
                           key={i}
                           onClick={() => {
                             searchFood();
-                            setindexFood(i);
+                            setSelectedFood(f);
                             setselectFood(f.name);
+                            setPortion("");
+                            portionFunction(f.name);
                             rotate();
                           }}
                           className="flex items-center gap-2 cursor-pointer rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-all hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white"
@@ -1013,6 +1075,49 @@ const NutritionTracker = () => {
                           <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
                         </li>
                       )}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Portion */}
+              <div
+                ref={portionBox}
+                className={`relative w-full sm:w-32 ${portionVisibility ? "z-50" : "z-10"}`}
+              >
+                <div
+                  onClick={() => {
+                    togglePortionDropdown();
+                    rotatePortion();
+                  }}
+                  className="flex h-11 w-full cursor-pointer items-center justify-between rounded-xl border border-white/15 bg-white/90 px-4 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-white"
+                >
+                  <span
+                    className={`truncate ${portion ? "text-slate-700" : "text-slate-400"}`}
+                  >
+                    {portion || "Portion"}
+                  </span>
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 text-slate-500 transition-transform duration-300 ${portionRotation ? "-rotate-180" : ""}`}
+                  />
+                </div>
+
+                {portionVisibility && (
+                  <div className="absolute left-0 top-[calc(100%+6px)] z-[70] w-full rounded-xl border border-slate-200 bg-white p-2 shadow-2xl shadow-black/40">
+                    <ul className="space-y-1">
+                      {portionOpts.map((option) => (
+                        <li
+                          key={option}
+                          onClick={() => {
+                            setPortion(option);
+                            rotatePortion();
+                            setPortionVisibility(false);
+                          }}
+                          className="cursor-pointer rounded-lg px-3 py-2 text-left text-xs leading-5 font-medium text-slate-700 transition-all hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white"
+                        >
+                          {option}
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 )}
@@ -1035,7 +1140,7 @@ const NutritionTracker = () => {
                     e.preventDefault();
                     return;
                   }
-                  setFood(indexFood);
+                  setFood();
                 }}
                 className="flex h-11 w-full sm:w-28 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 font-bold text-sm text-white shadow-lg shadow-emerald-900/30 transition-all hover:from-emerald-400 hover:to-emerald-500 active:scale-95"
               >
@@ -1071,3 +1176,4 @@ const NutritionTracker = () => {
 };
 
 export default NutritionTracker;
+
