@@ -38,7 +38,10 @@ function Footer() {
               </p>
             </div>
 
-            <div id="footer-contact" className="space-y-3 scroll-mt-28 sm:col-span-2 lg:col-span-1">
+            <div
+              id="footer-contact"
+              className="space-y-3 scroll-mt-28 sm:col-span-2 lg:col-span-1"
+            >
               <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/25">
                 Contact
               </p>
@@ -66,7 +69,9 @@ function Footer() {
           <p className="text-[11px] text-white/20">
             &copy; {new Date().getFullYear()} FitTrack
           </p>
-          <p className="text-[11px] text-white/20">Minimal fitness tracking</p>
+          <p className="text-[11px] text-white/20">
+            FitTracker fitness tracking
+          </p>
         </div>
       </div>
     </footer>
