@@ -2,7 +2,7 @@ import { Dumbbell, Mail, Phone } from "lucide-react";
 
 function Footer() {
   return (
-    <footer className="relative z-10 border-t border-white/[0.06] bg-black/40 backdrop-blur-sm">
+    <footer className="relative z-0 border-t border-white/[0.06] bg-black/40 backdrop-blur-sm">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12 lg:px-10">
         <div className="flex flex-col gap-8 sm:gap-10 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-4 lg:max-w-[220px]">

@@ -164,30 +164,35 @@ function Edit() {
       sub: "Little or no workout",
       value: 1.2,
       badge: "Easy",
+      mark: "S",
     },
     {
       label: "Lightly Active",
       sub: "Exercise 1–3 days/week",
       value: 1.375,
       badge: "Light",
+      mark: "L",
     },
     {
       label: "Moderately Active",
       sub: "Exercise 3–5 days/week",
       value: 1.55,
       badge: "Balanced",
+      mark: "M",
     },
     {
       label: "Very Active",
       sub: "Exercise 6–7 days/week",
       value: 1.725,
       badge: "High",
+      mark: "V",
     },
     {
       label: "Super Active",
       sub: "For athletes",
       value: 1.9,
       badge: "Athlete",
+      mark: "A",
     },
   ];
 
@@ -430,9 +435,9 @@ function Edit() {
                         ].join(" ")}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-r from-purple-500 to-blue-500">
-                            <span className="text-xs font-semibold text-white">
-                              {opt.badge}
+                          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-r from-purple-500 to-blue-500 shadow-lg shadow-purple-950/20">
+                            <span className="text-sm font-bold leading-none text-white">
+                              {opt.mark}
                             </span>
                           </div>
                           <div>
