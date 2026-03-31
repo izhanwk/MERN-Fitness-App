@@ -6,6 +6,7 @@ export const buildAuthResponsePayload = ({
 }) => ({
   success: true,
   needsOnboarding: !user.height || !user.weight || !user.activity,
+  nextStep: !user.height || !user.weight || !user.activity ? "onboarding" : "dashboard",
   data: {
     userId: user.id,
     email: user.email,

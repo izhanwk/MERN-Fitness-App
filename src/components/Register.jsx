@@ -8,6 +8,9 @@ import { useAlert } from "./Alert";
 import Footer from "./Footer";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const passwordRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+const passwordRuleMessage =
+  "Password must be at least 8 characters and include uppercase, lowercase, and a number";
 
 function Register() {
   const { showAlert, Alert } = useAlert();
@@ -42,8 +45,9 @@ function Register() {
         validateStatus: () => true,
       });
       if (response.status >= 200 && response.status < 300) {
+        const registeredEmail = response.data?.email || data.email;
         showAlert(
-          `Registration Successful! Please check ${response.data} for verification.`,
+          `Registration Successful! Please check ${registeredEmail} for verification.`,
           "success",
           "Account Created",
           8000,
@@ -56,10 +60,15 @@ function Register() {
         redirectTimeoutRef.current = setTimeout(() => {
           navigate("/signin");
         }, 8000);
-      } else if (response.status === 503) {
+      } else if (response.status === 409) {
         setError("email", {
           type: "server",
           message: "This email already exists",
+        });
+      } else if (response.status === 400) {
+        setError("password", {
+          type: "server",
+          message: response.data?.message || passwordRuleMessage,
         });
       }
     } catch (error) {
@@ -200,7 +209,11 @@ function Register() {
                     },
                     minLength: {
                       value: 8,
-                      message: "Password must be at least 8 characters",
+                      message: passwordRuleMessage,
+                    },
+                    pattern: {
+                      value: passwordRule,
+                      message: passwordRuleMessage,
                     },
                   })}
                 />

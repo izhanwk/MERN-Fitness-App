@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import Data from "../../Model/Registerdata.js";
+import User from "../../Model/User.js";
 import Sessions from "../../Model/Sessions.js";
-import { sendEmail } from "../emailSender.js";
+import { buildVerificationEmail, sendEmail } from "../emailSender.js";
 import { OAuth2Client } from "google-auth-library";
 import { buildAuthResponsePayload } from "../utils/authPayload.js";
 import { createSession } from "../services/sessionService.js";
@@ -11,16 +11,16 @@ import {
   isStrongEnoughPassword,
   isValidEmail,
   normalizeEmail,
+  passwordPolicyMessage,
 } from "../utils/validators.js";
-import {
-  createAccessToken,
-  createRefreshToken,
-} from "../utils/authTokens.js";
+import { createAccessToken, createRefreshToken } from "../utils/authTokens.js";
 
 const refreshkey = process.env.REFRESH;
 const googleClient = process.env.GOOGLE_CLIENT_ID
   ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
   : null;
+const INVALID_CREDENTIALS_MESSAGE =
+  "The information you entered is not correct";
 
 export const refreshToken = async (req, res) => {
   const { sessionId } = req.body;
@@ -48,8 +48,8 @@ export const refreshToken = async (req, res) => {
     }
 
     const user =
-      (await Data.findById(decoded.userId)) ||
-      (await Data.findOne({ email: decoded.email }));
+      (await User.findById(decoded.userId)) ||
+      (await User.findOne({ email: decoded.email }));
 
     if (!user) {
       await Sessions.deleteOne({ _id: sessionId });
@@ -87,25 +87,22 @@ export const signIn = async (req, res) => {
     const password = req.body.password;
 
     if (!isValidEmail(email) || !isStrongEnoughPassword(password)) {
-      return res
-        .status(401)
-        .json({ message: "The information you entered is not correct" });
+      return res.status(401).json({ message: INVALID_CREDENTIALS_MESSAGE });
     }
 
-    const user = await Data.findOne({ email });
+    const user = await User.findOne({ email }).collation({
+      locale: "en",
+      strength: 2,
+    });
 
     if (!user || !user.password) {
-      return res
-        .status(401)
-        .json({ message: "The information you entered is not correct" });
+      return res.status(401).json({ message: INVALID_CREDENTIALS_MESSAGE });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res
-        .status(401)
-        .send({ message: "The password you entered is incorrect" });
+      return res.status(401).json({ message: INVALID_CREDENTIALS_MESSAGE });
     }
 
     const token = createAccessToken(user);
@@ -123,10 +120,6 @@ export const signIn = async (req, res) => {
       refreshToken,
       sessionId,
     });
-
-    if (payload.needsOnboarding) {
-      return res.status(302).json(payload);
-    }
 
     return res.status(200).json(payload);
   } catch (err) {
@@ -174,10 +167,10 @@ export const googleSignIn = async (req, res) => {
         .json({ message: "Unable to verify Google account" });
     }
 
-    let user = await Data.findOne({ email: normalizedEmail });
+    let user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
-      user = new Data({
+      user = new User({
         email: normalizedEmail,
         password: null,
         verified: true,
@@ -215,10 +208,6 @@ export const googleSignIn = async (req, res) => {
       sessionId,
     });
 
-    if (responsePayload.needsOnboarding) {
-      return res.status(302).json(responsePayload);
-    }
-
     return res.status(200).json(responsePayload);
   } catch (error) {
     console.error("Google sign-in failed:", error);
@@ -232,12 +221,16 @@ export const register = async (req, res) => {
     const password = req.body.password;
 
     if (!isValidEmail(email) || !isStrongEnoughPassword(password)) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({
+        message: !isValidEmail(email)
+          ? "Invalid email address"
+          : passwordPolicyMessage,
+      });
     }
 
-    const exist = await Data.findOne({ email });
+    const exist = await User.findOne({ email });
     if (exist) {
-      return res.status(503).json({ message: "User already exists" });
+      return res.status(409).json({ message: "User already exists" });
     }
 
     const hashpassword = await bcrypt.hash(password, 10);
@@ -251,17 +244,21 @@ export const register = async (req, res) => {
     const baseUrl =
       process.env.SERVER_BASE_URL || `${req.protocol}://${req.get("host")}`;
     const url = `${baseUrl}/verify/${token}`;
+    const emailContent = buildVerificationEmail(url);
 
     await sendEmail({
       to: email,
       subject: "Verify your email",
-      html: `<h3>Click below to verify your email:</h3>
-             <a href="${url}">Click here to verify</a>`,
+      html: emailContent.html,
+      text: emailContent.text,
     });
-    res.status(200).send(email);
+    return res.status(200).json({
+      message: "Verification email sent",
+      email,
+    });
   } catch (err) {
-    console.error("Error sending verification email : ", err);
-    res.status(400).send("Registration failed : ", err);
+    console.error("Error sending verification email:", err);
+    return res.status(500).json({ message: "Registration failed" });
   }
 };
 
@@ -269,7 +266,7 @@ export const verifyEmail = async (req, res) => {
   try {
     const decoded = jwt.verify(req.params.token, process.env.JWT_VERIFY);
 
-    const exist = await Data.findOne({ email: decoded.email });
+    const exist = await User.findOne({ email: decoded.email });
     if (exist) {
       return res.render("verified", {
         success: false,
@@ -277,7 +274,7 @@ export const verifyEmail = async (req, res) => {
       });
     }
 
-    const newUser = new Data({
+    const newUser = new User({
       email: decoded.email,
       password: decoded.password,
       verified: true,

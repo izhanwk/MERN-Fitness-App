@@ -3,12 +3,16 @@ import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { test, expect } from "@playwright/test";
 
-import Data from "../Model/Registerdata.js";
+import User from "../Model/User.js";
 import Foods from "../Model/Foods.js";
 
 const email = "playwright-e2e@example.com";
 const password = "Password123";
-const dbName = process.env.MONGODB_DB_NAME || "fittrack_e2e";
+const dbName = "fittrack_e2e";
+
+if (dbName !== "fittrack_e2e") {
+  throw new Error("Refusing to run E2E against a non-test database");
+}
 
 async function connectToE2EDatabase() {
   if (!process.env.MONGODB_URI) {
@@ -24,7 +28,7 @@ test.beforeAll(async () => {
   await connectToE2EDatabase();
   await mongoose.connection.dropDatabase();
 
-  await Data.create({
+  await User.create({
     email,
     password: await bcrypt.hash(password, 10),
     verified: true,

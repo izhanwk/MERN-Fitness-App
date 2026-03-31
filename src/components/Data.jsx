@@ -67,8 +67,8 @@ function Data() {
             <input
               type="text"
               placeholder="Enter your name"
-              className={`theme-input rounded-lg border-2 py-3 text-white placeholder:text-white/35 ${
-                errors.name ? "border-red-500 bg-red-500/5 text-white" : "border-white/15 bg-white/8 text-white focus:border-purple-400"
+              className={`theme-input rounded-lg border-2 py-3 text-slate-800 placeholder:text-slate-400 ${
+                errors.name ? "border-red-500 bg-red-50 text-slate-800" : "border-white/15 bg-white/90 text-slate-800 focus:border-purple-400"
               }`}
               {...register("name", {
                 required: { value: true, message: "Name is required" },
@@ -102,8 +102,8 @@ function Data() {
             </label>
             <input
               type="date"
-              className={`theme-input rounded-lg border-2 py-3 ${
-                errors.date ? "border-red-500 bg-red-500/5 text-white" : "border-white/15 bg-white/8 text-white focus:border-purple-400"
+              className={`theme-input rounded-lg border-2 py-3 text-slate-800 ${
+                errors.date ? "border-red-500 bg-red-50 text-slate-800" : "border-white/15 bg-white/90 text-slate-800 focus:border-purple-400"
               }`}
               {...register("date", {
                 required: { value: true, message: "Date of birth is required" },
@@ -136,7 +136,7 @@ function Data() {
               Gender
             </label>
             <select
-              className="theme-select rounded-lg border-2 border-white/15 bg-white/8 py-3 text-white focus:border-purple-400"
+              className="theme-select rounded-lg border-2 border-white/15 bg-white/90 py-3 text-slate-800 focus:border-purple-400"
               {...register("gender")}
             >
               <option value="male" className="bg-slate-900 font-semibold text-white">
@@ -161,8 +161,8 @@ function Data() {
                 type="number"
                 step="0.1"
                 placeholder="Enter weight"
-                className={`theme-input max-md:text-xs rounded-lg border-2 py-3 text-white placeholder:text-white/35 ${
-                  errors.weight ? "border-red-500 bg-red-500/5 text-white" : "border-white/15 bg-white/8 text-white focus:border-purple-400"
+                className={`theme-input max-md:text-xs rounded-lg border-2 py-3 text-slate-800 placeholder:text-slate-400 ${
+                  errors.weight ? "border-red-500 bg-red-50 text-slate-800" : "border-white/15 bg-white/90 text-slate-800 focus:border-purple-400"
                 }`}
                 {...register("weight", {
                   required: { value: true, message: "Weight is required" },
@@ -194,7 +194,7 @@ function Data() {
                 Unit
               </label>
               <select
-                className="theme-select max-md:text-xs rounded-lg border-2 border-white/15 bg-white/8 py-3 text-white focus:border-purple-400"
+                className="theme-select max-md:text-xs rounded-lg border-2 border-white/15 bg-white/90 py-3 text-slate-800 focus:border-purple-400"
                 {...register("weightScale")}
               >
                 <option className="bg-slate-900 font-semibold text-white">
@@ -217,8 +217,8 @@ function Data() {
                 type="number"
                 step="any"
                 placeholder="Enter height"
-                className={`theme-input max-md:text-xs rounded-lg border-2 py-3 text-white placeholder:text-white/35 ${
-                  errors.height ? "border-red-500 bg-red-500/5 text-white" : "border-white/15 bg-white/8 text-white focus:border-purple-400"
+                className={`theme-input max-md:text-xs rounded-lg border-2 py-3 text-slate-800 placeholder:text-slate-400 ${
+                  errors.height ? "border-red-500 bg-red-50 text-slate-800" : "border-white/15 bg-white/90 text-slate-800 focus:border-purple-400"
                 }`}
                 {...register("height", {
                   required: { value: true, message: "Height is required" },
@@ -250,7 +250,7 @@ function Data() {
                 Unit
               </label>
               <select
-                className="theme-select max-md:text-xs rounded-lg border-2 border-white/15 bg-white/8 py-3 text-white focus:border-purple-400"
+                className="theme-select max-md:text-xs rounded-lg border-2 border-white/15 bg-white/90 py-3 text-slate-800 focus:border-purple-400"
                 {...register("lengthScale")}
               >
                 <option className="bg-slate-900 font-semibold text-white">ft</option>

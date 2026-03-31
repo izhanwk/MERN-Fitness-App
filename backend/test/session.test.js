@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import Data from "../../Model/Registerdata.js";
+import User from "../../Model/User.js";
 import Sessions from "../../Model/Sessions.js";
 
 vi.mock("../emailSender.js", () => ({
@@ -23,7 +23,7 @@ beforeEach(async () => {
 async function createSignedInUser(email) {
   const password = "Password123";
 
-  await Data.create({
+  await User.create({
     email,
     password: await bcrypt.hash(password, 10),
     verified: true,
@@ -57,7 +57,7 @@ describe("session routes", () => {
   it("returns the current user's sessions and marks the active one", async () => {
     const email = "sessions@example.com";
     const { token, sessionId } = await createSignedInUser(email);
-    const user = await Data.findOne({ email });
+    const user = await User.findOne({ email });
 
     await Sessions.create({
       userId: user._id,
@@ -87,7 +87,7 @@ describe("session routes", () => {
   it("revokes another session for the authenticated user", async () => {
     const email = "logoutsession@example.com";
     const { token, sessionId } = await createSignedInUser(email);
-    const user = await Data.findOne({ email });
+    const user = await User.findOne({ email });
 
     const otherSession = await Sessions.create({
       userId: user._id,

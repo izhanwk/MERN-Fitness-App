@@ -1,12 +1,13 @@
 import bcrypt from "bcrypt";
-import Data from "../../Model/Registerdata.js";
+import User from "../../Model/User.js";
 import Otp from "../../Model/Otp.js";
 import OtpRequest from "../../Model/OtpRequest.js";
-import { sendEmail } from "../emailSender.js";
+import { buildPasswordResetOtpEmail, sendEmail } from "../emailSender.js";
 import {
   isStrongEnoughPassword,
   isValidEmail,
   normalizeEmail,
+  passwordPolicyMessage,
 } from "../utils/validators.js";
 
 const OTP_REQUEST_LIMIT = 10;
@@ -19,7 +20,7 @@ export const forgotPassword = async (req, res) => {
       return res.status(400).json({ message: "Invalid email address" });
     }
 
-    const user = await Data.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -34,10 +35,12 @@ export const forgotPassword = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     await Otp.deleteMany({ email });
     await Otp.create({ email, otp });
+    const emailContent = buildPasswordResetOtpEmail(otp);
     await sendEmail({
       to: email,
       subject: "Password reset OTP",
-      html: `<p>Your OTP for password reset is <b>${otp}</b></p>`,
+      html: emailContent.html,
+      text: emailContent.text,
     });
     await OtpRequest.create({ email });
     return res.status(200).json({ message: "OTP sent" });
@@ -56,9 +59,7 @@ export const changePassword = async (req, res) => {
     }
 
     if (!isStrongEnoughPassword(password)) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters" });
+      return res.status(400).json({ message: passwordPolicyMessage });
     }
 
     if (typeof otp !== "string" || otp.trim().length !== 6) {
@@ -69,7 +70,7 @@ export const changePassword = async (req, res) => {
     if (!record) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
-    const user = await Data.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

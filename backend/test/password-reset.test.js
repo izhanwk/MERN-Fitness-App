@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import Data from "../../Model/Registerdata.js";
+import User from "../../Model/User.js";
 import Otp from "../../Model/Otp.js";
 import OtpRequest from "../../Model/OtpRequest.js";
 
@@ -13,6 +13,10 @@ const sendEmailMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("../emailSender.js", () => ({
   sendEmail: sendEmailMock,
+  buildPasswordResetOtpEmail: vi.fn((otp) => ({
+    html: `<p>${otp}</p>`,
+    text: otp,
+  })),
 }));
 
 let app;
@@ -39,7 +43,7 @@ describe("password reset routes", () => {
 
   it("creates an OTP request and sends email for forgot-password", async () => {
     const email = "forgot@example.com";
-    await Data.create({
+    await User.create({
       email,
       password: await bcrypt.hash("Password123", 10),
       verified: true,
@@ -59,7 +63,7 @@ describe("password reset routes", () => {
     const oldPassword = "Password123";
     const newPassword = "NewPassword456";
 
-    await Data.create({
+    await User.create({
       email,
       password: await bcrypt.hash(oldPassword, 10),
       verified: true,
@@ -75,7 +79,7 @@ describe("password reset routes", () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ message: "Password updated" });
 
-    const updatedUser = await Data.findOne({ email });
+    const updatedUser = await User.findOne({ email });
     expect(await bcrypt.compare(newPassword, updatedUser.password)).toBe(true);
     expect(await Otp.findOne({ email })).toBeNull();
   });
@@ -83,7 +87,7 @@ describe("password reset routes", () => {
   it("returns 400 when change-password receives an invalid OTP", async () => {
     const email = "badotp@example.com";
 
-    await Data.create({
+    await User.create({
       email,
       password: await bcrypt.hash("Password123", 10),
       verified: true,
@@ -101,9 +105,29 @@ describe("password reset routes", () => {
     });
   });
 
+  it("rejects weak passwords during password reset", async () => {
+    const email = "weakpassword@example.com";
+
+    await User.create({
+      email,
+      password: await bcrypt.hash("Password123", 10),
+      verified: true,
+    });
+    await Otp.create({ email, otp: "123456" });
+
+    const response = await request(app).post("/change-password").send({
+      email,
+      otp: "123456",
+      password: "weak1234",
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain("at least 8 characters");
+  });
+
   it("returns 429 when OTP request limit is exceeded", async () => {
     const email = "ratelimit@example.com";
-    await Data.create({
+    await User.create({
       email,
       password: await bcrypt.hash("Password123", 10),
       verified: true,

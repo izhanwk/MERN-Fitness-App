@@ -2,7 +2,7 @@
 
 FitTrack is a full-stack fitness and nutrition tracking app built with React, Express, and MongoDB. It helps users set up their profile, track calorie and nutrition intake, search food data, select foods portion-wise, and manage active sessions across devices.
 
-This project is structured as a real deployed application, not just a frontend demo. It includes authentication, Google sign-in, email-based account flows, session management, onboarding logic, and password reset with OTP protection.
+This project is a full-stack fitness tracker with real authentication, session management, onboarding, and password-reset flows. The codebase has been iteratively refactored toward cleaner backend structure and stronger test coverage.
 
 ## Highlights
 
@@ -48,7 +48,7 @@ e2e/
   signin-dashboard.spec.js
 
 Model/
-  Registerdata.js
+  User.js
   Foods.js
   Sessions.js
   Otp.js
@@ -158,10 +158,12 @@ Example:
 ```env
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
+MONGODB_DB_NAME=fittrack
 SECRET_KEY=your_access_token_secret
 REFRESH=your_refresh_token_secret
 JWT_VERIFY=your_email_verification_secret
 SERVER_BASE_URL=http://localhost:5000
+ALLOWED_ORIGINS=http://localhost:5173,https://mern-fitness-app-one.vercel.app
 
 GOOGLE_CLIENT_ID=your_google_client_id
 
@@ -171,12 +173,22 @@ RESEND_FROM_NAME=FitTrack App
 
 VITE_API_URL=http://localhost:5000
 VITE_GOOGLE_CLIENT_ID=your_google_client_id
+
+TEST_MONGODB_URI=your_test_mongodb_connection_string
+E2E_BACKEND_PORT=5001
+E2E_FRONTEND_PORT=4173
 ```
 
 ### 3. Start the backend
 
 ```bash
 npm run start:server
+```
+
+If you have older local data in the legacy `"Registeration Data"` collection, migrate it once before starting the updated app:
+
+```bash
+npm run migrate:users
 ```
 
 ### 4. Start the frontend
@@ -198,19 +210,19 @@ npm run test:run
 Run the backend integration test suite:
 
 ```bash
-npm.cmd run test:backend
+npm run test:backend
 ```
 
 Run the Playwright end-to-end suite:
 
 ```bash
-npm.cmd run test:e2e
+npm run test:e2e
 ```
 
 Run a single backend integration file:
 
 ```bash
-npm.cmd run test:backend -- auth.test.js
+npm run test:backend -- auth.test.js
 ```
 
 Run the auth component tests directly:
@@ -237,8 +249,9 @@ Frontend coverage includes:
 Backend integration coverage includes:
 
 - auth route tests for invalid sign-in, valid sign-in, token refresh, and invalid session refresh rejection
+- auth route tests for 200-based onboarding responses instead of redirect-style API responses
 - session route tests for missing auth rejection, session listing, remote session revocation, and active-session protection
-- password-reset route tests for unknown-user rejection, OTP creation, successful password change, invalid OTP rejection, and OTP rate limiting
+- password-reset route tests for unknown-user rejection, OTP creation, successful password change, weak-password rejection, invalid OTP rejection, and OTP rate limiting
 
 Backend integration tests use `supertest` against [`backend/app.js`](/C:/Users/izhan/Desktop/Node%20JS/React/new%20fitness%20app/backend/app.js). The shared setup in [`backend/test/setup.js`](/C:/Users/izhan/Desktop/Node%20JS/React/new%20fitness%20app/backend/test/setup.js) connects to `TEST_MONGODB_URI` when provided, otherwise it uses `MONGODB_URI` with an isolated `fittrack_test_*` database name. External email delivery is mocked in route tests so no real Resend calls are made.
 
@@ -249,6 +262,11 @@ Playwright end-to-end coverage includes:
 - open the meal log and confirm the tracked food appears
 
 The Playwright setup uses [`playwright.config.js`](/C:/Users/izhan/Desktop/Node%20JS/React/new%20fitness%20app/playwright.config.js) to boot isolated frontend and backend servers on dedicated e2e ports and uses an isolated MongoDB database name for the flow.
+
+Environment notes:
+
+- `ALLOWED_ORIGINS` accepts a comma-separated list of frontend origins for local, preview, and deployed environments
+- `MONGODB_DB_NAME` can be used to isolate local, test, and e2e databases without changing the main connection string
 
 GitHub Actions currently runs `npm run test:run` on every push and pull request through [`.github/workflows/test.yml`](/C:/Users/izhan/Desktop/Node%20JS/React/new%20fitness%20app/.github/workflows/test.yml).
 
@@ -262,6 +280,7 @@ GitHub Actions currently runs `npm run test:run` on every push and pull request 
 ## Security Notes
 
 - Passwords are hashed with bcrypt
+- Passwords must be at least 8 characters and include uppercase, lowercase, and a number
 - Protected routes require JWT plus session identity
 - OTP records expire automatically
 - OTP generation is rate-limited per email

@@ -92,7 +92,7 @@ const MacroCard = ({ label, value, target, accent, gradient, icon: Icon }) => {
         </div>
         <div>
           <p
-            className="text-xl sm:text-2xl font-black tabular-nums"
+            className="text-2xl font-black tabular-nums"
             style={{ color: accent }}
           >
             {value}
@@ -111,7 +111,7 @@ const MacroCard = ({ label, value, target, accent, gradient, icon: Icon }) => {
 };
 
 const SectionHeader = ({ icon: Icon, label, iconColor }) => (
-  <div className="flex items-center gap-3 mb-3 mt-8">
+  <div className="flex items-center gap-3 mb-3 mt-6 sm:mt-8">
     <div
       className="flex h-8 w-8 items-center justify-center rounded-xl"
       style={{ background: `${iconColor}20` }}
@@ -871,9 +871,9 @@ const NutritionTracker = () => {
 
         <DNavbar />
 
-        <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 pb-24 pt-6">
+        <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 pb-28 sm:pb-24 pt-4 sm:pt-6">
           {/* Welcome banner */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-white/8 bg-white/4 px-5 py-4 backdrop-blur-sm mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-white/8 bg-white/4 px-5 py-4 backdrop-blur-sm mb-8">
             <div>
               <p className="text-[10px] uppercase tracking-[0.3em] text-white/30 mb-1">
                 Welcome back
@@ -888,12 +888,12 @@ const NutritionTracker = () => {
                 </span>
               </h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => setshowList(true)}
-                className="relative flex items-center gap-2 rounded-xl border border-white/10 bg-white/6 px-3 py-2 text-xs font-semibold text-white/60 transition-all duration-200 hover:bg-white/12 hover:text-white"
+                className="relative flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/6 px-4 py-3 sm:py-2.5 text-xs font-semibold text-white/60 transition-all duration-200 hover:bg-white/12 hover:text-white active:scale-95"
               >
-                <ListChecks className="h-3.5 w-3.5" />
+                <ListChecks className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                 Meal Log
                 {newfood.length > 0 && (
                   <span className="flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-[9px] font-black text-white">
@@ -903,9 +903,9 @@ const NutritionTracker = () => {
               </button>
               <button
                 onClick={() => navigate("/edit")}
-                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/6 px-3 py-2 text-xs font-semibold text-white/60 transition-all duration-200 hover:bg-white/12 hover:text-white"
+                className="flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/6 px-4 py-3 sm:py-2.5 text-xs font-semibold text-white/60 transition-all duration-200 hover:bg-white/12 hover:text-white active:scale-95"
               >
-                <PencilLine className="h-3.5 w-3.5" />
+                <PencilLine className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                 Edit Profile
               </button>
             </div>
@@ -913,8 +913,12 @@ const NutritionTracker = () => {
 
           {/* Meal log modal */}
           {showList && (
-            <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 shadow-2xl shadow-black/70 overflow-hidden">
+            <div className="fixed inset-0 z-[90] flex items-end justify-center bg-slate-950/92 sm:items-center sm:p-4">
+              <div className="relative z-[91] w-full overflow-hidden rounded-t-3xl border border-white/10 bg-slate-950 shadow-2xl shadow-black/80 sm:max-w-md sm:rounded-2xl">
+                {/* Mobile drag handle */}
+                <div className="flex justify-center pt-3 pb-1 sm:hidden">
+                  <div className="w-10 h-1 rounded-full bg-white/20" />
+                </div>
                 <div className="flex items-center justify-between border-b border-white/8 px-6 py-4">
                   <div>
                     <h2 className="text-sm font-bold text-white">Meal Log</h2>
@@ -940,12 +944,12 @@ const NutritionTracker = () => {
                     </button>
                   </div>
                 </div>
-                <div className="max-h-[55vh] overflow-y-auto px-4 py-4 space-y-2">
+                <div className="max-h-[70vh] sm:max-h-[55vh] overflow-y-auto px-4 py-4 space-y-2">
                   {newfood.length > 0 ? (
                     newfood.map((f, i) => (
                       <div
                         key={i}
-                        className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/5 px-4 py-3 hover:bg-white/8 transition-colors duration-150"
+                        className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/5 px-4 py-3.5 sm:py-3 hover:bg-white/8 transition-colors duration-150"
                       >
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-white truncate">
@@ -960,15 +964,14 @@ const NutritionTracker = () => {
                             {Math.round((f.calories || 0) * f.quantity)} kcal
                           </p>
                           <p className="text-[10px] text-white/30">
-                            {Math.round((f.proteins || 0) * f.quantity)}g
-                            protein
+                            {Math.round((f.proteins || 0) * f.quantity)}g protein
                           </p>
                         </div>
                         <button
                           onClick={() => removefood(i)}
-                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-red-500/25 bg-red-500/10 text-red-400 transition-all hover:bg-red-500/20"
+                          className="flex h-9 w-9 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg border border-red-500/25 bg-red-500/10 text-red-400 transition-all hover:bg-red-500/20 active:scale-90"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                         </button>
                       </div>
                     ))
@@ -995,10 +998,10 @@ const NutritionTracker = () => {
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/35 mb-4">
               Add Food
             </p>
-            <div className="flex flex-col sm:flex-row items-stretch gap-3">
+            <div className="grid grid-cols-2 sm:flex sm:flex-row sm:items-stretch gap-3">
               {/* Dropdown trigger */}
               <div
-                className={`relative flex-1 ${searchVisiblity ? "z-50" : "z-10"}`}
+                className={`relative col-span-2 sm:flex-1 ${searchVisiblity ? "z-50" : "z-10"}`}
               >
                 <div
                   ref={Box}
@@ -1029,7 +1032,7 @@ const NutritionTracker = () => {
                 {searchVisiblity && (
                   <div
                     ref={sBox}
-                    className="absolute left-0 top-[calc(100%+6px)] z-[70] w-full max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-2xl shadow-black/40"
+                    className="absolute left-0 top-[calc(100%+6px)] z-[70] w-full max-h-[50vh] sm:max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-2xl shadow-black/40"
                   >
                     <div className="sticky top-0 bg-white px-3 pt-3 pb-2 border-b border-slate-100">
                       <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-yellow-400 transition-colors">
@@ -1065,7 +1068,7 @@ const NutritionTracker = () => {
                             portionFunction(f.name);
                             rotate();
                           }}
-                          className="flex items-center gap-2 cursor-pointer rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-all hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white"
+                          className="flex items-center gap-2 cursor-pointer rounded-lg px-3 py-3.5 sm:py-2.5 text-sm font-medium text-slate-700 transition-all hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white"
                         >
                           {f.name}
                         </li>
@@ -1083,7 +1086,7 @@ const NutritionTracker = () => {
               {/* Portion */}
               <div
                 ref={portionBox}
-                className={`relative w-full sm:w-32 ${portionVisibility ? "z-50" : "z-10"}`}
+                className={`relative sm:w-32 ${portionVisibility ? "z-50" : "z-10"}`}
               >
                 <div
                   onClick={() => {
@@ -1113,7 +1116,7 @@ const NutritionTracker = () => {
                             rotatePortion();
                             setPortionVisibility(false);
                           }}
-                          className="cursor-pointer rounded-lg px-3 py-2 text-left text-xs leading-5 font-medium text-slate-700 transition-all hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white"
+                          className="cursor-pointer rounded-lg px-3 py-3 sm:py-2 text-left text-xs leading-5 font-medium text-slate-700 transition-all hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white"
                         >
                           {option}
                         </li>
@@ -1128,7 +1131,7 @@ const NutritionTracker = () => {
                 type="number"
                 min="0"
                 placeholder="Qty"
-                className="h-11 w-full sm:w-28 rounded-xl border border-white/15 bg-white/90 px-4 text-center text-sm font-bold text-slate-700 outline-none transition-all focus:border-yellow-400 focus:bg-white placeholder-slate-400"
+                className="h-11 sm:w-28 rounded-xl border border-white/15 bg-white/90 px-4 text-center text-sm font-bold text-slate-700 outline-none transition-all focus:border-yellow-400 focus:bg-white placeholder-slate-400"
                 value={quantity}
                 onInput={(e) => setquantity(e.target.value)}
               />
@@ -1142,7 +1145,7 @@ const NutritionTracker = () => {
                   }
                   setFood();
                 }}
-                className="flex h-11 w-full sm:w-28 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 font-bold text-sm text-white shadow-lg shadow-emerald-900/30 transition-all hover:from-emerald-400 hover:to-emerald-500 active:scale-95"
+                className="col-span-2 flex h-11 sm:w-28 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 font-bold text-sm text-white shadow-lg shadow-emerald-900/30 transition-all hover:from-emerald-400 hover:to-emerald-500 active:scale-95"
               >
                 <Plus className="h-4 w-4" />
                 Add
@@ -1151,7 +1154,7 @@ const NutritionTracker = () => {
           </div>
 
           {/* Macro cards */}
-          <div className="relative z-0 grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          <div className="relative z-0 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8">
             {macroCards.map((c) => (
               <MacroCard key={c.label} {...c} />
             ))}
@@ -1163,7 +1166,7 @@ const NutritionTracker = () => {
             label="Vitamins & Minerals"
             iconColor="#a78bfa"
           />
-          <div className="relative z-0 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="relative z-0 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {vitaminCards.map((c) => (
               <MacroCard key={c.label} {...c} />
             ))}

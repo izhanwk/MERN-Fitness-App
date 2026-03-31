@@ -6,11 +6,15 @@ import jwt from "jsonwebtoken";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import Data from "../../Model/Registerdata.js";
+import User from "../../Model/User.js";
 import Sessions from "../../Model/Sessions.js";
 
 vi.mock("../emailSender.js", () => ({
   sendEmail: vi.fn().mockResolvedValue(undefined),
+  buildVerificationEmail: vi.fn((url) => ({
+    html: `<a href="${url}">Verify</a>`,
+    text: `Verify: ${url}`,
+  })),
 }));
 
 let app;
@@ -36,7 +40,7 @@ describe("auth routes", () => {
 
   it("returns an access token and session id for a valid signin", async () => {
     const password = "Password123";
-    const user = await Data.create({
+    const user = await User.create({
       email: "valid@example.com",
       password: await bcrypt.hash(password, 10),
       verified: true,
@@ -66,8 +70,29 @@ describe("auth routes", () => {
     expect(session.userId.toString()).toBe(user._id.toString());
   });
 
+  it("returns onboarding metadata for incomplete profiles without using redirects", async () => {
+    const password = "Password123";
+    await User.create({
+      email: "onboarding@example.com",
+      password: await bcrypt.hash(password, 10),
+      verified: true,
+    });
+
+    const response = await request(app)
+      .post("/signin")
+      .set("User-Agent", "Vitest Browser/1.0")
+      .send({
+        email: "onboarding@example.com",
+        password,
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.needsOnboarding).toBe(true);
+    expect(response.body.nextStep).toBe("onboarding");
+  });
+
   it("refreshes the access token for a valid session", async () => {
-    const user = await Data.create({
+    const user = await User.create({
       email: "refresh@example.com",
       password: await bcrypt.hash("Password123", 10),
       verified: true,
