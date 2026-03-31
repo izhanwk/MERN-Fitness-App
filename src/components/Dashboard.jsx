@@ -221,30 +221,6 @@ const NutritionTracker = () => {
 
   const [portionOpts, setportionOpts] = useState([]);
 
-  const redirectToSignin = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("sessionId");
-    navigate("/signin", { replace: true });
-  };
-
-  const ensureProtectedSuccess = (response) => {
-    if (response.status === 401 || response.status === 403) {
-      redirectToSignin();
-      return false;
-    }
-
-    return response.status >= 200 && response.status < 300;
-  };
-
-  // Early auth guard — redirect immediately if credentials are absent
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const sessionId = localStorage.getItem("sessionId");
-    if (!token || !sessionId) {
-      navigate("/signin", { replace: true });
-    }
-  }, []);
-
   useEffect(() => {
     const el = sBox.current;
     if (!el) return;
@@ -287,7 +263,7 @@ const NutritionTracker = () => {
         headers: getAuthHeaders(),
         validateStatus: () => true,
       });
-      if (ensureProtectedSuccess(res)) {
+      if (res.status >= 200 && res.status < 300) {
         const data = res.data;
         setempty(data.length === 0);
         initialFetchingDone.current = true;
@@ -319,7 +295,7 @@ const NutritionTracker = () => {
           headers: getAuthHeaders(),
           validateStatus: () => true,
         });
-        if (ensureProtectedSuccess(res)) {
+        if (res.status >= 200 && res.status < 300) {
           const data = res.data;
           const hasMore = data.length > 0 && data[0].showMore;
 
@@ -343,17 +319,13 @@ const NutritionTracker = () => {
           headers: getAuthHeaders(),
           validateStatus: () => true,
         });
-        if (!ensureProtectedSuccess(res)) {
-          return;
+        if (res.status >= 200 && res.status < 300) {
+          const data = res.data;
+          setuserData((p) => ({ ...p, ...data }));
+          setmode(data.mode);
+          setuserName(data.name || "");
         }
-
-        const data = res.data;
-        setuserData((p) => ({ ...p, ...data }));
-        setmode(data.mode);
-        setuserName(data.name || "");
       } catch (err) {
-        const status = err?.response?.status;
-        if (status === 401 || status === 403) { redirectToSignin(); return; }
         console.error(err);
       } finally {
         setUserBootstrapped(true);
@@ -593,13 +565,11 @@ const NutritionTracker = () => {
           },
           validateStatus: () => true,
         });
-        if (ensureProtectedSuccess(res)) {
+        if (res.status >= 200 && res.status < 300) {
           skipNextStoreSync.current = true;
           setinitialFood(res.data || []);
         }
       } catch (e) {
-        const status = e?.response?.status;
-        if (status === 401 || status === 403) { redirectToSignin(); return; }
         console.error(e);
       } finally {
         setIsFirstLoad(false);
@@ -634,11 +604,9 @@ const NutritionTracker = () => {
           },
         );
 
-        if (!ensureProtectedSuccess(response)) {
-          return;
+        if (response.status >= 200 && response.status < 300) {
+          setnewfood(initialFood);
         }
-
-        setnewfood(initialFood);
       } catch (e) {
         console.error(e);
       } finally {

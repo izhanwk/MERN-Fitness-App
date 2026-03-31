@@ -82,52 +82,14 @@ function DNavbar() {
     }
   };
 
+  // Synchronous guard: redirect immediately if credentials are absent.
+  // Expired/invalid tokens are handled by the response interceptor below.
   useEffect(() => {
-    let cancelled = false;
-
-    const validateSession = async () => {
-      const token = localStorage.getItem("token");
-      const sessionId = localStorage.getItem("sessionId");
-
-      if (!token || !sessionId) {
-        if (!cancelled) {
-          clearAuthAndRedirect(
-            "Authentication Required",
-            "Please sign in to continue.",
-          );
-        }
-        return;
-      }
-
-      try {
-        const response = await axios.get(`${API_URL}/checkData`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "X-Session-Id": sessionId,
-            "ngrok-skip-browser-warning": "true",
-          },
-          validateStatus: () => true,
-        });
-
-        if (response.status !== 200 && response.status !== 210) {
-          throw new Error("Session validation failed");
-        }
-      } catch {
-        const refreshedToken = await refreshSessionToken();
-        if (!refreshedToken && !cancelled) {
-          clearAuthAndRedirect(
-            "Authentication Failed",
-            "Session expired. Please sign in again.",
-          );
-        }
-      }
-    };
-
-    validateSession();
-
-    return () => {
-      cancelled = true;
-    };
+    const token = localStorage.getItem("token");
+    const sessionId = localStorage.getItem("sessionId");
+    if (!token || !sessionId) {
+      clearAuthAndRedirect("Authentication Required", "Please sign in to continue.");
+    }
   }, []);
 
   useEffect(() => {
@@ -146,15 +108,19 @@ function DNavbar() {
 
     const handleAuthFailure = async (originalRequest, response) => {
       const status = response?.status;
-      const isRefreshEndpoint =
-        originalRequest?.url?.includes("/refresh-token");
+      const isRefreshEndpoint = originalRequest?.url?.includes("/refresh-token");
 
-      if (
-        status === 403 &&
-        originalRequest &&
-        !originalRequest._retry &&
-        !isRefreshEndpoint
-      ) {
+      // Never intercept the refresh endpoint itself
+      if (isRefreshEndpoint) return null;
+
+      // 401 — token is invalid/expired with no recovery path
+      if (status === 401) {
+        clearAuthAndRedirect("Session Expired", "Please sign in again.");
+        return null;
+      }
+
+      // 403 — try a token refresh once, then redirect if it fails
+      if (status === 403 && originalRequest && !originalRequest._retry) {
         originalRequest._retry = true;
 
         let starter = false;
@@ -179,23 +145,13 @@ function DNavbar() {
             ...(originalRequest.headers || {}),
             Authorization: `Bearer ${newToken}`,
           };
-
           axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
-
           return axios(originalRequest);
         }
 
-        const err = new Error("Forbidden");
-        err.config = originalRequest;
-        err.response = response;
-        throw err;
-      }
-
-      if (status === 403 && !isRefreshEndpoint) {
-        const err = new Error("Forbidden");
-        err.config = originalRequest;
-        err.response = response;
-        throw err;
+        // Refresh failed — session is gone
+        clearAuthAndRedirect("Session Expired", "Please sign in again.");
+        return null;
       }
 
       return null;
@@ -203,37 +159,12 @@ function DNavbar() {
 
     const responseInterceptor = axios.interceptors.response.use(
       async (response) => {
-        try {
-          const retryResponse = await handleAuthFailure(
-            response?.config,
-            response,
-          );
-          if (retryResponse) {
-            return retryResponse;
-          }
-        } catch (err) {
-          return Promise.reject(err);
-        }
-
-        return response;
+        const retryResponse = await handleAuthFailure(response?.config, response);
+        return retryResponse ?? response;
       },
       async (error) => {
-        const originalRequest = error?.config;
-        const response = error?.response;
-
-        try {
-          const retryResponse = await handleAuthFailure(
-            originalRequest,
-            response,
-          );
-          if (retryResponse) {
-            return retryResponse;
-          }
-        } catch (err) {
-          return Promise.reject(err);
-        }
-
-        return Promise.reject(error);
+        const retryResponse = await handleAuthFailure(error?.config, error?.response);
+        return retryResponse ?? Promise.reject(error);
       },
     );
 
