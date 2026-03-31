@@ -10,7 +10,7 @@ const Loader = () => {
           />
         </div>
         <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-white/50">
-          Loading your plan...
+          Loading...
         </p>
       </div>
     </div>

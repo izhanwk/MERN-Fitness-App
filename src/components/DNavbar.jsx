@@ -16,6 +16,16 @@ function DNavbar() {
   const isRefreshing = useRef(false);
   const refreshPromiseRef = useRef(null);
 
+  const clearAuthAndRedirect = (
+    title = "Authentication Failed",
+    message = "Please sign in again.",
+  ) => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("sessionId");
+    showAlert(message, "error", title);
+    navigate("/signin", { replace: true });
+  };
+
   const scrollToFooterSection = (sectionId) => {
     const section = document.getElementById(sectionId);
     if (!section) return;
@@ -68,22 +78,66 @@ function DNavbar() {
       localStorage.setItem("token", data.token);
       return data.token;
     } catch (err) {
-      if (err.response?.status === 403) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("sessionId");
-        showAlert("Session Expired", "error", "Authentication Failed");
-        navigate("/signin");
-      }
       return null;
     }
   };
 
   useEffect(() => {
+    let cancelled = false;
+
+    const validateSession = async () => {
+      const token = localStorage.getItem("token");
+      const sessionId = localStorage.getItem("sessionId");
+
+      if (!token || !sessionId) {
+        if (!cancelled) {
+          clearAuthAndRedirect(
+            "Authentication Required",
+            "Please sign in to continue.",
+          );
+        }
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${API_URL}/checkData`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Session-Id": sessionId,
+            "ngrok-skip-browser-warning": "true",
+          },
+          validateStatus: () => true,
+        });
+
+        if (response.status !== 200 && response.status !== 210) {
+          throw new Error("Session validation failed");
+        }
+      } catch {
+        const refreshedToken = await refreshSessionToken();
+        if (!refreshedToken && !cancelled) {
+          clearAuthAndRedirect(
+            "Authentication Failed",
+            "Session expired. Please sign in again.",
+          );
+        }
+      }
+    };
+
+    validateSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use((config) => {
+      const token = localStorage.getItem("token");
       const sessionId = localStorage.getItem("sessionId");
 
       config.headers = {
         ...config.headers,
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...(sessionId && { "X-Session-Id": sessionId }),
       };
 
@@ -200,7 +254,10 @@ function DNavbar() {
             onClick={() => navigate("/dashboard")}
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 shadow-lg shadow-purple-950/40 sm:h-10 sm:w-10">
-              <Dumbbell className="h-5 w-5 text-white sm:h-6 sm:w-6" strokeWidth={2.5} />
+              <Dumbbell
+                className="h-5 w-5 text-white sm:h-6 sm:w-6"
+                strokeWidth={2.5}
+              />
             </div>
             <span className="truncate text-lg font-bold text-white sm:text-xl">
               FitTracker
