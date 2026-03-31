@@ -22,8 +22,8 @@ function DNavbar() {
   ) => {
     localStorage.removeItem("token");
     localStorage.removeItem("sessionId");
-    showAlert(message, "error", title);
     navigate("/signin", { replace: true });
+    try { showAlert(message, "error", title); } catch {}
   };
 
   const scrollToFooterSection = (sectionId) => {

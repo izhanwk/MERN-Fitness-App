@@ -236,6 +236,15 @@ const NutritionTracker = () => {
     return response.status >= 200 && response.status < 300;
   };
 
+  // Early auth guard — redirect immediately if credentials are absent
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const sessionId = localStorage.getItem("sessionId");
+    if (!token || !sessionId) {
+      navigate("/signin", { replace: true });
+    }
+  }, []);
+
   useEffect(() => {
     const el = sBox.current;
     if (!el) return;
@@ -343,6 +352,8 @@ const NutritionTracker = () => {
         setmode(data.mode);
         setuserName(data.name || "");
       } catch (err) {
+        const status = err?.response?.status;
+        if (status === 401 || status === 403) { redirectToSignin(); return; }
         console.error(err);
       } finally {
         setUserBootstrapped(true);
@@ -587,6 +598,8 @@ const NutritionTracker = () => {
           setinitialFood(res.data || []);
         }
       } catch (e) {
+        const status = e?.response?.status;
+        if (status === 401 || status === 403) { redirectToSignin(); return; }
         console.error(e);
       } finally {
         setIsFirstLoad(false);
