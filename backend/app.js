@@ -20,15 +20,18 @@ function createApp() {
   app.set("view engine", "ejs");
   app.set("views", path.join(__dirname, "views"));
 
-  const allowedOrigins = [
-    "http://localhost:5173",
-    "https://mern-fitness-app-one.vercel.app",
-  ];
-  const extraOrigin = process.env.FRONTEND_ORIGIN;
-
-  if (extraOrigin && !allowedOrigins.includes(extraOrigin)) {
-    allowedOrigins.push(extraOrigin);
-  }
+  const allowedOrigins = (
+    process.env.ALLOWED_ORIGINS ||
+    [
+      "http://localhost:5173",
+      "https://mern-fitness-app-one.vercel.app",
+    ]
+      .filter(Boolean)
+      .join(",")
+  )
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
   app.use(
     cors({

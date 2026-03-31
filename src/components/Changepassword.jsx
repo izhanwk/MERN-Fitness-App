@@ -8,6 +8,9 @@ import { useAlert } from "./Alert";
 import Footer from "./Footer";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const passwordRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+const passwordRuleMessage =
+  "Password must be at least 8 characters and include uppercase, lowercase, and a number";
 
 function Changepassword() {
   const { showAlert, Alert } = useAlert();
@@ -51,6 +54,10 @@ function Changepassword() {
     e.preventDefault();
     if (password !== confirm) {
       showAlert("Passwords do not match", "error", "Password Mismatch");
+      return;
+    }
+    if (!passwordRule.test(password)) {
+      showAlert(passwordRuleMessage, "error", "Weak Password");
       return;
     }
     setLoading(true);

@@ -45,7 +45,7 @@ function DNavbar() {
     }
   };
 
-  const refreshtoken = async () => {
+  const refreshSessionToken = async () => {
     try {
       const sessionId = localStorage.getItem("sessionId");
       if (!sessionId) {
@@ -106,7 +106,7 @@ function DNavbar() {
         let starter = false;
         if (!isRefreshing.current) {
           isRefreshing.current = true;
-          refreshPromiseRef.current = refreshtoken();
+          refreshPromiseRef.current = refreshSessionToken();
           starter = true;
         }
 

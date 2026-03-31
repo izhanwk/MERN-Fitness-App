@@ -1,9 +1,11 @@
 import "dotenv/config";
 import { defineConfig } from "@playwright/test";
+import { platform } from "node:process";
 
 const backendPort = process.env.E2E_BACKEND_PORT || "5001";
 const frontendPort = process.env.E2E_FRONTEND_PORT || "4173";
 const baseURL = `http://localhost:${frontendPort}`;
+const npmCommand = platform === "win32" ? "npm.cmd" : "npm";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -18,18 +20,18 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "npm.cmd run start:server",
+      command: `${npmCommand} run start:server`,
       url: `http://localhost:${backendPort}`,
       reuseExistingServer: false,
       env: {
         ...process.env,
         PORT: backendPort,
-        MONGODB_DB_NAME: process.env.MONGODB_DB_NAME || "fittrack_e2e",
-        FRONTEND_ORIGIN: baseURL,
+        MONGODB_DB_NAME: "fittrack_e2e",
+        ALLOWED_ORIGINS: baseURL,
       },
     },
     {
-      command: `npm.cmd run dev -- --host localhost --port ${frontendPort}`,
+      command: `${npmCommand} run dev -- --host localhost --port ${frontendPort}`,
       url: baseURL,
       reuseExistingServer: false,
       env: {

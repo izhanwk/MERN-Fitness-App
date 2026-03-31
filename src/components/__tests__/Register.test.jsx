@@ -83,7 +83,9 @@ describe("Register", () => {
     });
     axios.post.mockResolvedValue({
       status: 200,
-      data: "izhan@example.com",
+      data: {
+        email: "izhan@example.com",
+      },
     });
 
     renderRegister();
@@ -92,10 +94,10 @@ describe("Register", () => {
       target: { value: "izhan@example.com" },
     });
     fireEvent.change(screen.getByPlaceholderText(/create a password/i), {
-      target: { value: "password123" },
+      target: { value: "Password123" },
     });
     fireEvent.change(screen.getByPlaceholderText(/re-enter your password/i), {
-      target: { value: "password123" },
+      target: { value: "Password123" },
     });
     fireEvent.click(screen.getByRole("button", { name: /create account/i }));
 
@@ -107,8 +109,8 @@ describe("Register", () => {
       expect.stringMatching(/\/register$/),
       {
         email: "izhan@example.com",
-        password: "password123",
-        repassword: "password123",
+        password: "Password123",
+        repassword: "Password123",
       },
       expect.objectContaining({
         headers: expect.objectContaining({
@@ -140,7 +142,7 @@ describe("Register", () => {
     );
     await user.type(
       screen.getByPlaceholderText(/create a password/i),
-      "password123",
+      "Password123",
     );
     await user.type(
       screen.getByPlaceholderText(/re-enter your password/i),
@@ -157,7 +159,7 @@ describe("Register", () => {
   test("shows an email error when the account already exists", async () => {
     const user = userEvent.setup();
     axios.post.mockResolvedValue({
-      status: 503,
+      status: 409,
       data: {},
     });
 
@@ -169,11 +171,11 @@ describe("Register", () => {
     );
     await user.type(
       screen.getByPlaceholderText(/create a password/i),
-      "password123",
+      "Password123",
     );
     await user.type(
       screen.getByPlaceholderText(/re-enter your password/i),
-      "password123",
+      "Password123",
     );
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
@@ -197,11 +199,11 @@ describe("Register", () => {
     );
     await user.type(
       screen.getByPlaceholderText(/create a password/i),
-      "password123",
+      "Password123",
     );
     await user.type(
       screen.getByPlaceholderText(/re-enter your password/i),
-      "password123",
+      "Password123",
     );
     await user.click(screen.getByRole("button", { name: /create account/i }));
 

@@ -51,7 +51,7 @@ function Footer() {
                   className="flex items-start gap-2 text-xs text-white/35 transition-colors duration-200 hover:text-white/60 break-all sm:break-normal"
                 >
                   <Mail className="h-3 w-3 shrink-0" />
-                  <span>izhan3008@gmail.com</span>
+                  <span>hello@izhan.dev</span>
                 </a>
                 <a
                   href="tel:+923486186394"

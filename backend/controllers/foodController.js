@@ -1,10 +1,10 @@
-import Data from "../../Model/Registerdata.js";
+import User from "../../Model/User.js";
 import Foods from "../../Model/Foods.js";
 
 export const getStore = async (req, res) => {
   try {
     const email = req.email;
-    const user = await Data.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (user) {
       return res.status(200).json(user.array);
@@ -21,7 +21,7 @@ export const saveStore = async (req, res) => {
   try {
     const email = req.email;
     const array = req.body.array;
-    const user = await Data.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (user) {
       user.array = array;

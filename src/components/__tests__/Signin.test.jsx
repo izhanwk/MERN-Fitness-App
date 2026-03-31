@@ -90,7 +90,7 @@ describe("Signin", () => {
     );
     await user.type(
       screen.getByPlaceholderText(/enter your password/i),
-      "password123",
+      "Password123",
     );
     await user.click(screen.getByRole("button", { name: /^sign in$/i }));
 
@@ -99,7 +99,7 @@ describe("Signin", () => {
         expect.stringMatching(/\/signin$/),
         {
           email: "izhan@example.com",
-          password: "password123",
+          password: "Password123",
         },
         expect.objectContaining({
           headers: expect.objectContaining({
@@ -121,8 +121,9 @@ describe("Signin", () => {
   test("redirects incomplete profiles to setup with the submitted email", async () => {
     const user = userEvent.setup();
     axios.post.mockResolvedValue({
-      status: 302,
+      status: 200,
       data: {
+        needsOnboarding: true,
         data: {
           token: "pending-token",
         },
@@ -137,7 +138,7 @@ describe("Signin", () => {
     );
     await user.type(
       screen.getByPlaceholderText(/enter your password/i),
-      "password123",
+      "Password123",
     );
     await user.click(screen.getByRole("button", { name: /^sign in$/i }));
 
@@ -172,7 +173,7 @@ describe("Signin", () => {
     );
     await user.type(
       screen.getByPlaceholderText(/enter your password/i),
-      "wrongpass",
+      "Password123",
     );
     await user.click(screen.getByRole("button", { name: /^sign in$/i }));
 
@@ -195,7 +196,7 @@ describe("Signin", () => {
     );
     await user.type(
       screen.getByPlaceholderText(/enter your password/i),
-      "password123",
+      "Password123",
     );
     await user.click(screen.getByRole("button", { name: /^sign in$/i }));
 

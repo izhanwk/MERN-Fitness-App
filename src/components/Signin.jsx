@@ -34,7 +34,6 @@ function Signin() {
     } else {
       localStorage.removeItem("sessionId");
     }
-    localStorage.removeItem("refreshtoken");
   }, []);
 
   const onSubmit = async (data) => {
@@ -48,7 +47,7 @@ function Signin() {
         validateStatus: () => true,
       });
 
-      if (response.status === 302) {
+      if (response.status >= 200 && response.status < 300 && response.data?.needsOnboarding) {
         const sessionData = response.data?.data;
         persistSession(sessionData);
         showAlert(
@@ -114,7 +113,11 @@ function Signin() {
           },
         );
 
-        if (googleResponse.status === 302) {
+        if (
+          googleResponse.status >= 200 &&
+          googleResponse.status < 300 &&
+          googleResponse.data?.needsOnboarding
+        ) {
           const sessionData = googleResponse.data?.data;
           persistSession(sessionData);
           showAlert(
@@ -334,8 +337,9 @@ function Signin() {
                         message: "Password is required",
                       },
                       minLength: {
-                        value: 6,
-                        message: "Password must be at least 6 characters",
+                        value: 8,
+                        message:
+                          "Password must be at least 8 characters and include uppercase, lowercase, and a number",
                       },
                     })}
                   />

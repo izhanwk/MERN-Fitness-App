@@ -1,4 +1,4 @@
-import Data from "../../Model/Registerdata.js";
+import User from "../../Model/User.js";
 import { applyProfileComplete } from "../utils/profileComplete.js";
 import { safeUserFields } from "../utils/safeUserFields.js";
 import { isNonEmptyString, parseFiniteNumber } from "../utils/validators.js";
@@ -6,7 +6,7 @@ import { isNonEmptyString, parseFiniteNumber } from "../utils/validators.js";
 export const getData = async (req, res) => {
   try {
     const email = req.email;
-    const user = await Data.findOne({ email: email }).select(safeUserFields);
+    const user = await User.findOne({ email: email }).select(safeUserFields);
     if (user) {
       return res.status(200).json(user);
     } else {
@@ -25,7 +25,7 @@ export const saveData = async (req, res) => {
     req.body;
 
   try {
-    const user = await Data.findOne({ email: email });
+    const user = await User.findOne({ email: email });
 
     if (user) {
       user.name = isNonEmptyString(name) ? name.trim() : user.name;
@@ -54,7 +54,7 @@ export const saveData = async (req, res) => {
 export const saveMode = async (req, res) => {
   try {
     const email = req.user.email;
-    const user = await Data.findOne({ email: email });
+    const user = await User.findOne({ email: email });
     if (user) {
       user.mode = req.body.mode;
       applyProfileComplete(user);
@@ -71,7 +71,7 @@ export const saveMode = async (req, res) => {
 export const saveActivity = async (req, res) => {
   try {
     const email = req.user.email;
-    const user = await Data.findOne({ email: email });
+    const user = await User.findOne({ email: email });
     if (user) {
       user.activity = req.body.activity;
       applyProfileComplete(user);
@@ -89,7 +89,7 @@ export const saveActivity = async (req, res) => {
 export const saveGoal = async (req, res) => {
   try {
     const email = req.user.email;
-    const user = await Data.findOne({ email: email });
+    const user = await User.findOne({ email: email });
     if (user) {
       user.goal = req.body.goal;
       applyProfileComplete(user);
@@ -106,7 +106,7 @@ export const saveGoal = async (req, res) => {
 export const checkData = async (req, res) => {
   const email = req.email;
   try {
-    const user = await Data.findOne({ email: email });
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -123,7 +123,7 @@ export const checkData = async (req, res) => {
 
 export const getEditData = async (req, res) => {
   const email = req.email;
-  const user = await Data.findOne({ email: email }).select(safeUserFields);
+  const user = await User.findOne({ email: email }).select(safeUserFields);
   if (user) {
     return res.status(200).json(user);
   }
@@ -170,7 +170,7 @@ export const updateEditData = async (req, res) => {
       return res.status(400).json({ message: "Invalid numeric input" });
     }
 
-    const user = await Data.findOneAndUpdate(
+    const user = await User.findOneAndUpdate(
       { email: req.email },
       { $set: updates },
       { new: true },
