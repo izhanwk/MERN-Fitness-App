@@ -221,6 +221,21 @@ const NutritionTracker = () => {
 
   const [portionOpts, setportionOpts] = useState([]);
 
+  const redirectToSignin = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("sessionId");
+    navigate("/signin", { replace: true });
+  };
+
+  const ensureProtectedSuccess = (response) => {
+    if (response.status === 401 || response.status === 403) {
+      redirectToSignin();
+      return false;
+    }
+
+    return response.status >= 200 && response.status < 300;
+  };
+
   useEffect(() => {
     const el = sBox.current;
     if (!el) return;
@@ -263,9 +278,9 @@ const NutritionTracker = () => {
         headers: getAuthHeaders(),
         validateStatus: () => true,
       });
-      const data = res.data;
-      setempty(data.length === 0);
-      if (res.status >= 200 && res.status < 300) {
+      if (ensureProtectedSuccess(res)) {
+        const data = res.data;
+        setempty(data.length === 0);
         initialFetchingDone.current = true;
         setfood((p) => [...p, ...data]);
         setoriginalList((p) => [...p, ...data]);
@@ -295,7 +310,7 @@ const NutritionTracker = () => {
           headers: getAuthHeaders(),
           validateStatus: () => true,
         });
-        if (res.status >= 200 && res.status < 300) {
+        if (ensureProtectedSuccess(res)) {
           const data = res.data;
           const hasMore = data.length > 0 && data[0].showMore;
 
@@ -319,6 +334,10 @@ const NutritionTracker = () => {
           headers: getAuthHeaders(),
           validateStatus: () => true,
         });
+        if (!ensureProtectedSuccess(res)) {
+          return;
+        }
+
         const data = res.data;
         setuserData((p) => ({ ...p, ...data }));
         setmode(data.mode);
@@ -563,7 +582,7 @@ const NutritionTracker = () => {
           },
           validateStatus: () => true,
         });
-        if (res.status >= 200 && res.status < 300) {
+        if (ensureProtectedSuccess(res)) {
           skipNextStoreSync.current = true;
           setinitialFood(res.data || []);
         }
@@ -590,7 +609,7 @@ const NutritionTracker = () => {
     (async () => {
       try {
         setLoading(true);
-        await axios.post(
+        const response = await axios.post(
           `${API_URL}/store`,
           { array: initialFood },
           {
@@ -601,6 +620,10 @@ const NutritionTracker = () => {
             validateStatus: () => true,
           },
         );
+
+        if (!ensureProtectedSuccess(response)) {
+          return;
+        }
 
         setnewfood(initialFood);
       } catch (e) {
