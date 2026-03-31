@@ -31,6 +31,16 @@ import Footer from "./Footer";
 const API_URL = import.meta.env.VITE_API_URL;
 const clamp = (v, min = 0, max = 100) => Math.max(min, Math.min(max, v));
 const safePct = (num, den) => (den > 0 ? clamp((num / den) * 100) : 0);
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  const sessionId = localStorage.getItem("sessionId");
+
+  return {
+    Authorization: `Bearer ${token}`,
+    "ngrok-skip-browser-warning": "true",
+    ...(sessionId ? { "X-Session-Id": sessionId } : {}),
+  };
+};
 
 /* ── Sub-components ── */
 
@@ -146,6 +156,7 @@ const NutritionTracker = () => {
   const [selectedFood, setSelectedFood] = useState(null);
   const [quantity, setquantity] = useState("");
   const [portion, setPortion] = useState("");
+  const [portionLoading, setPortionLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [userData, setuserData] = useState({});
@@ -248,12 +259,8 @@ const NutritionTracker = () => {
     fetchingFood.current = true;
     try {
       setsearching(true);
-      const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/getfood2?page=0`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "ngrok-skip-browser-warning": "true",
-        },
+        headers: getAuthHeaders(),
         validateStatus: () => true,
       });
       const data = res.data;
@@ -284,12 +291,8 @@ const NutritionTracker = () => {
     (async () => {
       try {
         setloadMore(true);
-        const token = localStorage.getItem("token");
         const res = await axios.get(`${API_URL}/getfood2?page=${page}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
+          headers: getAuthHeaders(),
           validateStatus: () => true,
         });
         if (res.status >= 200 && res.status < 300) {
@@ -312,12 +315,8 @@ const NutritionTracker = () => {
   useEffect(() => {
     (async () => {
       try {
-        const token = localStorage.getItem("token");
         const res = await axios.get(`${API_URL}/getdata`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
+          headers: getAuthHeaders(),
           validateStatus: () => true,
         });
         const data = res.data;
@@ -451,20 +450,19 @@ const NutritionTracker = () => {
       return;
     }
     try {
-      const token = localStorage.getItem("token");
+      setPortionLoading(true);
       const response = await axios.get(
         `${API_URL}/getportion?name=${encodeURIComponent(foodName)}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
+          headers: getAuthHeaders(),
         },
       );
       setportionOpts(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.error(err);
       setportionOpts([]);
+    } finally {
+      setPortionLoading(false);
     }
   };
 
@@ -481,12 +479,8 @@ const NutritionTracker = () => {
           setempty(false);
           setsearching(true);
           onlineSearch.current = true;
-          const token = localStorage.getItem("token");
           const response = await axios.get(`${API_URL}/search?text=${query}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "ngrok-skip-browser-warning": "true",
-            },
+            headers: getAuthHeaders(),
           });
           const data = response.data;
           if (query !== latestQueryRef.current) return;
@@ -564,9 +558,8 @@ const NutritionTracker = () => {
       try {
         const res = await axios.get(`${API_URL}/store`, {
           headers: {
+            ...getAuthHeaders(),
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "ngrok-skip-browser-warning": "true",
           },
           validateStatus: () => true,
         });
@@ -602,9 +595,8 @@ const NutritionTracker = () => {
           { array: initialFood },
           {
             headers: {
+              ...getAuthHeaders(),
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-              "ngrok-skip-browser-warning": "true",
             },
             validateStatus: () => true,
           },
@@ -1107,21 +1099,33 @@ const NutritionTracker = () => {
 
                 {portionVisibility && (
                   <div className="absolute left-0 top-[calc(100%+6px)] z-[70] w-full rounded-xl border border-slate-200 bg-white p-2 shadow-2xl shadow-black/40">
-                    <ul className="space-y-1">
-                      {portionOpts.map((option) => (
-                        <li
-                          key={option}
-                          onClick={() => {
-                            setPortion(option);
-                            rotatePortion();
-                            setPortionVisibility(false);
-                          }}
-                          className="cursor-pointer rounded-lg px-3 py-3 sm:py-2 text-left text-xs leading-5 font-medium text-slate-700 transition-all hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white"
-                        >
-                          {option}
-                        </li>
-                      ))}
-                    </ul>
+                    {portionLoading ? (
+                      <div className="flex justify-center py-3">
+                        <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
+                      </div>
+                    ) : (
+                      <ul className="space-y-1">
+                        {portionOpts.length > 0 ? (
+                          portionOpts.map((option) => (
+                            <li
+                              key={option}
+                              onClick={() => {
+                                setPortion(option);
+                                rotatePortion();
+                                setPortionVisibility(false);
+                              }}
+                              className="cursor-pointer rounded-lg px-3 py-3 sm:py-2 text-left text-xs leading-5 font-medium text-slate-700 transition-all hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white"
+                            >
+                              {option}
+                            </li>
+                          ))
+                        ) : (
+                          <li className="px-3 py-2 text-xs text-slate-400">
+                            No portions available
+                          </li>
+                        )}
+                      </ul>
+                    )}
                   </div>
                 )}
               </div>
