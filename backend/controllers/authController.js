@@ -58,6 +58,12 @@ export const refreshToken = async (req, res) => {
 
     const token = createAccessToken(user);
 
+    // Keep session.userId in sync with the current user._id.
+    // This matters for accounts migrated from the legacy collection where
+    // the old _id differs from the new one in the `users` collection.
+    if (session.userId.toString() !== user._id.toString()) {
+      session.userId = user._id;
+    }
     session.lastActive = new Date();
     await session.save();
 
