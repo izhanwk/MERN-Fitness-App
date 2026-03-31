@@ -119,6 +119,14 @@ function DNavbar() {
         return null;
       }
 
+      // 403 after a retry — refresh worked but session still rejected the new
+      // token (e.g. session.userId was out of sync after a DB migration).
+      // The session is unrecoverable; force re-login.
+      if (status === 403 && originalRequest?._retry) {
+        clearAuthAndRedirect("Session Expired", "Please sign in again.");
+        return null;
+      }
+
       // 403 — try a token refresh once, then redirect if it fails
       if (status === 403 && originalRequest && !originalRequest._retry) {
         originalRequest._retry = true;

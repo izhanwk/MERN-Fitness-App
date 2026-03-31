@@ -270,8 +270,11 @@ const NutritionTracker = () => {
         setfood((p) => [...p, ...data]);
         setoriginalList((p) => [...p, ...data]);
         more.current = data.length > 0 && data[0].showMore;
+      } else {
+        setempty(true);
       }
     } catch (err) {
+      setempty(true);
       console.error(err);
     } finally {
       setsearching(false);
