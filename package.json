@@ -3,60 +3,38 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
     "lint": "eslint .",
     "test": "vitest",
-    "test:backend": "vitest run backend/test",
+    "test:frontend": "npm --prefix frontend run test:run",
+    "test:backend": "npm --prefix backend run test",
     "test:e2e": "playwright test",
     "test:run": "vitest run",
-    "migrate:users": "node backend/scripts/migrateLegacyUsersCollection.js",
-    "preview": "vite preview",
-    "start": "node ./backend/server.js",
-    "start:server": "node backend/server.js"
+    "migrate:users": "npm --prefix backend run migrate:users",
+    "preview": "npm --prefix frontend run preview",
+    "start": "npm --prefix backend run start",
+    "start:server": "npm --prefix backend run start"
   },
   "engines": {
     "node": ">=18"
   },
-  "dependencies": {
-    "axios": "^1.11.0",
-    "bcrypt": "^5.1.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "ejs": "^3.1.10",
-    "express": "^4.21.1",
-    "google-auth-library": "^10.3.0",
-    "jsonwebtoken": "^9.0.2",
-    "lodash.debounce": "^4.0.8",
-    "lucide-react": "^0.542.0",
-    "mongoose": "^8.8.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-hook-form": "^7.53.2",
-    "react-router-dom": "^6.28.0",
-    "resend": "^6.0.3",
-    "useragent": "^2.3.0"
-  },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@playwright/test": "^1.58.2",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^4.3.3",
-    "autoprefixer": "^10.4.20",
+    "dotenv": "^16.4.5",
     "eslint": "^9.13.0",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
     "jsdom": "^27.0.1",
-    "mongodb-memory-server": "^11.0.1",
-    "postcss": "^8.4.49",
-    "supertest": "^7.2.2",
-    "tailwindcss": "^3.4.15",
-    "vite": "^5.4.10",
     "vitest": "^3.2.4"
   }
 }

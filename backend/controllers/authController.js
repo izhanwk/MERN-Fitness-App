@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import User from "../../Model/User.js";
-import Sessions from "../../Model/Sessions.js";
+import User from "../Model/User.js";
+import Sessions from "../Model/Sessions.js";
 import { buildVerificationEmail, sendEmail } from "../emailSender.js";
 import { OAuth2Client } from "google-auth-library";
 import { buildAuthResponsePayload } from "../utils/authPayload.js";

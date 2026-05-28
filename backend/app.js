@@ -22,10 +22,7 @@ function createApp() {
 
   const allowedOrigins = (
     process.env.ALLOWED_ORIGINS ||
-    [
-      "http://localhost:5173",
-      "https://mern-fitness-app-one.vercel.app",
-    ]
+    ["http://localhost:5173", "https://mern-fitness-app-one.vercel.app"]
       .filter(Boolean)
       .join(",")
   )

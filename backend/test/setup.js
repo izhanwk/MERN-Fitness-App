@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "../config/env.js";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { afterAll, afterEach, beforeAll } from "vitest";

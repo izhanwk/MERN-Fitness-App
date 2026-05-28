@@ -1,4 +1,4 @@
-import User from "../../Model/User.js";
+import User from "../Model/User.js";
 import { applyProfileComplete } from "../utils/profileComplete.js";
 import { safeUserFields } from "../utils/safeUserFields.js";
 import { isNonEmptyString, parseFiniteNumber } from "../utils/validators.js";

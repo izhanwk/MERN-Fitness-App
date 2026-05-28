@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Sessions from "../../Model/Sessions.js";
+import Sessions from "../Model/Sessions.js";
 
 export const getSessions = async (req, res) => {
   try {

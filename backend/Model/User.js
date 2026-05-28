@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { isValidEmail, normalizeEmail } from "../backend/utils/validators.js";
+import { isValidEmail, normalizeEmail } from "../utils/validators.js";
 
 const userSchema = new mongoose.Schema(
   {

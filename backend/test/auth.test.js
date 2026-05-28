@@ -6,8 +6,8 @@ import jwt from "jsonwebtoken";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import User from "../../Model/User.js";
-import Sessions from "../../Model/Sessions.js";
+import User from "../Model/User.js";
+import Sessions from "../Model/Sessions.js";
 
 vi.mock("../emailSender.js", () => ({
   sendEmail: vi.fn().mockResolvedValue(undefined),

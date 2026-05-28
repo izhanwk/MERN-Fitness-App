@@ -1,5 +1,5 @@
-import User from "../../Model/User.js";
-import Foods from "../../Model/Foods.js";
+import User from "../Model/User.js";
+import Foods from "../Model/Foods.js";
 
 export const getStore = async (req, res) => {
   try {

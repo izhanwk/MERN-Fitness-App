@@ -20,7 +20,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: `${npmCommand} run start:server`,
+      command: `${npmCommand} --prefix backend run start`,
       url: `http://localhost:${backendPort}`,
       reuseExistingServer: false,
       env: {
@@ -31,7 +31,7 @@ export default defineConfig({
       },
     },
     {
-      command: `${npmCommand} run dev -- --host localhost --port ${frontendPort}`,
+      command: `${npmCommand} --prefix frontend run dev -- --host localhost --port ${frontendPort}`,
       url: baseURL,
       reuseExistingServer: false,
       env: {

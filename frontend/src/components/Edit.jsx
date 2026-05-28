@@ -76,7 +76,7 @@ function Edit() {
       }
     };
     getInfo();
-  }, []);
+  }, [showAlert]);
 
   const isDirty = useMemo(() => {
     if (!initialForm) return false;

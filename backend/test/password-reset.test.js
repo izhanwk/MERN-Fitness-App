@@ -5,9 +5,9 @@ import bcrypt from "bcrypt";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import User from "../../Model/User.js";
-import Otp from "../../Model/Otp.js";
-import OtpRequest from "../../Model/OtpRequest.js";
+import User from "../Model/User.js";
+import Otp from "../Model/Otp.js";
+import OtpRequest from "../Model/OtpRequest.js";
 
 const sendEmailMock = vi.fn().mockResolvedValue(undefined);
 

@@ -28,12 +28,22 @@ This project is a full-stack fitness tracker with real authentication, session m
 ## Project Structure
 
 ```text
-src/
-  components/
-  App.jsx
-  main.jsx
+frontend/
+  src/
+    components/
+    App.jsx
+    main.jsx
+  public/
+  package.json
+  vite.config.js
 
 backend/
+  Model/
+    User.js
+    Foods.js
+    Sessions.js
+    Otp.js
+    OtpRequest.js
   app.js
   controllers/
   middleware/
@@ -46,13 +56,6 @@ backend/
 
 e2e/
   signin-dashboard.spec.js
-
-Model/
-  User.js
-  Foods.js
-  Sessions.js
-  Otp.js
-  OtpRequest.js
 ```
 
 ## Core Features
@@ -197,6 +200,38 @@ npm run migrate:users
 npm run dev
 ```
 
+## Docker
+
+This repo includes a Docker setup for the full app:
+
+- `frontend/Dockerfile` builds the Vite app and serves it with Nginx
+- `backend/Dockerfile` runs the Express API
+- `docker-compose.yml` runs the frontend and backend containers
+- MongoDB runs on Atlas and is configured through `MONGODB_URI`
+
+Start the containers using the Atlas settings in your root `.env`:
+
+```bash
+docker compose up --build
+```
+
+Then open:
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:5000`
+
+For real secrets, copy `.env.docker.example` to `.env.docker`, update the values, then run:
+
+```bash
+docker compose --env-file .env.docker up --build
+```
+
+Stop the containers:
+
+```bash
+docker compose down
+```
+
 ## Testing
 
 This repo uses Vitest for both frontend and backend testing.
@@ -228,7 +263,7 @@ npm run test:backend -- auth.test.js
 Run the auth component tests directly:
 
 ```bash
-npm run test:run -- src/components/__tests__/Signin.test.jsx src/components/__tests__/Register.test.jsx
+npm run test:run -- frontend/src/components/__tests__/Signin.test.jsx frontend/src/components/__tests__/Register.test.jsx
 ```
 
 Frontend coverage includes:

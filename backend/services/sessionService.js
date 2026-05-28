@@ -1,4 +1,4 @@
-import Sessions from "../../Model/Sessions.js";
+import Sessions from "../Model/Sessions.js";
 import useragent from "useragent";
 import { getClientIp } from "../utils/getClientIp.js";
 

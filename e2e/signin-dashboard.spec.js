@@ -3,8 +3,8 @@ import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { test, expect } from "@playwright/test";
 
-import User from "../Model/User.js";
-import Foods from "../Model/Foods.js";
+import User from "../backend/Model/User.js";
+import Foods from "../backend/Model/Foods.js";
 
 const email = "playwright-e2e@example.com";
 const password = "Password123";

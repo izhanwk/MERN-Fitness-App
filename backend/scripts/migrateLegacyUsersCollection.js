@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "../config/env.js";
 import mongoose from "mongoose";
 
 const legacyCollectionName = "Registeration Data";
@@ -40,7 +40,8 @@ async function migrateLegacyUsersCollection() {
     const targetCollection = db.collection(targetCollectionName);
 
     for (const legacyUser of legacyUsers) {
-      const { _id, ...legacyUserWithoutId } = legacyUser;
+      const legacyUserWithoutId = { ...legacyUser };
+      delete legacyUserWithoutId._id;
       const normalizedEmail = legacyUser.email?.trim().toLowerCase();
 
       if (!normalizedEmail) {

@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import User from "../../Model/User.js";
-import Otp from "../../Model/Otp.js";
-import OtpRequest from "../../Model/OtpRequest.js";
+import User from "../Model/User.js";
+import Otp from "../Model/Otp.js";
+import OtpRequest from "../Model/OtpRequest.js";
 import { buildPasswordResetOtpEmail, sendEmail } from "../emailSender.js";
 import {
   isStrongEnoughPassword,

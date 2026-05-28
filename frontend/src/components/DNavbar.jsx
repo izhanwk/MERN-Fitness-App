@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X, Dumbbell } from "lucide-react";
 import Loader from "./Loader";
@@ -16,15 +16,19 @@ function DNavbar() {
   const isRefreshing = useRef(false);
   const refreshPromiseRef = useRef(null);
 
-  const clearAuthAndRedirect = (
+  const clearAuthAndRedirect = useCallback((
     title = "Authentication Failed",
     message = "Please sign in again.",
   ) => {
     localStorage.removeItem("token");
     localStorage.removeItem("sessionId");
     navigate("/signin", { replace: true });
-    try { showAlert(message, "error", title); } catch {}
-  };
+    try {
+      showAlert(message, "error", title);
+    } catch (error) {
+      console.error("Unable to show auth alert:", error);
+    }
+  }, [navigate, showAlert]);
 
   const scrollToFooterSection = (sectionId) => {
     const section = document.getElementById(sectionId);
@@ -55,7 +59,7 @@ function DNavbar() {
     }
   };
 
-  const refreshSessionToken = async () => {
+  const refreshSessionToken = useCallback(async () => {
     try {
       const sessionId = localStorage.getItem("sessionId");
       if (!sessionId) {
@@ -77,10 +81,10 @@ function DNavbar() {
       const data = response.data;
       localStorage.setItem("token", data.token);
       return data.token;
-    } catch (err) {
+    } catch {
       return null;
     }
-  };
+  }, []);
 
   // Synchronous guard: redirect immediately if credentials are absent.
   // Expired/invalid tokens are handled by the response interceptor below.
@@ -90,7 +94,7 @@ function DNavbar() {
     if (!token || !sessionId) {
       clearAuthAndRedirect("Authentication Required", "Please sign in to continue.");
     }
-  }, []);
+  }, [clearAuthAndRedirect]);
 
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use((config) => {
@@ -180,7 +184,7 @@ function DNavbar() {
       axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
     };
-  }, []);
+  }, [clearAuthAndRedirect, refreshSessionToken]);
 
   return (
     <div className="relative">

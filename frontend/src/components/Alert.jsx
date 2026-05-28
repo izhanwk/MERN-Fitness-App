@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from "lucide-react";
 
 const Alert = ({ 
@@ -12,6 +12,13 @@ const Alert = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 300); // Wait for animation to complete
+  }, [onClose]);
+
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -24,14 +31,7 @@ const Alert = ({
     } else {
       setIsVisible(false);
     }
-  }, [isOpen, duration]);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      onClose();
-    }, 300); // Wait for animation to complete
-  };
+  }, [isOpen, duration, handleClose]);
 
   const getAlertConfig = () => {
     switch (type) {
@@ -144,7 +144,7 @@ export const useAlert = () => {
     duration: 5000
   });
 
-  const showAlert = (message, type = "info", title = "", duration = 5000) => {
+  const showAlert = useCallback((message, type = "info", title = "", duration = 5000) => {
     setAlertState({
       isOpen: true,
       type,
@@ -152,16 +152,14 @@ export const useAlert = () => {
       message,
       duration
     });
-  };
+  }, []);
 
-  const hideAlert = () => {
+  const hideAlert = useCallback(() => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
-  };
+  }, []);
 
-  return {
-    showAlert,
-    hideAlert,
-    Alert: () => (
+  const AlertRenderer = useCallback(
+    () => (
       <Alert
         isOpen={alertState.isOpen}
         onClose={hideAlert}
@@ -170,7 +168,14 @@ export const useAlert = () => {
         message={alertState.message}
         duration={alertState.duration}
       />
-    )
+    ),
+    [alertState, hideAlert],
+  );
+
+  return {
+    showAlert,
+    hideAlert,
+    Alert: AlertRenderer
   };
 };
 

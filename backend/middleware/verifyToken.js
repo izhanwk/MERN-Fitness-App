@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import Sessions from "../../Model/Sessions.js";
+import Sessions from "../Model/Sessions.js";
 
 const secretkey = process.env.SECRET_KEY;
 

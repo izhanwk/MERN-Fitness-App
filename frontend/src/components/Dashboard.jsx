@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import DNavbar from "./DNavbar";
 import axios from "axios";
@@ -30,7 +30,6 @@ import Footer from "./Footer";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const clamp = (v, min = 0, max = 100) => Math.max(min, Math.min(max, v));
-const safePct = (num, den) => (den > 0 ? clamp((num / den) * 100) : 0);
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
   const sessionId = localStorage.getItem("sessionId");
@@ -43,40 +42,6 @@ const getAuthHeaders = () => {
 };
 
 /* ── Sub-components ── */
-
-const NutrientBar = ({ label, value, target, pct, color }) => (
-  <div className="group flex items-center gap-3 sm:gap-4 rounded-2xl border border-white/8 bg-white/4 px-4 py-3 sm:px-5 sm:py-4 transition-all duration-300 hover:bg-white/8 hover:border-white/15">
-    <div className="w-24 sm:w-28 shrink-0">
-      <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-white/50 group-hover:text-white/70 transition-colors duration-200">
-        {label}
-      </p>
-    </div>
-    <div className="flex-1 min-w-0">
-      <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
-        <div
-          className="h-full rounded-full transition-all duration-1000 ease-out"
-          style={{
-            width: `${pct}%`,
-            background: color,
-            boxShadow: `0 0 10px ${color}44`,
-          }}
-        />
-      </div>
-    </div>
-    <div className="w-20 sm:w-24 shrink-0 text-right">
-      <span className="text-[10px] sm:text-xs font-bold text-white/80">
-        {value}
-        <span className="text-white/35">/{target}</span>
-      </span>
-    </div>
-    <div
-      className="hidden sm:block w-10 shrink-0 text-right text-[11px] font-bold tabular-nums"
-      style={{ color: pct >= 100 ? "#4ade80" : "#64748b" }}
-    >
-      {Math.round(pct)}%
-    </div>
-  </div>
-);
 
 const MacroCard = ({ label, value, target, accent, gradient, icon: Icon }) => {
   const pct = clamp(target > 0 ? (value / target) * 100 : 0);
@@ -141,6 +106,7 @@ const NutritionTracker = () => {
 
   const [food, setfood] = useState([]);
   const [originalList, setoriginalList] = useState([]);
+  const originalListRef = useRef([]);
   const [newfood, setnewfood] = useState([]);
   const [initialFood, setinitialFood] = useState([]);
   const sBox = useRef(null);
@@ -149,6 +115,7 @@ const NutritionTracker = () => {
   const [searchText, setsearchText] = useState("");
   const [searchVisiblity, setsearchVisiblity] = useState(false);
   const [foodSearchInitialized, setFoodSearchInitialized] = useState(false);
+  const foodSearchInitializedRef = useRef(false);
   const [showList, setshowList] = useState(false);
   const [rotation, setrotation] = useState(false);
   const [portionVisibility, setPortionVisibility] = useState(false);
@@ -170,7 +137,6 @@ const NutritionTracker = () => {
   const [mode, setmode] = useState("");
   const [activity, setactivity] = useState(1.2);
 
-  const [BMR, setBMR] = useState(0);
   const [Crequirement, setCrequirement] = useState(0);
   const [proteinReq, setproteinReq] = useState(0);
   const [fatsreq, setfatsreq] = useState(0);
@@ -197,18 +163,6 @@ const NutritionTracker = () => {
   const [tCalcium, settCalcium] = useState(0);
   const [tMagnesium, settMagnesium] = useState(0);
 
-  const [calPercentage, setcalPercentage] = useState(0);
-  const [proPercentage, setproPercentage] = useState(0);
-  const [fatsPercentage, setfatsPercentage] = useState(0);
-  const [carbsPercentage, setcarbsPercentage] = useState(0);
-  const [vApercentage, setvApercentage] = useState(0);
-  const [vBpercentage, setvBpercentage] = useState(0);
-  const [vCpercentage, setvCpercentage] = useState(0);
-  const [vEpercentage, setvEpercentage] = useState(0);
-  const [vKpercentage, setvKpercentage] = useState(0);
-  const [ironPercentage, setironPercentage] = useState(0);
-  const [calciumPercentage, setcalciumPercentage] = useState(0);
-  const [magnesiumPercentage, setmagnesiumPercentage] = useState(0);
   const [searching, setsearching] = useState(false);
   const [loadMore, setloadMore] = useState(false);
   const [empty, setempty] = useState(false);
@@ -220,6 +174,14 @@ const NutritionTracker = () => {
   const portionBox = useRef(null);
 
   const [portionOpts, setportionOpts] = useState([]);
+
+  useEffect(() => {
+    originalListRef.current = originalList;
+  }, [originalList]);
+
+  useEffect(() => {
+    foodSearchInitializedRef.current = foodSearchInitialized;
+  }, [foodSearchInitialized]);
 
   useEffect(() => {
     const el = sBox.current;
@@ -290,7 +252,7 @@ const NutritionTracker = () => {
       isFirstRender.current = false;
       return;
     }
-    if (!foodSearchInitialized || !more.current) return;
+    if (!foodSearchInitializedRef.current || !more.current) return;
     (async () => {
       try {
         setloadMore(true);
@@ -426,7 +388,6 @@ const NutritionTracker = () => {
     else if (mode === "Fast Musclegain") target += 750;
     else if (mode === "Moderate fatloss") target -= 500;
     else if (mode === "Fast fatloss") target -= 800;
-    setBMR(Math.round(bmr));
     setCrequirement(Math.round(target));
   }, [gender, weight, height, userAge, activity, mode]);
 
@@ -524,7 +485,7 @@ const NutritionTracker = () => {
     if (searchVisiblity) {
       latestQueryRef.current = "";
       setsearchText("");
-      setfood(originalList);
+      setfood(originalListRef.current);
       if (sBox.current) sBox.current.scrollTop = 0;
     }
     const outside = (e) => {
@@ -534,7 +495,7 @@ const NutritionTracker = () => {
         !sBox.current.contains(e.target) &&
         !Box.current.contains(e.target)
       ) {
-        rotate();
+        setrotation((r) => !r);
         setsearchVisiblity(false);
       }
     };
@@ -549,7 +510,7 @@ const NutritionTracker = () => {
         portionBox.current &&
         !portionBox.current.contains(e.target)
       ) {
-        rotatePortion();
+        setPortionRotation((r) => !r);
         setPortionVisibility(false);
       }
     };
@@ -681,34 +642,6 @@ const NutritionTracker = () => {
     setinitialFood((p) => p.filter((_, i) => i !== idx));
   const clearAllFood = () => setinitialFood([]);
 
-  useEffect(
-    () => setcalPercentage(safePct(tcalories, Crequirement)),
-    [tcalories, Crequirement],
-  );
-  useEffect(
-    () => setproPercentage(safePct(tproteins, proteinReq)),
-    [tproteins, proteinReq],
-  );
-  useEffect(() => setfatsPercentage(safePct(tfats, fatsreq)), [tfats, fatsreq]);
-  useEffect(
-    () => setcarbsPercentage(safePct(tcarbs, carbsreq)),
-    [tcarbs, carbsreq],
-  );
-  useEffect(() => setvApercentage(safePct(tVA, Areq)), [tVA, Areq]);
-  useEffect(() => setvBpercentage(safePct(tVB, Breq)), [tVB, Breq]);
-  useEffect(() => setvCpercentage(safePct(tVC, Creq)), [tVC, Creq]);
-  useEffect(() => setvEpercentage(safePct(tVE, 15)), [tVE]);
-  useEffect(() => setvKpercentage(safePct(tVK, Kreq)), [tVK, Kreq]);
-  useEffect(() => setironPercentage(safePct(tIron, ireq)), [tIron, ireq]);
-  useEffect(
-    () => setcalciumPercentage(safePct(tCalcium, calciumReq)),
-    [tCalcium, calciumReq],
-  );
-  useEffect(
-    () => setmagnesiumPercentage(safePct(tMagnesium, magnesiumReq)),
-    [tMagnesium, magnesiumReq],
-  );
-
   const macroCards = [
     {
       label: "Calories",
@@ -741,37 +674,6 @@ const NutritionTracker = () => {
       accent: "#34d399",
       gradient: "linear-gradient(135deg,#34d399,#10b981)",
       icon: Wheat,
-    },
-  ];
-
-  const macroBars = [
-    {
-      label: "Calories",
-      value: tcalories,
-      target: Math.round(Crequirement),
-      pct: calPercentage,
-      color: "linear-gradient(90deg,#fbbf24,#f97316)",
-    },
-    {
-      label: "Proteins",
-      value: tproteins,
-      target: Math.round(proteinReq),
-      pct: proPercentage,
-      color: "linear-gradient(90deg,#38bdf8,#6366f1)",
-    },
-    {
-      label: "Fats",
-      value: tfats,
-      target: Math.round(fatsreq),
-      pct: fatsPercentage,
-      color: "linear-gradient(90deg,#fb7185,#f43f5e)",
-    },
-    {
-      label: "Carbs",
-      value: tcarbs,
-      target: Math.round(carbsreq),
-      pct: carbsPercentage,
-      color: "linear-gradient(90deg,#34d399,#10b981)",
     },
   ];
 
