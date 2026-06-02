@@ -166,7 +166,7 @@ SECRET_KEY=your_access_token_secret
 REFRESH=your_refresh_token_secret
 JWT_VERIFY=your_email_verification_secret
 SERVER_BASE_URL=http://localhost:5000
-ALLOWED_ORIGINS=http://localhost:5173,https://mern-fitness-app-one.vercel.app
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
 
 GOOGLE_CLIENT_ID=your_google_client_id
 
@@ -174,7 +174,7 @@ RESEND_API_KEY=your_resend_api_key
 RESEND_FROM_EMAIL=hello@yourdomain.com
 RESEND_FROM_NAME=FitTrack App
 
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5000/api
 VITE_GOOGLE_CLIENT_ID=your_google_client_id
 
 TEST_MONGODB_URI=your_test_mongodb_connection_string
@@ -206,8 +206,9 @@ This repo includes a Docker setup for the full app:
 
 - `frontend/Dockerfile` builds the Vite app and serves it with Nginx
 - `backend/Dockerfile` runs the Express API
-- `docker-compose.yml` runs the frontend and backend containers
+- `docker-compose.yml` runs the frontend and backend containers behind one public frontend URL
 - MongoDB runs on Atlas and is configured through `MONGODB_URI`
+- Nginx proxies `/api/*` from the frontend container to the backend container
 
 Start the containers using the Atlas settings in your root `.env`:
 
@@ -217,8 +218,10 @@ docker compose up --build
 
 Then open:
 
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:5000`
+- App: `http://localhost:3000`
+- API through the app URL: `http://localhost:3000/api`
+
+The backend container is internal in Docker Compose and is not published on a host port.
 
 For real secrets, copy `.env.docker.example` to `.env.docker`, update the values, then run:
 
@@ -231,6 +234,32 @@ Stop the containers:
 ```bash
 docker compose down
 ```
+
+## Railway
+
+Use two Railway services with one public frontend URL:
+
+- Frontend service: public, uses `frontend/Dockerfile`
+- Backend service: private/internal, uses `backend/Dockerfile`
+- Database: MongoDB Atlas
+
+Frontend service variables:
+
+```env
+VITE_API_URL=/api
+BACKEND_URL=http://your-backend-private-domain:5000
+```
+
+Backend service variables:
+
+```env
+MONGODB_URI=your_mongodb_atlas_connection_string
+MONGODB_DB_NAME=fittrack
+SERVER_BASE_URL=https://your-frontend-domain.up.railway.app
+ALLOWED_ORIGINS=https://your-frontend-domain.up.railway.app
+```
+
+Set the remaining auth, Google, and Resend secrets on the backend service.
 
 ## Testing
 

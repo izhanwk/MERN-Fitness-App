@@ -9,6 +9,8 @@ import User from "../Model/User.js";
 import Otp from "../Model/Otp.js";
 import OtpRequest from "../Model/OtpRequest.js";
 
+const API_BASE_PATH = "/api";
+
 const sendEmailMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("../emailSender.js", () => ({
@@ -31,9 +33,11 @@ beforeEach(async () => {
 
 describe("password reset routes", () => {
   it("returns 404 for forgot-password when the user does not exist", async () => {
-    const response = await request(app).post("/forgot-password").send({
-      email: "missing@example.com",
-    });
+    const response = await request(app)
+      .post(`${API_BASE_PATH}/forgot-password`)
+      .send({
+        email: "missing@example.com",
+      });
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({
@@ -49,7 +53,9 @@ describe("password reset routes", () => {
       verified: true,
     });
 
-    const response = await request(app).post("/forgot-password").send({ email });
+    const response = await request(app)
+      .post(`${API_BASE_PATH}/forgot-password`)
+      .send({ email });
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ message: "OTP sent" });
@@ -70,11 +76,13 @@ describe("password reset routes", () => {
     });
     await Otp.create({ email, otp: "123456" });
 
-    const response = await request(app).post("/change-password").send({
-      email,
-      otp: "123456",
-      password: newPassword,
-    });
+    const response = await request(app)
+      .post(`${API_BASE_PATH}/change-password`)
+      .send({
+        email,
+        otp: "123456",
+        password: newPassword,
+      });
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ message: "Password updated" });
@@ -93,11 +101,13 @@ describe("password reset routes", () => {
       verified: true,
     });
 
-    const response = await request(app).post("/change-password").send({
-      email,
-      otp: "000000",
-      password: "NewPassword456",
-    });
+    const response = await request(app)
+      .post(`${API_BASE_PATH}/change-password`)
+      .send({
+        email,
+        otp: "000000",
+        password: "NewPassword456",
+      });
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
@@ -115,11 +125,13 @@ describe("password reset routes", () => {
     });
     await Otp.create({ email, otp: "123456" });
 
-    const response = await request(app).post("/change-password").send({
-      email,
-      otp: "123456",
-      password: "weak1234",
-    });
+    const response = await request(app)
+      .post(`${API_BASE_PATH}/change-password`)
+      .send({
+        email,
+        otp: "123456",
+        password: "weak1234",
+      });
 
     expect(response.status).toBe(400);
     expect(response.body.message).toContain("at least 8 characters");
@@ -140,7 +152,9 @@ describe("password reset routes", () => {
       })),
     );
 
-    const response = await request(app).post("/forgot-password").send({ email });
+    const response = await request(app)
+      .post(`${API_BASE_PATH}/forgot-password`)
+      .send({ email });
 
     expect(response.status).toBe(429);
     expect(response.body.message).toContain("OTP request limit reached");

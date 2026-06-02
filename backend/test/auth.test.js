@@ -9,6 +9,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import User from "../Model/User.js";
 import Sessions from "../Model/Sessions.js";
 
+const API_BASE_PATH = "/api";
+
 vi.mock("../emailSender.js", () => ({
   sendEmail: vi.fn().mockResolvedValue(undefined),
   buildVerificationEmail: vi.fn((url) => ({
@@ -27,7 +29,7 @@ beforeEach(async () => {
 
 describe("auth routes", () => {
   it("returns 401 when signin credentials are invalid", async () => {
-    const response = await request(app).post("/signin").send({
+    const response = await request(app).post(`${API_BASE_PATH}/signin`).send({
       email: "missing@example.com",
       password: "Password123",
     });
@@ -51,7 +53,7 @@ describe("auth routes", () => {
     });
 
     const response = await request(app)
-      .post("/signin")
+      .post(`${API_BASE_PATH}/signin`)
       .set("User-Agent", "Vitest Browser/1.0")
       .send({
         email: user.email,
@@ -79,7 +81,7 @@ describe("auth routes", () => {
     });
 
     const response = await request(app)
-      .post("/signin")
+      .post(`${API_BASE_PATH}/signin`)
       .set("User-Agent", "Vitest Browser/1.0")
       .send({
         email: "onboarding@example.com",
@@ -115,18 +117,22 @@ describe("auth routes", () => {
       currentDevice: true,
     });
 
-    const response = await request(app).post("/refresh-token").send({
-      sessionId: session._id.toString(),
-    });
+    const response = await request(app)
+      .post(`${API_BASE_PATH}/refresh-token`)
+      .send({
+        sessionId: session._id.toString(),
+      });
 
     expect(response.status).toBe(200);
     expect(response.body.token).toEqual(expect.any(String));
   });
 
   it("rejects refresh token requests with an invalid session id", async () => {
-    const response = await request(app).post("/refresh-token").send({
-      sessionId: "not-a-valid-id",
-    });
+    const response = await request(app)
+      .post(`${API_BASE_PATH}/refresh-token`)
+      .send({
+        sessionId: "not-a-valid-id",
+      });
 
     expect(response.status).toBe(403);
     expect(response.body).toEqual({

@@ -18,7 +18,6 @@ ENV PORT=5000
 COPY --from=deps /app/node_modules /app/node_modules
 COPY --from=deps /app/package.json /app/package.json
 COPY --from=deps /app/package-lock.json /app/package-lock.json
-COPY --from=deps /app/backend/package.json ./package.json
 COPY backend ./
 
 EXPOSE 5000

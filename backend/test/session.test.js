@@ -8,6 +8,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import User from "../Model/User.js";
 import Sessions from "../Model/Sessions.js";
 
+const API_BASE_PATH = "/api";
+
 vi.mock("../emailSender.js", () => ({
   sendEmail: vi.fn().mockResolvedValue(undefined),
 }));
@@ -34,7 +36,7 @@ async function createSignedInUser(email) {
   });
 
   const response = await request(app)
-    .post("/signin")
+    .post(`${API_BASE_PATH}/signin`)
     .set("User-Agent", "Vitest Browser/1.0")
     .send({ email, password });
 
@@ -46,7 +48,7 @@ async function createSignedInUser(email) {
 
 describe("session routes", () => {
   it("requires both authorization and session headers for /sessions", async () => {
-    const response = await request(app).get("/sessions");
+    const response = await request(app).get(`${API_BASE_PATH}/sessions`);
 
     expect(response.status).toBe(403);
     expect(response.body).toEqual({
@@ -70,7 +72,7 @@ describe("session routes", () => {
     });
 
     const response = await request(app)
-      .get("/sessions")
+      .get(`${API_BASE_PATH}/sessions`)
       .set("Authorization", `Bearer ${token}`)
       .set("X-Session-Id", sessionId);
 
@@ -100,7 +102,7 @@ describe("session routes", () => {
     });
 
     const response = await request(app)
-      .delete(`/logoutsession?id=${otherSession._id}`)
+      .delete(`${API_BASE_PATH}/logoutsession?id=${otherSession._id}`)
       .set("Authorization", `Bearer ${token}`)
       .set("X-Session-Id", sessionId);
 
@@ -115,7 +117,7 @@ describe("session routes", () => {
     const { token, sessionId } = await createSignedInUser("activesession@example.com");
 
     const response = await request(app)
-      .delete(`/logoutsession?id=${sessionId}`)
+      .delete(`${API_BASE_PATH}/logoutsession?id=${sessionId}`)
       .set("Authorization", `Bearer ${token}`)
       .set("X-Session-Id", sessionId);
 

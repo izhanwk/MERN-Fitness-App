@@ -9,6 +9,8 @@ import passwordRoutes from "./routes/passwordRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import sessionRoutes from "./routes/sessionRoutes.js";
 
+export const API_BASE_PATH = "/api";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -22,9 +24,7 @@ function createApp() {
 
   const allowedOrigins = (
     process.env.ALLOWED_ORIGINS ||
-    ["http://localhost:5173", "https://mern-fitness-app-one.vercel.app"]
-      .filter(Boolean)
-      .join(",")
+    ["http://localhost:5173", "http://localhost:3000"].filter(Boolean).join(",")
   )
     .split(",")
     .map((origin) => origin.trim())
@@ -54,11 +54,14 @@ function createApp() {
     res.send("Hello World!");
   });
 
-  app.use("/", authRoutes);
-  app.use("/", profileRoutes);
-  app.use("/", foodRoutes);
-  app.use("/", sessionRoutes);
-  app.use("/", passwordRoutes);
+  const apiRouter = express.Router();
+  apiRouter.use(authRoutes);
+  apiRouter.use(profileRoutes);
+  apiRouter.use(foodRoutes);
+  apiRouter.use(sessionRoutes);
+  apiRouter.use(passwordRoutes);
+
+  app.use(API_BASE_PATH, apiRouter);
 
   return app;
 }

@@ -3,7 +3,7 @@
 FROM node:20-bookworm-slim AS builder
 WORKDIR /app
 
-ARG VITE_API_URL=http://localhost:5000
+ARG VITE_API_URL=/api
 ARG VITE_GOOGLE_CLIENT_ID=
 
 ENV VITE_API_URL=$VITE_API_URL
@@ -21,7 +21,10 @@ RUN npm --workspace frontend run build
 
 FROM nginx:1.27-alpine AS runner
 
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+ENV PORT=80
+ENV BACKEND_URL=http://backend:5000
+
+COPY frontend/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=builder /app/frontend/dist /usr/share/nginx/html
 
 EXPOSE 80

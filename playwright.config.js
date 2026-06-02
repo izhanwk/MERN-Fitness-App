@@ -36,7 +36,7 @@ export default defineConfig({
       reuseExistingServer: false,
       env: {
         ...process.env,
-        VITE_API_URL: `http://localhost:${backendPort}`,
+        VITE_API_URL: "/api",
       },
     },
   ],

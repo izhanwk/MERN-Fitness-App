@@ -21,6 +21,11 @@ const googleClient = process.env.GOOGLE_CLIENT_ID
   : null;
 const INVALID_CREDENTIALS_MESSAGE =
   "The information you entered is not correct";
+const API_BASE_PATH = "/api";
+
+function joinUrl(baseUrl, path) {
+  return `${baseUrl.replace(/\/+$/, "")}/${path.replace(/^\/+/, "")}`;
+}
 
 export const refreshToken = async (req, res) => {
   const { sessionId } = req.body;
@@ -249,7 +254,7 @@ export const register = async (req, res) => {
 
     const baseUrl =
       process.env.SERVER_BASE_URL || `${req.protocol}://${req.get("host")}`;
-    const url = `${baseUrl}/verify/${token}`;
+    const url = joinUrl(baseUrl, `${API_BASE_PATH}/verify/${token}`);
     const emailContent = buildVerificationEmail(url);
 
     await sendEmail({
